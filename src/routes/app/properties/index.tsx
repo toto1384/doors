@@ -1,11 +1,12 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, useRouter } from '@tanstack/react-router'
 import { useState, useEffect } from 'react'
 import { useTRPC } from '../../../../trpc/react'
-import { PropertyFilters } from 'utils/validation/propertyFilters'
+import { PropertyFilters } from 'utils/validation/types'
 import { LocationObject, PropertyObject } from 'utils/validation/types'
 import { LocationSelector } from '@/components/basics/locationSelector'
-import { createServerFn } from '@tanstack/react-start'
+import { Facilities, FacilitiesSet } from 'utils/validation/propertyFilters.ts'
 import { trpcRouter } from 'trpc/router'
+import { createServerFn } from '@tanstack/react-start'
 
 
 export const getInitialFilterData = createServerFn().handler(async () => {
@@ -19,7 +20,7 @@ export const getInitialFilterData = createServerFn().handler(async () => {
 
 
 export const Route = createFileRoute('/app/properties/')({
-    component: RouteComponent,
+    component: PropertiesRoute,
     loader: async () => {
         const data = await getInitialFilterData()
 
@@ -27,7 +28,9 @@ export const Route = createFileRoute('/app/properties/')({
     }
 })
 
-function RouteComponent() {
+
+function PropertiesRoute() {
+
     const propertiesRecieved = Route.useLoaderData()
     const trpc = useTRPC()
 
@@ -68,6 +71,8 @@ function RouteComponent() {
             ...newFilters
         }))
     }
+
+
 
     return (
         <div className="container mx-auto p-6">
@@ -148,7 +153,7 @@ function RouteComponent() {
                             className="bg-gray-800 text-white rounded px-3 py-2"
                             onChange={(e) => {
                                 const values = Array.from(e.target.selectedOptions, option => option.value)
-                                handleFilterChange({ facilities: values })
+                                handleFilterChange({ facilities: values as (typeof Facilities[number])[] })
                             }}
                         >
                             <option value="parking">Parking</option>
@@ -156,9 +161,10 @@ function RouteComponent() {
                             <option value="terrace">Terrace</option>
                             <option value="garden">Garden</option>
                             <option value="elevator">Elevator</option>
-                            <option value="air_conditioning">Air Conditioning</option>
-                            <option value="central_heating">Central Heating</option>
+                            <option value="air_conditioning">Air conditioning</option>
+                            <option value="central_heating">Central heating</option>
                             <option value="furnished">Furnished</option>
+                            <option value="internet">Internet</option>
                         </select>
                     </div>
                 </div>
@@ -181,7 +187,7 @@ function RouteComponent() {
             </div>
 
             {/* Properties Grid */}
-            {isLoading ? (
+            {/*isLoading ? (
                 <div>Loading properties...</div>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -210,7 +216,7 @@ function RouteComponent() {
                         </div>
                     ))}
                 </div>
-            )}
+            )*/}
 
             {properties && properties.length === 0 && (
                 <div className="text-center py-8">

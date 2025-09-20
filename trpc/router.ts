@@ -1,6 +1,6 @@
 import { TRPCError } from "@trpc/server";
 import type { TRPCRouterRecord } from "@trpc/server";
-import { z } from "zod";
+import { z } from "zod/v3";
 
 import { createTRPCRouter, publicProcedure } from "./init";
 import { propertyFiltersSchema } from "../utils/validation/propertyFilters";

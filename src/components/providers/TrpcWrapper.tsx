@@ -11,7 +11,7 @@ import { useState } from 'react';
 function getUrl() {
     const base = (() => {
         if (typeof window !== "undefined") return "";
-        return `http://localhost:${process.env.PORT ?? 3000}`;
+        return import.meta.env.VITE_BETTER_AUTH_URL
     })();
     return base + "/api/trpc";
 }
@@ -50,7 +50,7 @@ export function TRPCWrapper({ children }: { children: React.ReactNode }) {
         createTRPCClient<TRPCRouter>({
             links: [
                 httpBatchLink({
-                    url: 'http://localhost:3000/api/trpc', // Replace with your actual API URL
+                    url: `${getUrl()}/api/trpc`, // Replace with your actual API URL
                     transformer: superjson,
                 }),
             ],

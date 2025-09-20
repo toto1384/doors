@@ -52,7 +52,11 @@ import { nanoid } from 'zod';
 import { useClientToolChoice } from 'utils/hooks/aiChatbotButtonHook';
 import { searchLocationByString } from 'utils/googleMapsUtils';
 import { PropertyFilterContext } from '@/routes/__root';
+import { PropertyFilters } from 'utils/validation/types';
+import { useRouter, useRouterState } from '@tanstack/react-router';
 
+
+type Message = { source: 'user' | 'ai', message: string | ReactNode, id: string }
 
 function useChooseActions({ setMessages }: { setMessages: React.Dispatch<React.SetStateAction<Message[]>> }) {
 
@@ -71,11 +75,22 @@ function useChooseActions({ setMessages }: { setMessages: React.Dispatch<React.S
         }
     });
 
-    return { chooseHouseOrApartment, chooseBudget }
+    const { clientToolFunction: chooseFacilities } = useClientToolChoice({
+        choices: ['Parking', 'Balcony', 'Terrace', 'Garden', 'Elevator', 'Air Conditioning', 'Central Heating', 'Furnished'],
+        multiple: true,
+        onShowButtons: (buttonsNode) => {
+            setMessages(prev => [...prev, { message: buttonsNode, source: 'user', id: nanoid().toString() }]);
+        }
+    });
+
+    return { chooseHouseOrApartment, chooseBudget, chooseFacilities }
 }
 
 
 export const ElevenLabsChatBotDemo = ({ conversationToken }: { conversationToken: string }) => {
+
+    const router = useRouter();
+    const routerState = useRouterState();
 
     const [locale, setLocale] = useState(i18n.language as "ro" | "en");
 
@@ -96,7 +111,16 @@ export const ElevenLabsChatBotDemo = ({ conversationToken }: { conversationToken
         };
     }, [])
 
-    const { chooseBudget, chooseHouseOrApartment } = useChooseActions({ setMessages })
+    const { chooseBudget, chooseHouseOrApartment, chooseFacilities } = useChooseActions({ setMessages })
+
+
+    function applyFilters(filters: PropertyFilters) {
+        if (routerState.location.pathname === '/app/properties') {
+            router.navigate({ to: '/app/properties' })
+        }
+
+        setPropertyFilters(filters)
+    }
 
     useEffect(() => {
         console.log(propertyFilters)
@@ -104,7 +128,7 @@ export const ElevenLabsChatBotDemo = ({ conversationToken }: { conversationToken
 
     const conversation = useConversation({
         clientTools: {
-            chooseHouseOrApartment, chooseBudget,
+            chooseHouseOrApartment, chooseBudget, chooseFacilities,
             chooseAndSelectLocation: async ({ location }) => {
                 const locationResult = await searchLocationByString(location);
                 setPropertyFilters({ ...propertyFilters, location: locationResult ?? undefined });
@@ -171,7 +195,6 @@ export const ElevenLabsChatBotDemo = ({ conversationToken }: { conversationToken
     />
 }
 
-type Message = { source: 'user' | 'ai', message: string | ReactNode, id: string }
 
 const ChatBotDemo = ({ messages, sendMessage, sendUserActivity, status, startConversation, endConversation }: {
     messages: Message[],

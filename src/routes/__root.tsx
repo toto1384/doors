@@ -11,7 +11,7 @@ import { ThemeProvider, useTheme } from "@/components/providers/ThemeProvider";
 import AppRouteWrapper from '@/components/appWrapper';
 import { TRPCWrapper } from '@/components/providers/TrpcWrapper';
 import { AuthProvider } from '@/components/providers/BetterAuthProvider';
-import { PropertyFilters } from 'utils/validation/propertyFilters';
+import { PropertyFilters } from 'utils/validation/types';
 import { createContext, useContext, useState } from 'react';
 
 

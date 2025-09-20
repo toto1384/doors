@@ -3,6 +3,7 @@
 import { z } from 'zod/v3';
 import { LocationSchema } from './location';
 import { extendZod } from "@zodyac/zod-mongoose";
+import { zDate } from './zodUtils';
 
 extendZod(z as any);
 
@@ -16,7 +17,13 @@ export const UserSchema = z.object({
     _id: z.string(),
     preferences: z.object({
         budget: z.number(),
-    })
+    }),
+    name: z.string(),
+    email: z.string(),
+    emailVerified: z.boolean(),
+    image: z.string(),
+    createdAt: zDate,
+    updatedAt: zDate,
 })
 
 // Enum for common property features
