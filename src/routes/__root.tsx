@@ -79,8 +79,6 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 
     const routerState = useRouterState();
 
-    console.log('tf', import.meta.env.PROD, typeof import.meta.env.PROD)
-
     const appWrapper = routerState.location.pathname.includes('/app');
 
     return (
@@ -97,7 +95,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                     </TRPCWrapper>
                     {!import.meta.env.PROD && <TanstackDevtools
                         config={{
-                            position: 'bottom-left',
+                            position: 'bottom-right',
                         }}
                         plugins={[
                             {

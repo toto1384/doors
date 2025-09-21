@@ -150,7 +150,7 @@ export const ElevenLabsChatBotDemo = ({ conversationToken }: { conversationToken
         },
         overrides: {
             agent: {
-                language: locale ?? 'ro',
+                language: locale ? (locale.includes('-') ? locale.split('-')[0] : locale) as 'en' | 'ro' : 'ro',
             },
         },
     });
@@ -194,8 +194,6 @@ export const ElevenLabsChatBotDemo = ({ conversationToken }: { conversationToken
 
     const stopConversation = useCallback(async () => {
         await conversation.endSession();
-        // setLocale('' as any)
-        // setLocale(localeC)
     }, [conversation]);
 
 

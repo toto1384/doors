@@ -597,11 +597,12 @@ i18n
         fallbackLng: "en", // fallback language if translation missing
         supportedLngs: ['en', 'ro'],
         load: 'languageOnly',
+        convertDetectedLanguage: (lng: string) => lng.includes('-') ? lng.split('-')[0] : lng,
         detection: {
             order: ['localStorage', 'navigator', 'htmlTag'],
             lookupLocalStorage: 'i18nextLng',
             caches: ['localStorage']
         },
-    });
+    } as any);
 
 export default i18n;
