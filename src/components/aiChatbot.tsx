@@ -135,13 +135,16 @@ export const ElevenLabsChatBotDemo = ({ conversationToken }: { conversationToken
             }
         },
         dynamicVariables: {
-            'User_Name': "Alex"
+            'User_Name': "Alex",
+            "Send_To_Make": ""
         },
         volume: 0.5,
         onConnect: () => console.log('Connected'),
         onDisconnect: () => console.log('Disconnected'),
         onMessage: (message) => console.log('Message:', message),
         onError: (error) => console.error('Error:', error),
+        onDebug: (message) => console.log('Debug:', message),
+
         onStatusChange(prop) {
             console.log('Status changed:', prop)
         },
