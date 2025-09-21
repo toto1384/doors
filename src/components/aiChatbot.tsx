@@ -142,6 +142,9 @@ export const ElevenLabsChatBotDemo = ({ conversationToken }: { conversationToken
         onDisconnect: () => console.log('Disconnected'),
         onMessage: (message) => console.log('Message:', message),
         onError: (error) => console.error('Error:', error),
+        onStatusChange(prop) {
+            console.log('Status changed:', prop)
+        },
         overrides: {
             agent: {
                 language: locale ?? 'ro',
@@ -156,17 +159,25 @@ export const ElevenLabsChatBotDemo = ({ conversationToken }: { conversationToken
 
     const startConversation = useCallback(async () => {
 
+        console.log('start conversation', conversationToken)
         try {
             // Request microphone permission
             await navigator.mediaDevices.getUserMedia({ audio: true });
             // Start the conversation with your agent
             const str = await conversation.startSession({
                 onMessage: (message) => {
+                    console.log('message received', message)
                     setMessages((prev) => [...prev, { ...message, id: nanoid().toString() }])
                 },
                 // agentId: process.env.AGENT_ID!, // Replace with your agent I
                 conversationToken: conversationToken as string,
                 connectionType: 'webrtc', // either "webrtc" or "websocket"
+                onError(message, context) {
+                    console.log('Error:', message, context)
+                },
+                onConnect({ conversationId }) {
+                    console.log('Connected', conversationId)
+                },
 
                 // userId: 'YOUR_CUSTOMER_USER_ID' // Optional field for tracking your end user IDs
             });
