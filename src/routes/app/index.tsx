@@ -18,22 +18,6 @@ function Dashboard() {
     const [locationObject, setLocationObject] = useState<LocationObject | undefined>()
 
 
-    const { isLoaded, loadError } = useLoadScript({
-        googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY!,
-        libraries,
-    });
-
-    useEffect(() => {
-        async function f() {
-            if (isLoaded) {
-
-                const location = await searchLocationByString('constanta')
-                console.log(location)
-            }
-        }
-        f()
-    }, [isLoaded])
-
     return (
         <div className="flex flex-col items-center justify-center h-screen">
             <h1

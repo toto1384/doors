@@ -79,6 +79,8 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 
     const routerState = useRouterState();
 
+    console.log('tf', import.meta.env.PROD, typeof import.meta.env.PROD)
+
     const appWrapper = routerState.location.pathname.includes('/app');
 
     return (
@@ -93,7 +95,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                             {appWrapper ? <AppRouteWrapper token={token}>{children}</AppRouteWrapper> : children}
                         </AuthProvider>
                     </TRPCWrapper>
-                    <TanstackDevtools
+                    {!import.meta.env.PROD && <TanstackDevtools
                         config={{
                             position: 'bottom-left',
                         }}
@@ -103,7 +105,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                                 render: <TanStackRouterDevtoolsPanel />,
                             },
                         ]}
-                    />
+                    />}
                     <Scripts />
                 </PropertyFilterContext.Provider>
             </body>

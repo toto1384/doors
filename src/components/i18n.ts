@@ -595,6 +595,8 @@ i18n
     .init({
         resources,
         fallbackLng: "en", // fallback language if translation missing
+        supportedLngs: ['en', 'ro'],
+        load: 'languageOnly',
         detection: {
             order: ['localStorage', 'navigator', 'htmlTag'],
             lookupLocalStorage: 'i18nextLng',
