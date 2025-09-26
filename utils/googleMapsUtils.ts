@@ -51,7 +51,7 @@ export async function searchLocationByString(searchString: string): Promise<Loca
 /**
  * Formats a Google Places result into our LocationObject format
  */
-function formatPlaceToLocationObject(place: google.maps.places.PlaceResult): LocationObject {
+export function formatPlaceToLocationObject(place: google.maps.places.PlaceResult): LocationObject {
     const addressComponents = place.address_components;
 
     const componentMap = {
@@ -93,7 +93,7 @@ function formatPlaceToLocationObject(place: google.maps.places.PlaceResult): Loc
         countryShort: componentMap.countryShort,
         latitude: latitude ?? 0,
         longitude: longitude ?? 0,
-        fullLocationName: `${formattedAddress}, ${componentMap.administrative_area_level_1Short}, ${componentMap.administrative_area_level_2Short}, ${componentMap.countryShort}`,
+        fullLocationName: `${formattedAddress ? (formattedAddress + ', ') : ''}${componentMap.administrative_area_level_2Short ? (componentMap.administrative_area_level_2 + '') : ''}${componentMap.administrative_area_level_1Short ? (componentMap.administrative_area_level_1 + ', ') : ''}${componentMap.countryShort}`,
     };
 }
 

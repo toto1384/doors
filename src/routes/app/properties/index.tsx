@@ -1,228 +1,226 @@
-import { createFileRoute, useRouter } from '@tanstack/react-router'
-import { useState, useEffect } from 'react'
-import { useTRPC } from '../../../../trpc/react'
+import { createFileRoute, Link } from '@tanstack/react-router'
+import { useState, useEffect, useContext } from 'react'
+import { useTRPCClient } from '../../../../trpc/react'
 import { PropertyFilters } from 'utils/validation/types'
 import { LocationObject, PropertyObject } from 'utils/validation/types'
 import { LocationSelector } from '@/components/basics/locationSelector'
-import { Facilities, FacilitiesSet } from 'utils/validation/propertyFilters.ts'
+import { Facilities, propertyFiltersSchema } from 'utils/validation/propertyFilters.ts'
 import { trpcRouter } from 'trpc/router'
 import { createServerFn } from '@tanstack/react-start'
+import { PropertyType } from 'utils/validation/propertySchema'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { MultiSelect, MultiSelectContent, MultiSelectItem, MultiSelectSeparator, MultiSelectTrigger, MultiSelectValue } from '@/components/ui/multi-select'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { PropertyFilterContext, UpdatePropertyFiltersContext } from '@/routes/__root'
 
 
-export const getInitialFilterData = createServerFn().handler(async () => {
+export const getPropertiesWithFilters = createServerFn().validator((d) => propertyFiltersSchema.parse(d)).handler(async ({ data: filters, }) => {
     const caller = trpcRouter.createCaller({})
-
-    console.log('running')
-    const res = await caller.properties.list({})
-
+    const res = await caller.properties.list(filters)
     return res as PropertyObject[]
 })
-
 
 export const Route = createFileRoute('/app/properties/')({
     component: PropertiesRoute,
     loader: async () => {
-        const data = await getInitialFilterData()
-
+        // Load initial properties without filters
+        const data = await getPropertiesWithFilters({ data: {} })
+        console.log('getPropertiesWithFilters', data.length)
         return data
     }
 })
 
 
 function PropertiesRoute() {
+    const propertiesReceived = Route.useLoaderData()
+    const trpcClient = useTRPCClient()
 
-    const propertiesRecieved = Route.useLoaderData()
-    const trpc = useTRPC()
+    const { propertyFilters, setPropertyFilters } = useContext(PropertyFilterContext)
 
-    const [properties, setProperties] = useState<PropertyObject[]>(propertiesRecieved)
+    const [location, setLocation] = useState<LocationObject | undefined>(propertyFilters?.location)
 
     useEffect(() => {
-        setProperties(propertiesRecieved)
+        setPropertyFilters({ ...propertyFilters, location })
+    }, [location,])
 
-        // const { data: properties, isLoading, error } = trpc.properties.list.useQuery(filters)
-    }, [propertiesRecieved])
-
-
-    const [filters, setFilters] = useState<PropertyFilters>({})
-    const [location, setLocation] = useState<LocationObject | undefined>()
-
-
-
-    // Update filters when location changes
     useEffect(() => {
-        if (location) {
-            setFilters(prev => ({
-                ...prev,
-                location: {
-                    city: location.city,
-                    state: location.state,
-                    latitude: location.latitude,
-                    longitude: location.longitude,
-                    radius: 10 // Default 10km radius
-                }
-            }))
-        }
-    }, [location])
+        setLocation(propertyFilters?.location)
+    }, [propertyFilters?.location])
+
+    const { updatePropertyFilters, setUpdatePropertyFilters } = useContext(UpdatePropertyFiltersContext)
+
+    const [properties, setProperties] = useState<PropertyObject[]>(propertiesReceived)
 
 
-    const handleFilterChange = (newFilters: Partial<PropertyFilters>) => {
-        setFilters(prev => ({
-            ...prev,
-            ...newFilters
-        }))
+    // Set up the updatePropertyFilters function to work with context instead of URL
+    useEffect(() => {
+        setUpdatePropertyFilters(() => async (filters: PropertyFilters) => {
+            console.log('setUpdatePropertyFilters', { ...propertyFilters, location, ...filters })
+
+            // Update context instead of URL
+            setPropertyFilters({ ...propertyFilters, location, ...filters })
+
+            const newProps = await trpcClient.properties.list.query({ ...propertyFilters, location, ...filters })
+            setProperties(newProps)
+
+            return JSON.stringify(newProps)
+        })
+    }, [setUpdatePropertyFilters, setPropertyFilters, trpcClient])
+
+    const handleFilterChange = async (newFilters: Partial<PropertyFilters>) => {
+        await updatePropertyFilters(newFilters)
     }
 
 
 
+
     return (
-        <div className="container mx-auto p-6">
-            <h1 className="text-3xl font-bold mb-6">Cele mai potrivite proprietăți pentru tine</h1>
+        <div className="container mx-auto h-full">
+            <div className='flex flex-col gap-2 w-full border-b dark:border-[#404040] dark:bg-[#262626] pt-4 pb-5 px-6'>
+                <h1 className="text-2xl font-light">Cele mai potrivite proprietăți pentru tine</h1>
+
+                <p className={`max-w-2xl before:content-['•'] before:dark:text-[#737373] before:text-3xl/1 pl-4 before:absolute before:mt-1 before:left-0 relative  before:text-gray-500 text-xs dark:text-[#a3a3a3]`}>Am filtrat proprietățile în funcție de preferințele tale. Poți vedea aici cele care se potrivesc cel mai bine criteriilor setate.</p>
+            </div>
+
 
             {/* Filters Section */}
-            <div className="bg-gray-900 rounded-lg p-6 mb-8">
-                <div className="flex flex-wrap gap-4 mb-4">
-                    {/* Property Type Filter */}
-                    <div>
-                        <label className="block text-sm font-medium mb-2">Property Type</label>
-                        <select
-                            multiple
-                            className="bg-gray-800 text-white rounded px-3 py-2"
-                            onChange={(e) => {
-                                const values = Array.from(e.target.selectedOptions, option => option.value) as ('apartment' | 'house' | 'hotel' | 'office')[]
-                                handleFilterChange({ propertyType: values })
-                            }}
-                        >
-                            <option value="apartment">Apartment</option>
-                            <option value="house">House</option>
-                            <option value="hotel">Hotel</option>
-                            <option value="office">Office</option>
-                        </select>
-                    </div>
+            <div className="px-4 pt-4">
+                <div className='flex flex-row items-center gap-3'>
 
-                    {/* Budget Filter */}
-                    <div>
-                        <label className="block text-sm font-medium mb-2">Budget Range</label>
-                        <div className="flex gap-2">
-                            <input
-                                type="number"
-                                placeholder="Min"
-                                className="bg-gray-800 text-white rounded px-3 py-2 w-24"
-                                onChange={(e) => {
-                                    const min = e.target.value ? parseInt(e.target.value) : undefined
-                                    handleFilterChange({
-                                        budget: { ...filters.budget, min }
-                                    })
-                                }}
-                            />
-                            <input
-                                type="number"
-                                placeholder="Max"
-                                className="bg-gray-800 text-white rounded px-3 py-2 w-24"
-                                onChange={(e) => {
-                                    const max = e.target.value ? parseInt(e.target.value) : undefined
-                                    handleFilterChange({
-                                        budget: { ...filters.budget, max }
-                                    })
-                                }}
-                            />
-                        </div>
-                    </div>
+                    <MultiSelect values={propertyFilters?.propertyType} onValuesChange={value => handleFilterChange({ propertyType: value as any })}>
+                        <MultiSelectTrigger className=" w-[150px] custor-pointer" >
+                            <MultiSelectValue className='cursor-pointer' placeholder="Property Type" />
+                        </MultiSelectTrigger>
+                        <MultiSelectContent>
+                            <MultiSelectItem value="apartment">Apartment</MultiSelectItem>
+                            <MultiSelectItem value="house">House</MultiSelectItem>
+                            <MultiSelectItem value="hotel">Hotel</MultiSelectItem>
+                            <MultiSelectItem value="office">Office</MultiSelectItem>
+                        </MultiSelectContent>
+                    </MultiSelect>
+                    <Popover>
+                        <PopoverTrigger className='px-3 py-1.5 dark:bg-[#404040] rounded'>Budget</PopoverTrigger>
+                        <PopoverContent>
+                            <label className="block text-sm font-medium mb-2">Budget Range</label>
+                            <div className="flex gap-2">
+                                <input
+                                    type="number"
+                                    placeholder="Min"
+                                    value={propertyFilters?.budget?.min || ''}
+                                    className="bg-gray-800 text-white rounded px-3 py-2 w-24"
+                                    onChange={(e) => {
+                                        const min = e.target.value ? parseInt(e.target.value) : undefined
+                                        handleFilterChange({
+                                            budget: { ...propertyFilters?.budget, min }
+                                        })
+                                    }}
+                                />
+                                <input
+                                    type="number"
+                                    placeholder="Max"
+                                    value={propertyFilters?.budget?.max || ''}
+                                    className="bg-gray-800 text-white rounded px-3 py-2 w-24"
+                                    onChange={(e) => {
+                                        const max = e.target.value ? parseInt(e.target.value) : undefined
+                                        handleFilterChange({
+                                            budget: { ...propertyFilters?.budget, max }
+                                        })
+                                    }}
+                                />
+                            </div>
 
-                    {/* Number of Rooms Filter */}
-                    <div>
-                        <label className="block text-sm font-medium mb-2">Number of Rooms</label>
-                        <select
-                            multiple
-                            className="bg-gray-800 text-white rounded px-3 py-2"
-                            onChange={(e) => {
-                                const values = Array.from(e.target.selectedOptions, option => parseInt(option.value))
-                                handleFilterChange({ numberOfRooms: values })
-                            }}
-                        >
-                            {[1, 2, 3, 4, 5, 6, 7, 8].map(num => (
-                                <option key={num} value={num}>{num} rooms</option>
-                            ))}
-                        </select>
-                    </div>
+                        </PopoverContent>
+                    </Popover>
 
-                    {/* Facilities Filter */}
-                    <div>
-                        <label className="block text-sm font-medium mb-2">Facilities</label>
-                        <select
-                            multiple
-                            className="bg-gray-800 text-white rounded px-3 py-2"
-                            onChange={(e) => {
-                                const values = Array.from(e.target.selectedOptions, option => option.value)
-                                handleFilterChange({ facilities: values as (typeof Facilities[number])[] })
-                            }}
-                        >
-                            <option value="parking">Parking</option>
-                            <option value="balcony">Balcony</option>
-                            <option value="terrace">Terrace</option>
-                            <option value="garden">Garden</option>
-                            <option value="elevator">Elevator</option>
-                            <option value="air_conditioning">Air conditioning</option>
-                            <option value="central_heating">Central heating</option>
-                            <option value="furnished">Furnished</option>
-                            <option value="internet">Internet</option>
-                        </select>
-                    </div>
-                </div>
-
-                {/* Location Selector */}
-                <div>
-                    <label className="block text-sm font-medium mb-2">Location</label>
                     <LocationSelector
-                        locationObject={location}
-                        setLocationObject={setLocation}
+                        width={150}
+                        locationObject={propertyFilters?.location}
+                        setLocationObject={(l) => {
+                            console.log('in loc', propertyFilters)
+                            // handleFilterChange({ location: l })
+                            setLocation(l)
+                        }}
                     />
+
+                    <MultiSelect
+                        values={propertyFilters?.numberOfRooms?.map(i => i.toString())}
+                        onValuesChange={value => handleFilterChange({ numberOfRooms: value.map(i => Number(i)) as any })}
+                    >
+                        <MultiSelectTrigger className=" w-[150px] custor-pointer" >
+                            <MultiSelectValue className='cursor-pointer' placeholder="Number of Rooms" />
+                        </MultiSelectTrigger>
+                        <MultiSelectContent>
+                            {[1, 2, 3, 4, 5, 6, 7, 8].map(num => (
+                                <MultiSelectItem key={num} value={`${num}`}>{num} rooms</MultiSelectItem>
+                            ))}
+                        </MultiSelectContent>
+                    </MultiSelect>
+
+                    <MultiSelect values={propertyFilters?.facilities} onValuesChange={value => handleFilterChange({ facilities: value as (typeof Facilities[number])[] })}>
+                        <MultiSelectTrigger className=" w-[150px] custor-pointer" >
+                            <MultiSelectValue className='cursor-pointer' placeholder="Facilities" />
+                        </MultiSelectTrigger>
+                        <MultiSelectContent>
+                            <MultiSelectItem value="parking">Parking</MultiSelectItem>
+                            <MultiSelectItem value="balcony">Balcony</MultiSelectItem>
+                            <MultiSelectItem value="terrace">Terrace</MultiSelectItem>
+                            <MultiSelectItem value="garden">Garden</MultiSelectItem>
+                            <MultiSelectItem value="elevator">Elevator</MultiSelectItem>
+                            <MultiSelectItem value="air_conditioning">Air conditioning</MultiSelectItem>
+                            <MultiSelectItem value="central_heating">Central heating</MultiSelectItem>
+                            <MultiSelectItem value="furnished">Furnished</MultiSelectItem>
+                            <MultiSelectItem value="internet">Internet</MultiSelectItem>
+                        </MultiSelectContent>
+                    </MultiSelect>
+                    {/* <button */}
+                    {/*     className="bg-blue-600 text-white px-6 py-2 rounded mt-4 bg-gradient-to-br from-[#4C7CED] to-[#7B31DC]" */}
+                    {/*     onClick={() => setPropertyFilters({})} */}
+                    {/* > */}
+                    {/*     Save Changes */}
+                    {/* </button> */}
                 </div>
 
-                <button
-                    className="bg-blue-600 text-white px-6 py-2 rounded mt-4"
-                    onClick={() => setFilters({})}
-                >
-                    Clear Filters
-                </button>
             </div>
 
             {/* Properties Grid */}
-            {/*isLoading ? (
-                <div>Loading properties...</div>
-            ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {properties?.map((property) => (
-                        <div key={property._id} className="bg-gray-800 rounded-lg overflow-hidden">
-                            <div className="bg-gray-600 h-48 flex items-center justify-center">
-                                <span className="text-gray-400">Property Photo</span>
-                            </div>
+            {<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 p-4">
+                {properties?.map((property) => (<PropertyCard key={property._id} property={property} />))}
+            </div>}
 
-                            <div className="p-4">
-                                <div className="flex items-center justify-between mb-2">
-                                    <span className="bg-green-600 text-white text-xs px-2 py-1 rounded">
-                                        100% Match
-                                    </span>
-                                </div>
-
-                                <h3 className="text-lg font-semibold mb-2">{property.title}</h3>
-                                <p className="text-2xl font-bold mb-2">€{property.price.value.toLocaleString()}</p>
-
-                                <div className="flex items-center gap-4 text-sm text-gray-400">
-                                    <span>📏 {property.surfaceArea}m²</span>
-                                    <span>🛏️ {property.numberOfRooms} rooms</span>
-                                    <span>📍 {property.location.city}</span>
-                                </div>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            )*/}
-
-            {properties && properties.length === 0 && (
-                <div className="text-center py-8">
-                    <p className="text-gray-400">No properties found matching your criteria.</p>
-                </div>
-            )}
-        </div>
+            {
+                properties && properties.length === 0 && (
+                    <div className="text-center h-full py-8">
+                        <p className="text-gray-400">No properties found matching your criteria.</p>
+                    </div>
+                )
+            }
+        </div >
     )
+}
+
+
+export const PropertyCard = ({ property }: { property: PropertyObject }) => {
+    return <Link to='/app/properties/$id' params={{ id: property._id }} key={property._id} className="relative bg-[#262626] rounded-[6px] overflow-hidden">
+        <div className="bg-gray-600 h-48 flex items-center justify-center">
+            <img src={property.imageUrls[0]} className="w-full h-full object-cover" />
+        </div>
+
+        <div className="p-4">
+            <div className="flex items-center absolute top-2 left-2 justify-between mb-2">
+                <span className="bg-[#737373] text-white flex flex-row font-light items-center text-xs px-2 py-1 rounded">
+                    <img src="/icons/checkIcon.svg" className="w-3 h-3 mr-1" />
+                    100% Match
+                </span>
+            </div>
+
+            <h3 className="text-lg font-normal mb-2">{property.title}</h3>
+            <p className="text-[22px] font-light mb-2 text-[#a3a3a3]">€{property.price.value.toLocaleString()}</p>
+
+            <div className="flex items-center gap-4 text-sm text-[#a3a3a3]">
+                <span className='flex flex-row items-center gap-1'><img src="/icons/surfaceArea.svg" className="w-4 h-4" /> {property.surfaceArea}m²</span>
+                <span className='flex flex-row items-center gap-1'><img src="/icons/bedIcon.svg" className="w-4 h-4" /> {property.numberOfRooms} rooms</span>
+                <span className='flex flex-row items-center gap-1'><img src="/icons/locationIcon.svg" className="w-4 h-4" /> {property.location.city}</span>
+            </div>
+        </div>
+    </Link>
 }

@@ -13,7 +13,7 @@ function getUrl() {
         if (typeof window !== "undefined") return "";
         return import.meta.env.VITE_BETTER_AUTH_URL
     })();
-    return base + "/api/trpc";
+    return base;
 }
 
 

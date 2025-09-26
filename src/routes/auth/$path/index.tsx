@@ -14,7 +14,7 @@ function AuthPage() {
     const router = useRouterState()
 
     return (
-        <main className="container flex grow flex-col items-center justify-center self-center p-4 md:p-6">
+        <main className="container flex grow flex-col items-center justify-center mx-auto h-dvh p-4 md:p-6 w-dvh">
             <AuthView path={router.location.pathname} redirectTo="/app" />
         </main>
     )

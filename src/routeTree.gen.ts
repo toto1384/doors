@@ -20,6 +20,7 @@ import { Route as AppPropertiesIndexRouteImport } from './routes/app/properties/
 import { Route as AppProfileIndexRouteImport } from './routes/app/profile/index'
 import { Route as DemoStartServerFuncsRouteImport } from './routes/demo.start.server-funcs'
 import { Route as DemoStartApiRequestRouteImport } from './routes/demo.start.api-request'
+import { Route as AppPropertiesIdRouteImport } from './routes/app/properties/$id'
 import { ServerRoute as ApiTrpcSplatServerRouteImport } from './routes/api/trpc/$'
 import { ServerRoute as ApiAuthSplatServerRouteImport } from './routes/api/auth/$'
 
@@ -70,6 +71,11 @@ const DemoStartApiRequestRoute = DemoStartApiRequestRouteImport.update({
   path: '/demo/start/api-request',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppPropertiesIdRoute = AppPropertiesIdRouteImport.update({
+  id: '/app/properties/$id',
+  path: '/app/properties/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiTrpcSplatServerRoute = ApiTrpcSplatServerRouteImport.update({
   id: '/api/trpc/$',
   path: '/api/trpc/$',
@@ -86,6 +92,7 @@ export interface FileRoutesByFullPath {
   '/app': typeof AppIndexRoute
   '/privacy-policy': typeof PrivacyPolicyIndexRoute
   '/terms-of-service': typeof TermsOfServiceIndexRoute
+  '/app/properties/$id': typeof AppPropertiesIdRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
   '/app/profile': typeof AppProfileIndexRoute
@@ -97,6 +104,7 @@ export interface FileRoutesByTo {
   '/app': typeof AppIndexRoute
   '/privacy-policy': typeof PrivacyPolicyIndexRoute
   '/terms-of-service': typeof TermsOfServiceIndexRoute
+  '/app/properties/$id': typeof AppPropertiesIdRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
   '/app/profile': typeof AppProfileIndexRoute
@@ -109,6 +117,7 @@ export interface FileRoutesById {
   '/app/': typeof AppIndexRoute
   '/privacy-policy/': typeof PrivacyPolicyIndexRoute
   '/terms-of-service/': typeof TermsOfServiceIndexRoute
+  '/app/properties/$id': typeof AppPropertiesIdRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
   '/app/profile/': typeof AppProfileIndexRoute
@@ -122,6 +131,7 @@ export interface FileRouteTypes {
     | '/app'
     | '/privacy-policy'
     | '/terms-of-service'
+    | '/app/properties/$id'
     | '/demo/start/api-request'
     | '/demo/start/server-funcs'
     | '/app/profile'
@@ -133,6 +143,7 @@ export interface FileRouteTypes {
     | '/app'
     | '/privacy-policy'
     | '/terms-of-service'
+    | '/app/properties/$id'
     | '/demo/start/api-request'
     | '/demo/start/server-funcs'
     | '/app/profile'
@@ -144,6 +155,7 @@ export interface FileRouteTypes {
     | '/app/'
     | '/privacy-policy/'
     | '/terms-of-service/'
+    | '/app/properties/$id'
     | '/demo/start/api-request'
     | '/demo/start/server-funcs'
     | '/app/profile/'
@@ -156,6 +168,7 @@ export interface RootRouteChildren {
   AppIndexRoute: typeof AppIndexRoute
   PrivacyPolicyIndexRoute: typeof PrivacyPolicyIndexRoute
   TermsOfServiceIndexRoute: typeof TermsOfServiceIndexRoute
+  AppPropertiesIdRoute: typeof AppPropertiesIdRoute
   DemoStartApiRequestRoute: typeof DemoStartApiRequestRoute
   DemoStartServerFuncsRoute: typeof DemoStartServerFuncsRoute
   AppProfileIndexRoute: typeof AppProfileIndexRoute
@@ -253,6 +266,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DemoStartApiRequestRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/app/properties/$id': {
+      id: '/app/properties/$id'
+      path: '/app/properties/$id'
+      fullPath: '/app/properties/$id'
+      preLoaderRoute: typeof AppPropertiesIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 declare module '@tanstack/react-start/server' {
@@ -279,6 +299,7 @@ const rootRouteChildren: RootRouteChildren = {
   AppIndexRoute: AppIndexRoute,
   PrivacyPolicyIndexRoute: PrivacyPolicyIndexRoute,
   TermsOfServiceIndexRoute: TermsOfServiceIndexRoute,
+  AppPropertiesIdRoute: AppPropertiesIdRoute,
   DemoStartApiRequestRoute: DemoStartApiRequestRoute,
   DemoStartServerFuncsRoute: DemoStartServerFuncsRoute,
   AppProfileIndexRoute: AppProfileIndexRoute,

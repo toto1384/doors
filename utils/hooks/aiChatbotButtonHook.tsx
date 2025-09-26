@@ -1,13 +1,13 @@
-import { useState, useCallback, useEffect } from 'react';
+import { IsConnectedContext } from '@/components/aiChatbot';
+import { useState, useCallback, useEffect, useContext } from 'react';
 
-interface UseClientToolChoiceOptions<T extends boolean> {
+
+export function useClientToolChoice<T extends boolean>({ choices, onShowButtons, fullWidth, multiple, }: {
     choices: string[];
     onShowButtons: (buttonsNode: React.ReactNode) => void;
     fullWidth?: boolean;
     multiple?: T;
-}
-
-export function useClientToolChoice<T extends boolean>({ choices, onShowButtons, fullWidth, multiple }: UseClientToolChoiceOptions<T>) {
+}) {
 
 
     const clientToolFunction = useCallback(async ({ message }: { message: string }) => {
@@ -32,11 +32,11 @@ export function useClientToolChoice<T extends boolean>({ choices, onShowButtons,
 }
 
 
-const Buttons = <T extends boolean>({ choices, resolve, fullWidth, multiple }: {
+const Buttons = <T extends boolean>({ choices, resolve, fullWidth, multiple, }: {
     choices: string[];
     resolve: (choice: (T extends true ? string[] : string)) => void;
     fullWidth?: boolean
-    multiple?: T
+    multiple?: T;
 }) => {
 
     const [selectedChoice, setSelectedChoice] = useState<string | undefined>();
@@ -44,33 +44,43 @@ const Buttons = <T extends boolean>({ choices, resolve, fullWidth, multiple }: {
     const [selectedChoices, setSelectedChoices] = useState<string[]>([]);
     const [done, setDone] = useState(false);
 
-    return <div className={`flex gap-2 px-3 mt-3 ${fullWidth && 'flex-wrap'}`}>
+    const isConnected = useContext(IsConnectedContext);
+
+    return <div className={`flex gap-2 px-3 mt-3 flex-wrap`}>
         {choices.map((choice) => (
             <button
                 key={choice}
+                disabled={!isConnected}
                 onClick={() => {
-                    console.log('clicked', choice, selectedChoice);
-                    if (multiple === true) {
-                        if (!done) setSelectedChoices(prev => [...prev, choice]);
-                    } else {
-                        if (resolve && !selectedChoice) {
-                            setSelectedChoice(choice);
-                            resolve(choice as T extends true ? string[] : string);
+                    if (isConnected) {
+                        console.log('clicked', choice, selectedChoice);
+                        if (multiple === true) {
+                            if (!done) setSelectedChoices(prev => [...prev, choice]);
+                        } else {
+                            if (resolve && !selectedChoice) {
+                                setSelectedChoice(choice);
+                                resolve(choice as T extends true ? string[] : string);
+                            }
                         }
+
                     }
                 }}
-                className={`px-4 py-2 text-white rounded hover:opacity-90 bg-gradient-to-br ${fullWidth && 'w-full'}  ${choice !== selectedChoice ? 'bg-[#404040]' : 'from-[#4C7CED] to-[#7B31DC]'}`}
+                className={`px-4 py-2 text-white rounded hover:opacity-90 bg-gradient-to-br ${fullWidth && 'w-full'}  ${(choice === selectedChoice || selectedChoices?.includes(choice)) ? 'from-[#4C7CED] to-[#7B31DC]' : 'bg-[#404040]'}`}
             >
                 {choice}
             </button>
         ))}
         {multiple && <button
             key={'done'}
+            disabled={done || !isConnected}
             onClick={() => {
-                setDone(true);
-                resolve(selectedChoices as T extends true ? string[] : string);
+                if (isConnected) {
+                    setDone(true);
+                    resolve(selectedChoices as T extends true ? string[] : string);
+
+                }
             }}
-            className={`px-4 py-2 text-white rounded hover:opacity-90 bg-gradient-to-br w-full from-[#4C7CED] to-[#7B31DC]`}
+            className={`px-4 py-2 text-white rounded hover:opacity-90 bg-gradient-to-br w-full from-[#4C7CED] to-[#7B31DC] disabled:from-[#79a0fc] disabled:to-[#a561ff]`}
         >Done</button>}
     </div>
 } 

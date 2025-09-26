@@ -6,6 +6,7 @@ import { Link } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { useTRPC } from 'trpc/react';
 import { SignedIn, SignedOut } from '@daveyplate/better-auth-ui';
+import { authClient } from 'utils/auth-client';
 
 // Header Component
 export const Header: React.FC = () => {
@@ -14,6 +15,9 @@ export const Header: React.FC = () => {
     const trpc = useTRPC()
 
     const { t } = useTranslation('translation', { keyPrefix: 'landing-page' });
+
+
+    const { data } = authClient.useSession()
 
     return (
         <header className="fixed top-0 w-full bg-slate-900/95 backdrop-blur-md border-b border-slate-700/50 z-50">
@@ -30,22 +34,17 @@ export const Header: React.FC = () => {
                         <Link to={"#features" as any} className="text-slate-300 hover:text-white transition-colors">{t('navigation.features')}</Link>
                         <Link to={"#demo" as any} className="text-slate-300 hover:text-white transition-colors">{t('navigation.demo')}</Link>
                         <Link to={"#pricing" as any} className="text-slate-300 hover:text-white transition-colors">{t('navigation.pricing')}</Link>
-                        <SignedOut>
-                            <Link
-                                className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-2 rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all transform hover:scale-105"
-                                to={"/auth/sign-in" as any}
-                            >
-                                {t('hero.buttons.getStarted')}
-                            </Link>
-                        </SignedOut>
-                        <SignedIn>
-                            <Link
-                                className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-2 rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all transform hover:scale-105"
-                                to={"/app" as any}
-                            >
-                                Go to App
-                            </Link>
-                        </SignedIn>
+                        {data ? <Link
+                            className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-2 rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all transform hover:scale-105"
+                            to={"/app" as any}
+                        >
+                            Go to App
+                        </Link> : <Link
+                            className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-2 rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all transform hover:scale-105"
+                            to={"/auth/sign-in" as any}
+                        >
+                            {t('hero.buttons.getStarted')}
+                        </Link>}
                     </nav>
 
                     <button

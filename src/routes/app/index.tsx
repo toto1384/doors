@@ -23,7 +23,7 @@ function Dashboard() {
             <h1
                 className="text-4xl font-bold"
             >Dashboard</h1>
-            <LocationSelector locationObject={locationObject as any} setLocationObject={setLocationObject} />
+            {/* <LocationSelector locationObject={locationObject as any} setLocationObject={setLocationObject} /> */}
 
         </div>
     );

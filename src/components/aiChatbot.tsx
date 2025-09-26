@@ -7,20 +7,11 @@ import {
 import { Message, MessageContent } from 'components/ai-elements/message';
 import {
     PromptInput,
-    PromptInputActionAddAttachments,
-    PromptInputActionMenu,
-    PromptInputActionMenuContent,
-    PromptInputActionMenuTrigger,
     PromptInputAttachment,
     PromptInputAttachments,
     PromptInputBody,
     PromptInputButton,
     type PromptInputMessage,
-    PromptInputModelSelect,
-    PromptInputModelSelectContent,
-    PromptInputModelSelectItem,
-    PromptInputModelSelectTrigger,
-    PromptInputModelSelectValue,
     PromptInputSubmit,
     PromptInputTextarea,
     PromptInputToolbar,
@@ -29,80 +20,83 @@ import {
 import {
     Actions
 } from 'components/ai-elements/actions';
-import { ReactNode, useCallback, useContext, useEffect, useState } from 'react';
-import { useChat } from '@ai-sdk/react';
+import { createContext, ReactNode, useCallback, useContext, useEffect, useState } from 'react';
 import { Response } from 'components/ai-elements/response';
-import { CopyIcon, GlobeIcon, Play, RefreshCcwIcon, StopCircleIcon } from 'lucide-react';
-import {
-    Source,
-    Sources,
-    SourcesContent,
-    SourcesTrigger,
-} from 'components/ai-elements/sources';
-import {
-    Reasoning,
-    ReasoningContent,
-    ReasoningTrigger,
-} from 'components/ai-elements/reasoning';
+import { CopyIcon, Play, RefreshCcwIcon, StopCircleIcon } from 'lucide-react';
 import { Loader } from 'components/ai-elements/loader';
 import { Status, useConversation } from '@elevenlabs/react';
 import { FileUIPart } from 'ai';
 import i18n from './i18n';
-import { nanoid } from 'zod';
+import { nanoid } from 'nanoid';
 import { useClientToolChoice } from 'utils/hooks/aiChatbotButtonHook';
 import { searchLocationByString } from 'utils/googleMapsUtils';
-import { PropertyFilterContext } from '@/routes/__root';
+import { PropertyFilterContext, UpdatePropertyFiltersContext } from '@/routes/__root';
 import { PropertyFilters } from 'utils/validation/types';
 import { useRouter, useRouterState } from '@tanstack/react-router';
+import { useTRPC, useTRPCClient } from 'trpc/react';
+import { useQuery } from '@tanstack/react-query';
 
 
 type Message = { source: 'user' | 'ai', message: string | ReactNode, id: string }
 
-function useChooseActions({ setMessages }: { setMessages: React.Dispatch<React.SetStateAction<Message[]>> }) {
+function useChooseActions({ setMessages, }: { setMessages: React.Dispatch<React.SetStateAction<Message[]>>, }) {
 
     const { clientToolFunction: chooseHouseOrApartment } = useClientToolChoice({
         choices: ['Casa', 'Apartament'],
         onShowButtons: (buttonsNode) => {
-            setMessages(prev => [...prev, { message: buttonsNode, source: 'user', id: nanoid().toString() }]);
-        }
+            setMessages(prev => [...prev, { message: buttonsNode, source: 'user', id: nanoid() }]);
+        },
     });
 
     const { clientToolFunction: chooseBudget } = useClientToolChoice({
         choices: ['Sub 100.000 €', 'Intre 100.000 € și 200.000 €', 'Peste 200.000 €'],
         fullWidth: true,
         onShowButtons: (buttonsNode) => {
-            setMessages(prev => [...prev, { message: buttonsNode, source: 'user', id: nanoid().toString() }]);
-        }
+            setMessages(prev => [...prev, { message: buttonsNode, source: 'user', id: nanoid() }]);
+        },
     });
 
     const { clientToolFunction: chooseFacilities } = useClientToolChoice({
         choices: ['Parking', 'Balcony', 'Terrace', 'Garden', 'Elevator', 'Air Conditioning', 'Central Heating', 'Furnished'],
         multiple: true,
+
         onShowButtons: (buttonsNode) => {
-            setMessages(prev => [...prev, { message: buttonsNode, source: 'user', id: nanoid().toString() }]);
-        }
+            setMessages(prev => [...prev, { message: buttonsNode, source: 'user', id: nanoid() }]);
+        },
     });
 
     return { chooseHouseOrApartment, chooseBudget, chooseFacilities }
 }
+
+export const IsConnectedContext = createContext<boolean>(false);
 
 
 export const ElevenLabsChatBotDemo = ({ conversationToken }: { conversationToken: string }) => {
 
     const router = useRouter();
     const routerState = useRouterState();
+    const trpc = useTRPC();
+
+    const tokenQuery = useQuery({ ...trpc.auth.getToken.queryOptions(), initialData: { token: conversationToken } });
 
     const [locale, setLocale] = useState(i18n.language as "ro" | "en");
 
-    const { propertyFilters, setPropertyFilters } = useContext(PropertyFilterContext);
+    const { propertyFilters, } = useContext(PropertyFilterContext);
 
     const [messages, setMessages] = useState<Message[]>([]);
+
+    const { updatePropertyFilters, sendUpdate, setSendUpdate } = useContext(UpdatePropertyFiltersContext);
+
 
 
     useEffect(() => {
         const handleLanguageChange = (lng: string) => {
             setLocale(lng as "ro" | "en");
         };
+
+        setSendUpdate(str => {
+            conversation.sendContextualUpdate(str)
+        })
 
         i18n.on('languageChanged', handleLanguageChange);
 
@@ -111,28 +105,31 @@ export const ElevenLabsChatBotDemo = ({ conversationToken }: { conversationToken
         };
     }, [])
 
-    const { chooseBudget, chooseHouseOrApartment, chooseFacilities } = useChooseActions({ setMessages })
+    const { chooseBudget, chooseHouseOrApartment, chooseFacilities } = useChooseActions({ setMessages, })
 
-
-    function applyFilters(filters: PropertyFilters) {
-        if (routerState.location.pathname === '/app/properties') {
-            router.navigate({ to: '/app/properties' })
-        }
-
-        setPropertyFilters(filters)
-    }
 
     useEffect(() => {
         console.log(propertyFilters)
     }, [propertyFilters])
 
     const conversation = useConversation({
+
         clientTools: {
             chooseHouseOrApartment, chooseBudget, chooseFacilities,
             chooseAndSelectLocation: async ({ location }) => {
                 const locationResult = await searchLocationByString(location);
-                setPropertyFilters({ ...propertyFilters, location: locationResult ?? undefined });
-            }
+                updatePropertyFilters({ ...propertyFilters, location: locationResult ?? undefined });
+                // setPropertyFilters({ ...propertyFilters, location: locationResult ?? undefined });
+            },
+            applyFiltersWithoutLocation: async (propertyFilters: { filterObject: PropertyFilters }) => {
+                console.log('setPropertyFilters', routerState.location.pathname, propertyFilters.filterObject)
+                if (routerState.location.pathname !== '/app/properties') {
+                    router.navigate({ to: '/app/properties' })
+                }
+
+                // setPropertyFilters(propertyFilters.filterObject)
+                return await updatePropertyFilters(propertyFilters.filterObject)
+            },
         },
         dynamicVariables: {
             'User_Name': "Alex",
@@ -141,8 +138,6 @@ export const ElevenLabsChatBotDemo = ({ conversationToken }: { conversationToken
         volume: 0.5,
         onConnect: () => console.log('Connected'),
         onDisconnect: () => console.log('Disconnected'),
-        onMessage: (message) => console.log('Message:', message),
-        onError: (error) => console.error('Error:', error),
         onDebug: (message) => console.log('Debug:', message),
 
         onStatusChange(prop) {
@@ -155,25 +150,17 @@ export const ElevenLabsChatBotDemo = ({ conversationToken }: { conversationToken
         },
     });
 
-
-
-
     const { isSpeaking, status, } = conversation
 
     const startConversation = useCallback(async () => {
 
-        console.log('start conversation', conversationToken)
-        try {
-            // Request microphone permission
-            await navigator.mediaDevices.getUserMedia({ audio: true });
-            // Start the conversation with your agent
+        async function start(token: string) {
             const str = await conversation.startSession({
                 onMessage: (message) => {
-                    console.log('message received', message)
-                    setMessages((prev) => [...prev, { ...message, id: nanoid().toString() }])
+                    setMessages((prev) => [...prev, { ...message, id: nanoid() }])
                 },
                 // agentId: process.env.AGENT_ID!, // Replace with your agent I
-                conversationToken: conversationToken as string,
+                conversationToken: token,
                 connectionType: 'webrtc', // either "webrtc" or "websocket"
                 onError(message, context) {
                     console.log('Error:', message, context)
@@ -186,8 +173,18 @@ export const ElevenLabsChatBotDemo = ({ conversationToken }: { conversationToken
             });
 
             console.log(str)
+        }
+        console.log('start conversation', conversationToken)
+        try {
+            // Request microphone permission
+            await navigator.mediaDevices.getUserMedia({ audio: true });
+            await start(tokenQuery.data.token);
+            // Start the conversation with your agent
         } catch (error) {
-            console.error('Failed to start conversation:', error);
+            console.log('Failed to start conversation:', { error });
+            if ((error as any).status == 401) {
+                tokenQuery.refetch().then(_ => start(_.data?.token ?? ''));
+            }
         }
     }, [conversation]);
 
@@ -197,14 +194,16 @@ export const ElevenLabsChatBotDemo = ({ conversationToken }: { conversationToken
     }, [conversation]);
 
 
-    return <ChatBotDemo
-        status={conversation.status}
-        sendUserActivity={conversation.sendUserActivity}
-        messages={messages}
-        startConversation={startConversation}
-        endConversation={stopConversation}
-        sendMessage={(message) => { conversation.sendUserMessage(message.text); return setMessages(prev => [...prev, { message: message.text, source: 'user', id: nanoid().toString() }]); }}
-    />
+    return <IsConnectedContext.Provider value={conversation.status === 'connected'}>
+        <ChatBotDemo
+            status={conversation.status}
+            sendUserActivity={conversation.sendUserActivity}
+            messages={messages}
+            startConversation={startConversation}
+            endConversation={stopConversation}
+            sendMessage={(message) => { conversation.sendUserMessage(message.text); return setMessages(prev => [...prev, { message: message.text, source: 'user', id: nanoid() }]); }}
+        />
+    </IsConnectedContext.Provider>
 }
 
 
@@ -215,6 +214,9 @@ const ChatBotDemo = ({ messages, sendMessage, sendUserActivity, status, startCon
     status: Status, startConversation: () => void, endConversation: () => void
 }) => {
     const [input, setInput] = useState('');
+
+
+    const trpc = useTRPCClient()
 
     const handleSubmit = (message: PromptInputMessage) => {
         const hasText = Boolean(message.text);
@@ -232,16 +234,29 @@ const ChatBotDemo = ({ messages, sendMessage, sendUserActivity, status, startCon
     return (
         <div className="mx-auto py-4 relative h-full w-full">
             <div className="flex flex-col h-full">
-                <Conversation className="h-full no-scrollbar">
-                    <ConversationContent className='bg-transparent p-0'>
-                        {messages.map((message, i) => (
-                            <div key={message.id.toString()}>
 
+                <div className='flex flex-row items-center px-3 pb-5 border-b gap-2 border-[#404040]'>
+                    <img src={'/icons/robot.svg'} className="w-[35px] h-[35px] object-contain bg-[#525252] rounded-full p-2 object-center" />
+                    <div className="flex flex-col mr-3">
+                        <p
+                        >AI Assistant</p>
+                        <p className="text-xs text-[#a3a3a3]">Online</p>
+                    </div>
+                </div>
+
+                <Conversation className="h-full no-scrollbar">
+                    <ConversationContent className='bg-transparent p-0 min-h-full flex flex-col'>
+                        {messages.length === 0 && <div className='flex flex-col min-h-full grow-1 flex-1 items-center justify-center'>
+                            <img src={'/icons/robot.svg'} className="w-[100px] h-[100px] object-contain bg-[#525252] text-white opacity-40 rounded-full p-2 object-center" />
+                            <p className='text-gray-400 text-center mt-3'>Ai Assistent Not Started</p>
+                        </div>}
+                        {messages.length > 0 && messages.map((message, i) => (
+                            <div key={message.id.toString()}>
                                 <div key={`${message.message}-${i}`}>
                                     {typeof message.message == 'string' ?
                                         <Message from={message.source === 'ai' ? 'assistant' : 'user'}>
                                             <MessageContent>
-                                                <Response className={message.source == 'ai' ? 'bg-[#404040] p-2 rounded-lg' : undefined} >
+                                                <Response className={message.source == 'ai' ? 'bg-[#d1d1d1] dark:bg-[#404040] p-2 rounded-lg' : undefined} >
                                                     {message.message}
                                                 </Response>
                                                 {(message.source === 'ai' && typeof message.message == 'string' && i === messages.length - 1) && (
@@ -274,7 +289,7 @@ const ChatBotDemo = ({ messages, sendMessage, sendUserActivity, status, startCon
                 </Conversation>
 
                 <div className='px-3 w-full'>
-                    <PromptInput onSubmit={handleSubmit} className="mt-4 px-2 w-full" globalDrop multiple>
+                    <PromptInput onSubmit={handleSubmit} className="mt-4 px-2 " globalDrop multiple>
                         {status === 'connected' && <>
                             <PromptInputBody>
                                 <PromptInputAttachments>
@@ -314,9 +329,10 @@ const ChatBotDemo = ({ messages, sendMessage, sendUserActivity, status, startCon
                             <PromptInputButton
                                 onClick={() => startConversation()}
                                 variant={'default'}
+                                className='w-full cursor-pointer'
                             >
+                                <span className="">Start Conversation</span>
                                 <Play size={16} />
-                                <span className="sr-only">Microphone</span>
                             </PromptInputButton>
                         </>}
 

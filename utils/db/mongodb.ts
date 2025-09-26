@@ -9,7 +9,7 @@ if (!cached) {
 
 
 
-async function dbConnect<T extends boolean>(): Promise<T extends true ? { autoIncrement: any, conn: typeof mongoose } : typeof mongoose> {
+async function dbConnect(): Promise<typeof mongoose> {
     if (cached.conn) {
         return cached.conn
     }

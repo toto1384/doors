@@ -3,6 +3,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useLoadScript } from "@react-google-maps/api";
 import { LocationObject } from "utils/validation/types";
+import { formatPlaceToLocationObject } from "utils/googleMapsUtils";
 
 //https://medium.com/@mangergeorgepraise/integrating-google-places-autocomplete-api-for-form-filling-in-next-js-137ef1a2b7ee
 
@@ -31,7 +32,15 @@ interface GoogleMapsResult {
 export const libraries = ["places"] as any;
 
 
-export function LocationSelector({ locationObject, setLocationObject }: { locationObject: LocationObject | undefined, setLocationObject: React.Dispatch<React.SetStateAction<LocationObject | undefined>> }) {
+export function LocationSelector(
+    { locationObject, setLocationObject, width }:
+        {
+            locationObject: LocationObject | undefined,
+            setLocationObject: (l: LocationObject | undefined) => void,
+            className?: string
+            width?: number
+        }
+) {
 
     const inputRef = useRef(null);
 
@@ -41,49 +50,9 @@ export function LocationSelector({ locationObject, setLocationObject }: { locati
         libraries,
     });
 
-    const formData = (data: GoogleMapsResult) => {
-        console.log(data)
-        const addressComponents = data?.address_components;
-
-        const componentMap = {
-            subPremise: "",
-            premise: "",
-            street_number: "",
-            route: "",
-            country: "",
-            postal_code: "",
-            administrative_area_level_2: "",
-            administrative_area_level_1: "",
-            countryShort: "",
-            administrative_area_level_2Short: "",
-            administrative_area_level_1Short: "",
-        };
-
-        for (const component of addressComponents) {
-            const componentType = component.types[0];
-            if (componentMap.hasOwnProperty(componentType)) {
-                (componentMap as any)[componentType] = component.long_name;
-                if (component.short_name) (componentMap as any)[`${componentType}Short`] = component.short_name;
-            }
-        }
-
-        const formattedAddress =
-            `${componentMap.subPremise} ${componentMap.premise} ${componentMap.street_number} ${componentMap.route}`.trim();
-        const latitude = data?.geometry?.location?.lat();
-        const longitude = data?.geometry?.location?.lng();
-
-        setLocationObject((prev) => ({
-            streetAddress: formattedAddress,
-            country: componentMap.country,
-            zipCode: componentMap.postal_code,
-            city: componentMap.administrative_area_level_2,
-            state: componentMap.administrative_area_level_1,
-            stateShort: componentMap.administrative_area_level_1Short,
-            countryShort: componentMap.countryShort,
-            latitude: latitude,
-            longitude: longitude,
-            fullLocationName: `${formattedAddress}, ${componentMap.administrative_area_level_1Short}, ${componentMap.administrative_area_level_2Short}, ${componentMap.countryShort}`,
-        }));
+    const formData = (data: google.maps.places.PlaceResult) => {
+        const locationObject = formatPlaceToLocationObject(data);
+        setLocationObject(locationObject)
     };
 
     const handlePlaceChanged = async (address: any) => {
@@ -97,13 +66,17 @@ export function LocationSelector({ locationObject, setLocationObject }: { locati
         formData(place);
     };
 
+    useEffect(() => {
+        if (inputRef.current) (inputRef.current as any).value = locationObject?.fullLocationName || ''
+    }, [locationObject])
+
 
     useEffect(() => {
         if (!isLoaded || loadError) return;
 
         const autocomplete = new google.maps.places.Autocomplete(inputRef.current as any, {
             componentRestrictions: { country: "ro" },
-            fields: ["address_components", "geometry"],
+            fields: ["address_components", "geometry"]
             // types
         });
 
@@ -113,21 +86,26 @@ export function LocationSelector({ locationObject, setLocationObject }: { locati
     }, [isLoaded, loadError]);
 
 
-    const className = ' w-3xl'
 
-    return <div className="p-4 grid grid-cols-2 gap-5">
-        <div className="flex flex-col w-full">
-            <label className="text-md">Street address</label>
-            <input
-                type="search"
-                name="fullLocationName"
-                autoComplete="off"
-                ref={inputRef}
-                className={className}
-                placeholder="Enter Street Address"
-                required
-            />
-        </div>
-    </div>
+    return <>
+        <input
+            type="search"
+            name="fullLocationName"
+            autoComplete="off"
+            onChange={(e) => {
+                const value = e.target.value;
+                // Detect when X button is clicked (value becomes empty)
+                if (value === '') {
+                    setLocationObject(undefined)
+                    // Add your logic here
+                }
+            }}
+            ref={inputRef}
+            style={{ width: width }}
+            className={' dark:bg-[#404040] pl-3 py-1.5 rounded'}
+            placeholder="Enter Street Address"
+            required
+        />
+    </>
 
 }

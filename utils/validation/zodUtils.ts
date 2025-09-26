@@ -1,7 +1,4 @@
 import { z } from 'zod/v3';
-import { extendZod } from "@zodyac/zod-mongoose";
-
-extendZod(z as any);
 
 
 export const zDate = z.preprocess((arg) => {

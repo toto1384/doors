@@ -2,11 +2,7 @@
 
 import { z } from 'zod/v3';
 import { LocationSchema } from './location';
-import { extendZod } from "@zodyac/zod-mongoose";
 import { zDate } from './zodUtils';
-
-extendZod(z as any);
-
 
 
 // Enum for property status
@@ -76,6 +72,10 @@ const PropertyFeatures = z.enum([
     'garage',
     'covered-parking'
 ]);
+
+export const PropertyType = ['apartment', 'house', 'hotel', 'office'] as const
+
+
 // Main Property schema
 export const PropertySchema = z.object({
     _id: z.string(),
@@ -95,26 +95,14 @@ export const PropertySchema = z.object({
     surfaceArea: z.number(),
     furnished: z.boolean(),
     features: z.array(PropertyFeatures).default([]),
-    propertyType: z.enum(['apartment', 'house', 'hotel', 'office']).optional(),
+    propertyType: z.enum(PropertyType).optional(),
     heating: z.enum(['gas', 'fireplace', 'electric', '3rd_party']).optional(),
     buildingYear: z.number().optional(),
     buildingFloors: z.number().optional(),
 
     floor: z.number().optional(),
 
-    parking: z.object({
-        available: z.boolean(),
-        spaces: z.number().optional(),
-        type: z.enum(['garage', 'driveway', 'street', 'covered', 'underground']).optional()
-    }),
-
-
     imageUrls: z.array(z.string()),
-
-    // Alternative for base64 images (uncomment if needed)
-    // imageData: z.array(
-    //   z.string().regex(/^data:image\/(jpeg|jpg|png|gif);base64,/)
-    // ).optional(),
 
     tags: z.array(z.string()).default([]),
 

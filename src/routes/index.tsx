@@ -6,7 +6,7 @@ import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Header } from "src/components/headerLanding";
 import { useTRPC } from 'trpc/react';
-import { SignedIn, SignedOut } from '@daveyplate/better-auth-ui';
+import { authClient } from 'utils/auth-client';
 
 
 export const Route = createFileRoute('/')({
@@ -40,6 +40,9 @@ const HeroSection: React.FC = () => {
     const response = useQuery(trpc.guitars.list.queryOptions())
 
 
+    const { data } = authClient.useSession()
+
+
     return (
         <section className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center relative overflow-hidden">
             {/* Background Effects */}
@@ -67,23 +70,19 @@ const HeroSection: React.FC = () => {
                 </p>
 
                 <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
-                    <SignedOut>
-                        <Link
-                            to="/auth/$path"
-                            params={{ path: "sign-in" }}
-                            className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:from-blue-600 hover:to-purple-700 transition-all transform hover:scale-105 shadow-2xl"
-                        >
-                            {heroT('buttons.getStarted')}
-                        </Link>
-                    </SignedOut>
-                    <SignedIn>
-                        <Link
-                            to="/app"
-                            className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:from-blue-600 hover:to-purple-700 transition-all transform hover:scale-105 shadow-2xl"
-                        >
-                            Go to App
-                        </Link>
-                    </SignedIn>
+
+                    {data ? <Link
+                        to="/app"
+                        className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:from-blue-600 hover:to-purple-700 transition-all transform hover:scale-105 shadow-2xl"
+                    >
+                        Go to App
+                    </Link> : <Link
+                        to="/auth/$path"
+                        params={{ path: "sign-in" }}
+                        className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:from-blue-600 hover:to-purple-700 transition-all transform hover:scale-105 shadow-2xl"
+                    >
+                        {heroT('buttons.getStarted')}
+                    </Link>}
                     <button className="border-2 border-slate-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:border-slate-400 hover:bg-slate-800/50 transition-all">
                         {heroT('buttons.watchDemo')}
                     </button>
@@ -260,8 +259,6 @@ const PricingSection: React.FC = () => {
             features: pricingT('plans.premium.features', { returnObjects: true })
         }
     ];
-
-    console.log(pricingTiers)
 
     return (
         <section id="pricing" className="py-20 bg-slate-800">

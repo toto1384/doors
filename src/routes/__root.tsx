@@ -7,11 +7,12 @@ import Header from '../components/Header'
 
 import appCss from '../styles.css?url'
 import { getThemeServerFn } from 'utils/theme';
-import { ThemeProvider, useTheme } from "@/components/providers/ThemeProvider";
+import { Theme, ThemeProvider, useTheme } from "@/components/providers/ThemeProvider";
 import AppRouteWrapper from '@/components/appWrapper';
 import { TRPCWrapper } from '@/components/providers/TrpcWrapper';
 import { AuthProvider } from '@/components/providers/BetterAuthProvider';
-import { PropertyFilters } from 'utils/validation/types';
+import { GoogleMapsProvider } from '@/components/providers/GoogleMapsProvider';
+import { PropertyFilters, PropertyObject } from 'utils/validation/types';
 import { createContext, useContext, useState } from 'react';
 
 
@@ -38,7 +39,6 @@ export const Route = createRootRoute({
     }),
     loader: async () => {
         const theme = await getThemeServerFn()
-        console.log(process.env.VITE_AGENT_ID, process.env.ELEVENLABS_API_KEY)
 
         const response = await fetch(
             `https://api.elevenlabs.io/v1/convai/conversation/token?agent_id=${process.env.VITE_AGENT_ID}`,
@@ -53,12 +53,25 @@ export const Route = createRootRoute({
 })
 
 
-export const PropertyFilterContext = createContext<{ propertyFilters: PropertyFilters | undefined, setPropertyFilters: (propertyFilters: PropertyFilters | undefined) => void }>({ propertyFilters: undefined, setPropertyFilters: () => { } });
+export const PropertyFilterContext = createContext<{
+    propertyFilters: PropertyFilters | undefined,
+    setPropertyFilters: React.Dispatch<React.SetStateAction<PropertyFilters | undefined>>
+}>({ propertyFilters: undefined, setPropertyFilters: () => { } });
+
+type UpdateFiltersFunction = (filters: PropertyFilters) => Promise<string>
+
+export const UpdatePropertyFiltersContext = createContext<{
+    updatePropertyFilters: UpdateFiltersFunction,
+    setUpdatePropertyFilters: React.Dispatch<React.SetStateAction<UpdateFiltersFunction>>,
+    sendUpdate(str: string): void
+    setSendUpdate(fn: (str: string) => void): void
+}>({ updatePropertyFilters: async () => '', setUpdatePropertyFilters: () => { }, sendUpdate: (s) => { }, setSendUpdate: (fn) => { } });
 
 export const ElevenlabsTokenContext = createContext<{ token: string | undefined, setToken: (token: string | undefined) => void }>({ token: undefined, setToken: () => { } });
 
 function RootComponent() {
     const { theme } = Route.useLoaderData();
+
     return (
         <ThemeProvider theme={theme}>
             <RootDocument>
@@ -73,8 +86,9 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 
     const [token, setToken] = useState<string>(receivedToken);
 
-
-    const [propertyFilters, setPropertyFilters] = useState<PropertyFilters | undefined>(undefined);
+    const [updatePropertyFilters, setUpdatePropertyFilters] = useState<UpdateFiltersFunction>(async () => '');
+    const [sendUpdate, setSendUpdate] = useState<(str: string) => void>(() => { });
+    const [propertyFilters, setPropertyFilters] = useState<PropertyFilters | undefined>();
 
 
     const routerState = useRouterState();
@@ -87,25 +101,29 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                 <HeadContent />
             </head>
             <body>
-                <PropertyFilterContext.Provider value={{ propertyFilters, setPropertyFilters }}>
-                    <TRPCWrapper>
-                        <AuthProvider>
-                            {appWrapper ? <AppRouteWrapper token={token}>{children}</AppRouteWrapper> : children}
-                        </AuthProvider>
-                    </TRPCWrapper>
-                    {!import.meta.env.PROD && <TanstackDevtools
-                        config={{
-                            position: 'bottom-right',
-                        }}
-                        plugins={[
-                            {
-                                name: 'Tanstack Router',
-                                render: <TanStackRouterDevtoolsPanel />,
-                            },
-                        ]}
-                    />}
-                    <Scripts />
-                </PropertyFilterContext.Provider>
+                <UpdatePropertyFiltersContext.Provider value={{ updatePropertyFilters, setUpdatePropertyFilters, sendUpdate, setSendUpdate }}>
+                    <PropertyFilterContext.Provider value={{ propertyFilters, setPropertyFilters }}>
+                        <GoogleMapsProvider>
+                            <TRPCWrapper>
+                                <AuthProvider>
+                                    {appWrapper ? <AppRouteWrapper token={token}>{children}</AppRouteWrapper> : children}
+                                </AuthProvider>
+                            </TRPCWrapper>
+                        </GoogleMapsProvider>
+                        {!import.meta.env.PROD && <TanstackDevtools
+                            config={{
+                                position: 'bottom-right',
+                            }}
+                            plugins={[
+                                {
+                                    name: 'Tanstack Router',
+                                    render: <TanStackRouterDevtoolsPanel />,
+                                },
+                            ]}
+                        />}
+                        <Scripts />
+                    </PropertyFilterContext.Provider>
+                </UpdatePropertyFiltersContext.Provider>
             </body>
         </html>
     )
