@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { MultiSelect, MultiSelectContent, MultiSelectItem, MultiSelectSeparator, MultiSelectTrigger, MultiSelectValue } from '@/components/ui/multi-select'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { PropertyFilterContext, UpdatePropertyFiltersContext } from '@/routes/__root'
+import { ChevronDownIcon } from 'lucide-react'
 
 
 export const getPropertiesWithFilters = createServerFn().validator((d) => propertyFiltersSchema.parse(d)).handler(async ({ data: filters, }) => {
@@ -99,7 +100,10 @@ function PropertiesRoute() {
                         </MultiSelectContent>
                     </MultiSelect>
                     <Popover>
-                        <PopoverTrigger className='px-3 py-1.5 dark:bg-[#404040] rounded'>Budget</PopoverTrigger>
+                        <PopoverTrigger className='px-3 py-1.5 bg-input/30 text-black/50 dark:text-white hover:bg-input/50 dark:bg-[#404040] rounded flex flex-row items-center'>
+                            Budget
+                            <ChevronDownIcon className="size-4 shrink-0 opacity-50" />
+                        </PopoverTrigger>
                         <PopoverContent>
                             <label className="block text-sm font-medium mb-2">Budget Range</label>
                             <div className="flex gap-2">
@@ -107,7 +111,7 @@ function PropertiesRoute() {
                                     type="number"
                                     placeholder="Min"
                                     value={propertyFilters?.budget?.min || ''}
-                                    className="bg-gray-800 text-white rounded px-3 py-2 w-24"
+                                    className="bg-input/50 text-black/50 dark:text-white rounded px-3 py-2 w-24"
                                     onChange={(e) => {
                                         const min = e.target.value ? parseInt(e.target.value) : undefined
                                         handleFilterChange({
@@ -119,7 +123,7 @@ function PropertiesRoute() {
                                     type="number"
                                     placeholder="Max"
                                     value={propertyFilters?.budget?.max || ''}
-                                    className="bg-gray-800 text-white rounded px-3 py-2 w-24"
+                                    className="bg-input/50 text-black/50 dark:text-white rounded px-3 py-2 w-24"
                                     onChange={(e) => {
                                         const max = e.target.value ? parseInt(e.target.value) : undefined
                                         handleFilterChange({
@@ -200,8 +204,8 @@ function PropertiesRoute() {
 
 
 export const PropertyCard = ({ property }: { property: PropertyObject }) => {
-    return <Link to='/app/properties/$id' params={{ id: property._id }} key={property._id} className="relative bg-[#262626] rounded-[6px] overflow-hidden">
-        <div className="bg-gray-600 h-48 flex items-center justify-center">
+    return <Link to='/app/properties/$id' params={{ id: property._id }} key={property._id} className="relative bg-[#f7f7f7] dark:bg-[#262626] rounded-[6px] overflow-hidden">
+        <div className=" h-48 flex items-center justify-center">
             <img src={property.imageUrls[0]} className="w-full h-full object-cover" />
         </div>
 

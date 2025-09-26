@@ -102,7 +102,7 @@ export function LocationSelector(
             }}
             ref={inputRef}
             style={{ width: width }}
-            className={' dark:bg-[#404040] pl-3 py-1.5 rounded'}
+            className={' bg-input/30 dark:bg-[#404040] px-3 py-1.5 rounded'}
             placeholder="Enter Street Address"
             required
         />

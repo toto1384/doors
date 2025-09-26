@@ -207,7 +207,7 @@ function PropertyActionButtons({ isSaved, setIsSaved }: {
         <div className="flex grow-1 w-full space-x-4 mb-6 pb-6 border-b border-[#404040]">
             <Button
                 variant="outline"
-                className="flex w-[32%] grow-1 items-center space-x-2 bg-gray-800 border-gray-600 hover:bg-gray-700"
+                className="flex w-[32%] grow-1 items-center space-x-2 bg-muted dark:border-gray-600 hover:bg-muted-foreground"
                 onClick={() => setIsSaved(!isSaved)}
             >
                 <Heart className={`w-4 h-4 ${isSaved ? 'fill-current text-red-500' : ''}`} />
@@ -215,14 +215,14 @@ function PropertyActionButtons({ isSaved, setIsSaved }: {
             </Button>
             <Button
                 variant="outline"
-                className="flex w-[32%] grow-1 items-center space-x-2 bg-gray-800 border-gray-600 hover:bg-gray-700"
+                className="flex w-[32%] grow-1 items-center space-x-2 bg-muted dark:border-gray-600 hover:bg-muted-foreground"
             >
                 <Calendar className="w-4 h-4" />
                 <span>Schedule Viewing</span>
             </Button>
             <Button
                 variant="outline"
-                className="flex w-[32%] grow-1 items-center space-x-2 bg-gray-800 border-gray-600 hover:bg-gray-700"
+                className="flex w-[32%] grow-1 items-center space-x-2 bg-muted darkborder-gray-600 hover:bg-muted-foreground"
             >
                 <DollarSign className="w-4 h-4" />
                 <span>Make Offer</span>
@@ -234,7 +234,7 @@ function PropertyActionButtons({ isSaved, setIsSaved }: {
 // Component: Location Section
 function LocationSection({ property }: { property: PropertyObject }) {
     return (<div className='flex flex-col mb-6 pb-6 border-b border-[#404040]'>
-        <h2 className="text-lg mb-3.5 text-white">Location</h2>
+        <h2 className="text-lg mb-3.5 text-foreground">Location</h2>
         <p className="a3Text mb-2">
             {property.location.streetAddress}, {property.location.city}, {property.location.zipCode}
         </p>
@@ -253,7 +253,7 @@ function LocationSection({ property }: { property: PropertyObject }) {
 function DescriptionSection({ property }: { property: PropertyObject }) {
     return (
         <div className='flex flex-col items-start mb-6 pb-6 border-b border-[#404040]'>
-            <h2 className="text-white text-lg">Description</h2>
+            <h2 className="text-foreground text-lg">Description</h2>
             <p className="text-gray-300 leading-relaxed mb-4">
                 {property.description}
             </p>
@@ -269,7 +269,7 @@ function DescriptionSection({ property }: { property: PropertyObject }) {
 function FeaturesSection({ property }: { property: PropertyObject }) {
     return (
         <div className="flex flex-col items-start mb-6 pb-6 border-b border-[#404040]">
-            <h2 className="text-white text-lg mb-2">Features</h2>
+            <h2 className="text-foreground text-lg mb-2">Features</h2>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
                 {property.features.map((feature, index) => (
                     <div key={index} className="flex items-center space-x-2 p-3 bg-input/30 rounded-lg">
@@ -292,14 +292,14 @@ function FeaturesSection({ property }: { property: PropertyObject }) {
 function AIMarketInsights() {
     return (
         <div className="flex flex-col items-start mb-6 pb-6 border-b border-[#404040]">
-            <h2 className="text-white text-lg mb-2">AI Market Insights</h2>
+            <h2 className="text-foreground text-lg mb-2">AI Market Insights</h2>
             <div className='flex flex-row items-start gap-3 bg-input/30 w-full border border-input/30 dark:border-input rounded-lg p-3.5 mb-4'>
                 <img src="/icons/idea.svg" className="w-4 h-4 mt-1.5 text-green-400" />
                 <div>
                     <div className="flex items-center space-x-2 mb-2">
                         <span className="a3Text font-light">Recommended Bid Range</span>
                     </div>
-                    <p className="text-white/70 mb-2">
+                    <p className="text-foreground/70 mb-2">
                         Based on recent sales in this area, consider bidding between €720,000 - €740,000 for a competitive offer.
                     </p>
                     <button className="a3Text hover:text-blue-300">
@@ -318,16 +318,16 @@ function NotesSection({ notes, setNotes }: {
 }) {
     return (
         <div className="flex flex-col items-start mb-6 pb-6 border-b border-[#404040]">
-            <CardTitle className="text-white text-lg">Your Notes</CardTitle>
+            <CardTitle className="text-foreground text-lg">Your Notes</CardTitle>
             <textarea
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 placeholder="Add your thoughts about this property..."
-                className="w-full h-32 p-3 bg-input/30 border border-input/30 dark:border-input rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
+                className="w-full h-32 p-3 bg-input/30 border border-input/30 dark:border-input rounded-lg text-foreground placeholder-gray-400 focus:outline-none focus:border-blue-500"
             />
             <div className="flex justify-end mt-4">
                 <Button
-                    className="bg-input dark:bg-input/30 hover:bg-input/40 dark:hover:bg-input/40 text-white"
+                    className="bg-input dark:bg-input/30 hover:bg-input/40 dark:hover:bg-input/40 text-foreground"
                     onClick={() => {
                         console.log('Saving notes:', notes)
                     }}
