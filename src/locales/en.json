@@ -1,0 +1,246 @@
+{
+  "landing-page": {
+    "hero": {
+      "title": {
+        "line1": "Find your dream home with the help of",
+        "line2": "Doors"
+      },
+      "subtitle": "without agents, without huge commissions, without headaches",
+      "description": "Your AI real estate assistant helps you instantly discover, select and schedule viewings - at a fraction of the cost of a traditional agency.",
+      "buttons": {
+        "register": "Register for free",
+        "login": "Login"
+      }
+    },
+    "benefits": {
+      "title": "Benefits",
+      "items": {
+        "personalAssistant": {
+          "title": "Your personal AI assistant",
+          "description": "Available 24/7, remembers your preferences, speaks your language (RO/EN)."
+        },
+        "personalizedSearch": {
+          "title": "Fast and personalized search",
+          "description": "Instant suggestions based on your needs - no endless searching."
+        },
+        "correctPrice": {
+          "title": "Fair and transparent pricing",
+          "description": "You pay less than 0.5% of what you would pay a real estate agency."
+        },
+        "betterExperience": {
+          "title": "A better experience",
+          "description": "From search to offer, you get an intuitive and simple process - without agents."
+        }
+      }
+    },
+    "demo": {
+      "title": "Demo"
+    },
+    "about": {
+      "title": "About us",
+      "description": {
+        "paragraph1": "At DOORS, we believe that buying or selling a home should be fair, transparent and stress-free. Our AI assistant makes the real estate process simpler, more accessible and friendlier than traditional methods.",
+        "paragraph2": "We are determined to bring this solution to every buyer and seller in Romania, combining cutting-edge artificial intelligence with the trust and clarity that the real estate industry so desperately needs."
+      },
+      "features": {
+        "protectedData": "Your data is protected according to GDPR.",
+        "aiTechnology": "Cutting-edge AI technology",
+        "localFocus": "Local focus: real estate from Romania, in your language",
+        "verifiedListings": "Verified listings and secure payments for a risk-free experience."
+      }
+    },
+    "pricing": {
+      "title": "Pricing",
+      "subtitle": "Simple, fair, token-based",
+      "features": [
+        "You start for free with an included token package",
+        "Each interaction with AI consumes a few tokens",
+        "You recharge only when you need it"
+      ],
+      "plan": {
+        "name": "Starter",
+        "price": "$49.99",
+        "tokens": "500 tokens"
+      }
+    },
+    "faq": {
+      "title": "Frequently asked questions",
+      "seeAll": "See all questions",
+      "items": {
+        "tokens": {
+          "question": "What are tokens and how do they work?",
+          "answer": "Tokens are virtual credits for AI interactions. You get them free at the start and can buy more anytime."
+        },
+        "dataSafety": {
+          "question": "Is my data safe?",
+          "answer": "Yes, all data is protected according to standards and is only shared with mentioned third parties."
+        },
+        "buyerSeller": {
+          "question": "Can I use the platform as both a seller and a buyer?",
+          "answer": "Yes, the platform is designed for both roles and offers complete functionality for selling and buying properties."
+        },
+        "whyDoors": {
+          "question": "Why choose DOORS and not a classic agency?",
+          "answer": "DOORS offers complete transparency, reduced costs and immediate access to information, eliminating intermediaries and large commissions."
+        }
+      }
+    },
+    "finalCta": {
+      "title": "Your dream home is just one conversation away",
+      "subtitle": "Try the AI assistant now:",
+      "button": "Register for free"
+    },
+    "footer": {
+      "brand": "DOORS",
+      "slogan": "Find the perfect home quickly, safely and intelligently.",
+      "navigation": {
+        "benefits": "Benefits",
+        "demo": "Demo",
+        "pricing": "Pricing",
+        "faq": "FAQ"
+      },
+      "legal": {
+        "terms": "Terms and conditions",
+        "privacy": "Privacy policy"
+      },
+      "copyright": "© DOORS 2025. All rights reserved."
+    }
+  },
+  "register-page": {
+    "title": "Sign Up",
+    "subtitle": "Create your account to get started",
+    "form": {
+      "email": "Email",
+      "password": "Password",
+      "confirmPassword": "Confirm Password",
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "button": "Create Account",
+      "haveAccount": "Already have an account?",
+      "signIn": "Sign in"
+    }
+  },
+  "login-page": {
+    "title": "Sign In",
+    "subtitle": "Sign in to your account",
+    "form": {
+      "email": "Email",
+      "password": "Password",
+      "button": "Sign In",
+      "forgotPassword": "Forgot your password?",
+      "noAccount": "Don't have an account?",
+      "signUp": "Sign up"
+    }
+  },
+  "profile-page": {
+    "title": "Profile",
+    "subtitle": "Manage your account settings",
+    "settings": "Settings",
+    "sections": {
+      "personal": "Personal Information",
+      "preferences": "Preferences",
+      "security": "Security",
+      "language": "Language"
+    },
+    "language": {
+      "title": "Language Settings",
+      "subtitle": "Choose your preferred language",
+      "english": "English",
+      "romanian": "Romanian"
+    },
+    "theme": {
+      "title": "Theme Settings",
+      "subtitle": "Choose your preferred theme"
+    },
+    "account": {
+      "title": "Account"
+    }
+  },
+  "privacy-policy": {
+    "title": "Privacy Policy",
+    "lastUpdated": "Last updated: {date}",
+    "introduction": "This Privacy Policy describes how we collect, use, and protect your information."
+  },
+  "terms-of-service": {
+    "title": "Terms of Service",
+    "lastUpdated": "Last updated: {date}",
+    "introduction": "These Terms of Service govern your use of our platform and services."
+  },
+  "common": {
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "delete": "Delete",
+    "confirm": "Confirm",
+    "close": "Close"
+  },
+  "auth-ui": {
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "signOut": "Sign Out",
+    "forgotPassword": "Forgot Password",
+    "resetPassword": "Reset Password",
+    "changePassword": "Change Password",
+    "updateProfile": "Update Profile",
+    "settings": "Settings",
+    "profile": "Profile",
+    "account": "Account",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "newPassword": "New Password",
+    "currentPassword": "Current Password",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "name": "Name",
+    "displayName": "Display Name",
+    "phoneNumber": "Phone Number",
+    "dateOfBirth": "Date of Birth",
+    "gender": "Gender",
+    "bio": "Bio",
+    "website": "Website",
+    "location": "Location",
+    "timezone": "Timezone",
+    "language": "Language",
+    "theme": "Theme",
+    "notifications": "Notifications",
+    "privacy": "Privacy",
+    "security": "Security",
+    "sessions": "Sessions",
+    "devices": "Devices",
+    "continue": "Continue",
+    "byContinuingYouAgree": "By continuing, you agree to our",
+    "termsOfService": "Terms of Service",
+    "privacyPolicy": "Privacy Policy",
+    "and": "and",
+    "or": "or",
+    "rememberMe": "Remember Me",
+    "staySignedIn": "Stay signed in",
+    "alreadyHaveAccount": "Already have an account?",
+    "dontHaveAccount": "Don't have an account?",
+    "backToSignIn": "Back to Sign In",
+    "createAccount": "Create Account",
+    "enterEmail": "Enter your email",
+    "enterPassword": "Enter your password",
+    "enterNewPassword": "Enter your new password",
+    "confirmNewPassword": "Confirm your new password",
+    "sendResetLink": "Send Reset Link",
+    "checkEmail": "Check your email",
+    "resetLinkSent": "We've sent you a password reset link",
+    "passwordUpdated": "Password updated successfully",
+    "profileUpdated": "Profile updated successfully",
+    "emailVerified": "Email verified successfully",
+    "verifyEmail": "Verify Email",
+    "resendVerification": "Resend Verification",
+    "verificationSent": "Verification email sent",
+    "emailNotVerified": "Email not verified",
+    "pleaseVerifyEmail": "Please verify your email address",
+    "loading": "Loading...",
+    "saving": "Saving...",
+    "submitting": "Submitting...",
+    "processing": "Processing...",
+    "optional": "Optional",
+    "required": "Required"
+  }
+}

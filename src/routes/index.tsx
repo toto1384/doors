@@ -7,6 +7,8 @@ import { useTranslation } from 'react-i18next';
 import { Header } from "src/components/headerLanding";
 import { useTRPC } from 'trpc/react';
 import { authClient } from 'utils/auth-client';
+import '../components/i18n';
+import i18n from '../components/i18n';
 
 
 export const Route = createFileRoute('/')({
@@ -59,6 +61,8 @@ function HomePage() {
 // Hero Section Component
 const HeroSection: React.FC = () => {
     const { data } = authClient.useSession();
+    const { t } = useTranslation();
+    const language = i18n.language;
 
     return (
         <section className="min-h-[95dvh] bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-end relative md:overflow-hidden h-fit">
@@ -71,21 +75,20 @@ const HeroSection: React.FC = () => {
 
             <div className="md:max-w-[75vw] md:px-6 absolute bottom-0 md:mt-0 md:top-[25%] md:right-[10%] mx-auto">
                 <div className="z-10 px-3 text-center">
-                    <span className="text-4xl md:text-2xl md:block text-center md:pl-5 font-light text-white mb-4">
-                        Găsește-ți casa de vis cu ajutorul
+                    <span className={`text-4xl md:text-2xl md:block text-center ${language == 'ro' ? "md:pl-5 " : "md:pl-16"} font-light text-white mb-4`}>
+                        {t('landing-page.hero.title.line1')}
                     </span>
                     <span className="text-4xl md:text-[13rem]/15 font-semibold text-white mb-8 ml-2 md:ml-0">
-                        Doors
+                        {t('landing-page.hero.title.line2')}
                     </span>
                 </div>
                 <div className='z-40 relative md:absolute px-3'>
                     <p className="text-xl md:text-[26px] text-center md:-mx-5 mt-4 md:mt-8 mb-8 ">
-                        fără agenți, fără comisioane uriașe, fără bătai de cap
+                        {t('landing-page.hero.subtitle')}
                     </p>
 
                     <p className="md:text-sm font-light mt-6 md:mt-16 mb-8 md:mb-4 max-w-3xl mx-auto text-[#C4CDD5]">
-                        Asistentul tău imobiliar AI te ajută imediat să descoperi, să selectezi și să programezi
-                        vizionări - la o fracțiune din costul unei agenții tradiționale.
+                        {t('landing-page.hero.description')}
                     </p>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-6 justify-center items-center">
@@ -94,11 +97,14 @@ const HeroSection: React.FC = () => {
                             params={data ? {} : { path: "sign-in" }}
                             className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-4 py-3 md:py-[9px] rounded-sm text-lg md:text-base hover:from-blue-600 hover:to-purple-700 transition-all transform shadow-2xl text-center"
                         >
-                            Înregistrează-te gratuit
+                            {t('landing-page.hero.buttons.register')}
                         </Link>
-                        <button className="outline-1 outline-white text-white px-4 py-3 md:py-2 rounded-sm text-lg md:text-base hover:outline-slate-400 hover:bg-slate-800/50 transition-all text-center">
-                            Autentificare
-                        </button>
+                        <Link
+                            to={data ? "/app" : "/auth/$path"}
+                            params={data ? {} : { path: "sign-in" }}
+                            className="outline-1 outline-white text-white px-4 py-3 md:py-2 rounded-sm text-lg md:text-base hover:outline-slate-400 hover:bg-slate-800/50 transition-all text-center">
+                            {t('landing-page.hero.buttons.login')}
+                        </Link>
                     </div>
 
                 </div>
@@ -109,34 +115,36 @@ const HeroSection: React.FC = () => {
 
 // Benefits Section Component
 const BenefitsSection: React.FC = () => {
+    const { t } = useTranslation();
+
     const benefits = [
         {
             icon: <img src="/icons/landing/personalAssistent.png" className="w-28 h-28 object-contain" />,
-            title: "Asistentul tău personal AI",
-            description: "Disponibil 24/7, îti retine preferințele, vorbește limba ta (RO/EN)."
+            title: t('landing-page.benefits.items.personalAssistant.title'),
+            description: t('landing-page.benefits.items.personalAssistant.description')
         },
         {
             icon: <img src="/icons/landing/personalizedSearch.png" className="w-28 h-28 object-contain" />,
-            title: "Căutare rapidă și personalizată",
-            description: "Sugestii instant pe baza nevoilor tale - fără căutări nesfarsite."
+            title: t('landing-page.benefits.items.personalizedSearch.title'),
+            description: t('landing-page.benefits.items.personalizedSearch.description')
         },
         {
             icon: <img src="/icons/landing/correctPrice.png" className="w-28 h-28 object-contain" />,
-            title: "Preț corect și transparent",
-            description: "Plătești sub 0.5% din cat ai platii unei agenții imobiliare."
+            title: t('landing-page.benefits.items.correctPrice.title'),
+            description: t('landing-page.benefits.items.correctPrice.description')
         },
         {
             icon: <img src="/icons/landing/betterExperience.png" className="w-28 h-28 object-contain" />,
-            title: "O experiență mai bună",
-            description: "De la căutare la ofertă, ai parte de un proces intuitiv și simplu - fără agenți."
+            title: t('landing-page.benefits.items.betterExperience.title'),
+            description: t('landing-page.benefits.items.betterExperience.description')
         }
     ];
 
     return (
-        <section className="py-16 md:py-20 ">
+        <section id="benefits" className="py-16 md:py-20 ">
             <div className="max-w-5xl mx-auto px-6">
                 <h2 className="text-3xl md:text-4xl font-semibold text-center mx-auto text-white mb-6">
-                    Beneficii
+                    {t('landing-page.benefits.title')}
                 </h2>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -157,12 +165,14 @@ const BenefitsSection: React.FC = () => {
 
 // Demo Section Component
 const DemoSection: React.FC = () => {
-    return (
-        <section className="md:py-10 ">
-            <div className="max-w-7xl mx-auto px-6">
-                <h2 className="text-3xl md:text-4xl font-semibold text-white mb-7 md:mb-12 text-center mx-auto "> Demo </h2>
+    const { t } = useTranslation();
 
-                <img src="/landing/demo.png" className="w-full max-w-[800px] mx-auto h-auto mb-16 z-50 relative" />
+    return (
+        <section id="demo" className="md:py-10 ">
+            <div className="max-w-7xl mx-auto px-6">
+                <h2 className="text-3xl md:text-4xl font-semibold text-white mb-7 md:mb-12 text-center mx-auto ">{t('landing-page.demo.title')}</h2>
+
+                <img src="/landing/demo.png" className="w-full max-w-[800px] mx-auto h-auto mb-16 relative" />
             </div>
         </section>
     );
@@ -170,44 +180,40 @@ const DemoSection: React.FC = () => {
 
 // About Section Component
 const AboutSection: React.FC = () => {
+    const { t } = useTranslation();
+
     const features = [
         {
             icon: <img src="/icons/landing/protectedData.png" className="w-12 h-12" />,
-            title: "Datele tale sunt protejate conform GDPR."
+            title: t('landing-page.about.features.protectedData')
         },
         {
             icon: <img src="/icons/landing/aiTechnology.png" className='w-12 h-12' />,
-            title: "Tehnologie AI de ultimă generație"
+            title: t('landing-page.about.features.aiTechnology')
         },
         {
             icon: <img src="/icons/landing/localFocus.png" className='w-12 h-12' />,
-            title: "Focus local: imobiliare din România, în limba ta"
+            title: t('landing-page.about.features.localFocus')
         },
         {
             icon: <img src="/icons/landing/verifiedListings.png" className='w-12 h-12' />,
-            title: "Anunțuri verificate și plăți sigure pentru o experiență fără riscuri."
+            title: t('landing-page.about.features.verifiedListings')
         }
     ];
 
     return (
-        <section className="py-12 md:py-20 max-w-4xl mx-auto">
+        <section id="about" className="py-12 md:py-20 max-w-4xl mx-auto">
             <div className="grid lg:grid-cols-2 gap-12 items-stretch mx-4">
                 {/* Left side - Blue card */}
                 <div className="bg-gradient-to-br from-blue-500/50 to-purple-600/50 rounded-[18px] p-6 text-white">
                     <h2 className="text-3xl md:text-4xl font-medium mb-6">
-                        Despre noi
+                        {t('landing-page.about.title')}
                     </h2>
                     <p className="text-sm leading-relaxed mb-3">
-                        La DOORS, credem că achizița sau vânzarea unei locuințe
-                        trebuie să fie corectă, transparentă și lipsită de stres.
-                        Asistentul nostru AI face procesul imobiliar mai simplu, mai
-                        accesibil și mai prietenos decât metodele tradiționale.
+                        {t('landing-page.about.description.paragraph1')}
                     </p>
                     <p className="text-sm leading-relaxed">
-                        Suntem hotărâți să aducem această soluție fiecărui
-                        cumpărător și vânzător din România, combinând inteligența
-                        artificială de ultimă generație cu increderea și claritatea de
-                        care industria imobiliară are atât de multă nevoie.
+                        {t('landing-page.about.description.paragraph2')}
                     </p>
                 </div>
 
@@ -230,30 +236,32 @@ const AboutSection: React.FC = () => {
 
 // Pricing Section Component
 const PricingSection: React.FC = () => {
+    const { t } = useTranslation();
+
     return (
-        <section className="py-12 md:py-20 max-w-5xl mx-auto w-full px-4">
+        <section id="pricing" className="py-12 md:py-20 max-w-5xl mx-auto w-full px-4">
             <div className="text-center mb-8">
                 <h2 className="text-3xl md:text-4xl font-medium text-white mb-6">
-                    Preturi
+                    {t('landing-page.pricing.title')}
                 </h2>
                 <p className="text-sm text-slate-300 max-w-3xl mx-auto mb-2">
-                    Simplu, corect, pe bază de tokeni
+                    {t('landing-page.pricing.subtitle')}
                 </p>
 
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 items-stretch w-full gap-4 max-w-4xl mx-auto">
                 <div className="grid grid-cols-1 gap-2 md:gap-4">
-                    {["Incepi gratuit cu un pachet de tokeni inclusi", "Fiecare interacțiune cu AI-ul consumă câțiva tokeni", "Reîncarci doar când ai nevoie"].map((text, index) => (
+                    {t('landing-page.pricing.features', { returnObjects: true }).map((text, index) => (
                         <p key={index} className="text-slate-300 text-center flex flex-row items-center justify-center px-6 py-4 rounded-lg bg-[#120826]">
                             {text}
                         </p>
                     ))}
                 </div>
                 <div className="rounded-lg bg-[#120826] p-8 text-center">
-                    <h3 className="text-xl font-light text-white mb-4">Starter</h3>
-                    <span className="text-3xl font-light text-white ">$49.99</span>
-                    <p className="text-[#919EAB] mt-3">500 tokeni</p>
+                    <h3 className="text-xl font-light text-white mb-4">{t('landing-page.pricing.plan.name')}</h3>
+                    <span className="text-3xl font-light text-white ">{t('landing-page.pricing.plan.price')}</span>
+                    <p className="text-[#919EAB] mt-3">{t('landing-page.pricing.plan.tokens')}</p>
 
                 </div>
             </div>
@@ -263,36 +271,37 @@ const PricingSection: React.FC = () => {
 
 // FAQ Section Component
 const FAQSection: React.FC = () => {
+    const { t } = useTranslation();
     const [openFAQ, setOpenFAQ] = useState<number | null>(null);
 
     const faqs = [
         {
-            question: "Ce sunt tokenii și cum funcționează?",
-            answer: "Tokenii sunt credite virtuale pentru interacțiunile cu AI-ul. Primești gratuit la început și poți cumpăra mai mulți oricând."
+            question: t('landing-page.faq.items.tokens.question'),
+            answer: t('landing-page.faq.items.tokens.answer')
         },
         {
-            question: "Datele mele sunt în siguranță?",
-            answer: "Da, toate datele sunt protejate conform standardelor si nu sunt impartasite decat cu tertii mentionati."
+            question: t('landing-page.faq.items.dataSafety.question'),
+            answer: t('landing-page.faq.items.dataSafety.answer')
         },
         {
-            question: "Pot folosi platforma și ca vânzător, și ca cumpărător?",
-            answer: "Da, platforma este concepută pentru ambele roluri și oferă funcționalități complete pentru vânzarea și cumpărarea proprietăților."
+            question: t('landing-page.faq.items.buyerSeller.question'),
+            answer: t('landing-page.faq.items.buyerSeller.answer')
         },
         {
-            question: "De ce să aleg DOORS și nu o agenție clasică?",
-            answer: "DOORS oferă transparență completă, costuri reduse și acces imediat la informații, eliminând intermediarii și comisioanele mari."
+            question: t('landing-page.faq.items.whyDoors.question'),
+            answer: t('landing-page.faq.items.whyDoors.answer')
         }
     ];
 
     const seeAllButton = <button className="border-1 border-white text-white w-full md:w-fit px-16 py-2.5 rounded-md font-semibold text-md hover:border-purple-500 hover:bg-slate-800/50 transition-all">
-        Vezi toate întrebările
+        {t('landing-page.faq.seeAll')}
     </button>
     return (
-        <section className="py-12 md:py-20 mx-4">
+        <section id="faq" className="py-12 md:py-20 mx-4">
             <div className="max-w-4xl mx-auto">
                 <div className="flex flex-row items-center justify-center md:justify-between mb-4">
                     <h2 className="text-3xl md:text-4xl text-center font-medium text-white mb-6">
-                        Întrebări frecvente
+                        {t('landing-page.faq.title')}
                     </h2>
                     <div className='hidden md:block'>{seeAllButton}</div>
                 </div>
@@ -330,6 +339,7 @@ const FAQSection: React.FC = () => {
 // Final CTA Section Component
 const FinalCTASection: React.FC = () => {
     const { data } = authClient.useSession();
+    const { t } = useTranslation();
 
     return (
         <section className="py-5 min-h-[70dvh] md:min-h-fit relative flex flex-row bg-gradient-to-br items-center from-[#120826] to-[#32215A] from-[70%] md:to-[80%] max-w-5xl rounded-2xl mx-3 md:mx-auto mb-20 overflow-x-clip">
@@ -341,11 +351,11 @@ const FinalCTASection: React.FC = () => {
 
             <div className="max-w-4xl mx-auto px-6 text-center absolute bottom-[5%] md:relative z-10">
                 <h2 className="text-4xl md:text-5xl font-medium text-white mb-6 leading-tight">
-                    Casa ta de vis este la doar o conversație distantă
+                    {t('landing-page.finalCta.title')}
                 </h2>
 
                 <p className="text-md text-slate-300 mb-2 max-w-2xl mx-auto">
-                    Încearcă asistentul AI acum:
+                    {t('landing-page.finalCta.subtitle')}
                 </p>
 
                 <Link
@@ -353,7 +363,7 @@ const FinalCTASection: React.FC = () => {
                     params={data ? {} : { path: "sign-in" }}
                     className="inline-block bg-gradient-to-r from-blue-500 to-purple-600 text-white px-5 py-3 rounded-md font-semibold text-md hover:from-blue-600 hover:to-purple-700 transition-all transform hover:scale-105 shadow-2xl"
                 >
-                    Înregistrează-te gratuit
+                    {t('landing-page.finalCta.button')}
                 </Link>
             </div>
         </section>
@@ -362,6 +372,7 @@ const FinalCTASection: React.FC = () => {
 
 // Footer Component
 const Footer: React.FC = () => {
+    const { t } = useTranslation();
     return (
         <footer className="bg-black relative py-5">
             <img src="/landing/footerAnimation.gif" loading='lazy' className="absolute z-0 top-0 left-0 right-0 mx-auto max-w-5xl w-full h-full object-cover object-center scale-[0.9] opacity-30" />
@@ -375,28 +386,28 @@ const Footer: React.FC = () => {
                     {/* Navigation */}
                     <div className="flex flex-col md:flex-row space-y-3 md:space-y-0 md:space-x-5">
                         {[
-                            { text: "Beneficii", href: "#benefits" },
-                            { text: "Demo", href: "#demo" },
-                            { text: "Prețuri", href: "#pricing" },
-                            { text: "Întrebări frecvente", href: "#faqs" },
+                            { text: t('landing-page.footer.navigation.benefits'), href: "#benefits" },
+                            { text: t('landing-page.footer.navigation.demo'), href: "#demo" },
+                            { text: t('landing-page.footer.navigation.pricing'), href: "#pricing" },
+                            { text: t('landing-page.footer.navigation.faq'), href: "#faq" },
                         ].map(({ text, href }, index) => (
-                            <a key={index} href="#" className="text-white hover:text-slate-400 text-sm transition-colors">{text}</a>
+                            <a key={index} href={href} className="text-white hover:text-slate-400 text-sm transition-colors">{text}</a>
                         ))}
                     </div>
                 </div>
 
                 <h3 className="text-2xl md:text-4xl font-bold text-white mt-16 mb-12">
-                    Găsește casa perfectă rapid, sigur și inteligent.
+                    {t('landing-page.footer.slogan')}
                 </h3>
 
                 <div className="border-t border-slate-700 pt-8">
                     <div className="flex flex-col md:flex-row justify-between items-center">
                         <p className="text-white text-xs mb-4 md:mb-0">
-                            © DOORS 2025. Toate drepturile rezervate.
+                            {t('landing-page.footer.copyright')}
                         </p>
                         <div className="flex space-x-6">
-                            <a href="#" className="hover:text-slate-400 text-white text-xs transition-colors">Termeni și condiții</a>
-                            <a href="#" className="hover:text-slate-400 text-white text-xs transition-colors">Politica și confidențialitate</a>
+                            <a href="#" className="hover:text-slate-400 text-white text-xs transition-colors">{t('landing-page.footer.legal.terms')}</a>
+                            <a href="#" className="hover:text-slate-400 text-white text-xs transition-colors">{t('landing-page.footer.legal.privacy')}</a>
                         </div>
                     </div>
                 </div>

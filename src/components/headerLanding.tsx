@@ -41,10 +41,10 @@ export const Header: React.FC = () => {
                     </div>
 
                     <nav className='space-x-7 hidden md:block'>
-                        <Link to={"#beneficii" as any} className="hover:text-slate-300 transition-colors">Beneficii</Link>
-                        <Link to={"#demo" as any} className="hover:text-slate-300 transition-colors">Demo</Link>
-                        <Link to={"#prețuri" as any} className="hover:text-slate-300 transition-colors">Prețuri</Link>
-                        <Link to={"#întrebări" as any} className="hover:text-slate-300 transition-colors">Întrebări</Link>
+                        <a href="#benefits" className="hover:text-slate-300 transition-colors">{t('footer.navigation.benefits')}</a>
+                        <a href="#demo" className="hover:text-slate-300 transition-colors">{t('footer.navigation.demo')}</a>
+                        <a href="#pricing" className="hover:text-slate-300 transition-colors">{t('footer.navigation.pricing')}</a>
+                        <a href="#faq" className="hover:text-slate-300 transition-colors">{t('footer.navigation.faq')}</a>
 
                     </nav>
 
@@ -64,10 +64,10 @@ export const Header: React.FC = () => {
                 {isMenuOpen && (
                     <div className="md:hidden border-t border-slate-700 bg-[#120826]/50 backdrop-blur-md p-3 rounded">
                         <div className="flex flex-col space-y-4 mt-4">
-                            <Link to={"#beneficii" as any} className="hover:text-slate-300 transition-colors">Beneficii</Link>
-                            <Link to={"#demo" as any} className="hover:text-slate-300 transition-colors">Demo</Link>
-                            <Link to={"#prețuri" as any} className="hover:text-slate-300 transition-colors">Prețuri</Link>
-                            <Link to={"#întrebări" as any} className="hover:text-slate-300 transition-colors">Întrebări</Link>
+                            <a href="#benefits" className="hover:text-slate-300 transition-colors" onClick={() => setIsMenuOpen(false)}>{t('footer.navigation.benefits')}</a>
+                            <a href="#demo" className="hover:text-slate-300 transition-colors" onClick={() => setIsMenuOpen(false)}>{t('footer.navigation.demo')}</a>
+                            <a href="#pricing" className="hover:text-slate-300 transition-colors" onClick={() => setIsMenuOpen(false)}>{t('footer.navigation.pricing')}</a>
+                            <a href="#faq" className="hover:text-slate-300 transition-colors" onClick={() => setIsMenuOpen(false)}>{t('footer.navigation.faq')}</a>
                         </div>
                     </div>
                 )}

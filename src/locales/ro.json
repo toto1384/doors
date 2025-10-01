@@ -1,0 +1,246 @@
+{
+  "landing-page": {
+    "hero": {
+      "title": {
+        "line1": "Găsește-ți casa de vis cu ajutorul",
+        "line2": "Doors"
+      },
+      "subtitle": "fără agenți, fără comisioane uriașe, fără bătai de cap",
+      "description": "Asistentul tău imobiliar AI te ajută imediat să descoperi, să selectezi și să programezi vizionări - la o fracțiune din costul unei agenții tradiționale.",
+      "buttons": {
+        "register": "Înregistrează-te gratuit",
+        "login": "Autentificare"
+      }
+    },
+    "benefits": {
+      "title": "Beneficii",
+      "items": {
+        "personalAssistant": {
+          "title": "Asistentul tău personal AI",
+          "description": "Disponibil 24/7, îti retine preferințele, vorbește limba ta (RO/EN)."
+        },
+        "personalizedSearch": {
+          "title": "Căutare rapidă și personalizată",
+          "description": "Sugestii instant pe baza nevoilor tale - fără căutări nesfarsite."
+        },
+        "correctPrice": {
+          "title": "Preț corect și transparent",
+          "description": "Plătești sub 0.5% din cat ai platii unei agenții imobiliare."
+        },
+        "betterExperience": {
+          "title": "O experiență mai bună",
+          "description": "De la căutare la ofertă, ai parte de un proces intuitiv și simplu - fără agenți."
+        }
+      }
+    },
+    "demo": {
+      "title": "Demo"
+    },
+    "about": {
+      "title": "Despre noi",
+      "description": {
+        "paragraph1": "La DOORS, credem că achizția sau vânzarea unei locuințe trebuie să fie corectă, transparentă și lipsită de stres. Asistentul nostru AI face procesul imobiliar mai simplu, mai accesibil și mai prietenos decât metodele tradiționale.",
+        "paragraph2": "Suntem hotărâți să aducem această soluție fiecărui cumpărător și vânzător din România, combinând inteligența artificială de ultimă generație cu increderea și claritatea de care industria imobiliară are atât de multă nevoie."
+      },
+      "features": {
+        "protectedData": "Datele tale sunt protejate conform GDPR.",
+        "aiTechnology": "Tehnologie AI de ultimă generație",
+        "localFocus": "Focus local: imobiliare din România, în limba ta",
+        "verifiedListings": "Anunțuri verificate și plăți sigure pentru o experiență fără riscuri."
+      }
+    },
+    "pricing": {
+      "title": "Preturi",
+      "subtitle": "Simplu, corect, pe bază de tokeni",
+      "features": [
+        "Incepi gratuit cu un pachet de tokeni inclusi",
+        "Fiecare interacțiune cu AI-ul consumă câțiva tokeni",
+        "Reîncarci doar când ai nevoie"
+      ],
+      "plan": {
+        "name": "Starter",
+        "price": "$49.99",
+        "tokens": "500 tokeni"
+      }
+    },
+    "faq": {
+      "title": "Întrebări frecvente",
+      "seeAll": "Vezi toate întrebările",
+      "items": {
+        "tokens": {
+          "question": "Ce sunt tokenii și cum funcționează?",
+          "answer": "Tokenii sunt credite virtuale pentru interacțiunile cu AI-ul. Primești gratuit la început și poți cumpăra mai mulți oricând."
+        },
+        "dataSafety": {
+          "question": "Datele mele sunt în siguranță?",
+          "answer": "Da, toate datele sunt protejate conform standardelor si nu sunt impartasite decat cu tertii mentionati."
+        },
+        "buyerSeller": {
+          "question": "Pot folosi platforma și ca vânzător, și ca cumpărător?",
+          "answer": "Da, platforma este concepută pentru ambele roluri și oferă funcționalități complete pentru vânzarea și cumpărarea proprietăților."
+        },
+        "whyDoors": {
+          "question": "De ce să aleg DOORS și nu o agenție clasică?",
+          "answer": "DOORS oferă transparență completă, costuri reduse și acces imediat la informații, eliminând intermediarii și comisioanele mari."
+        }
+      }
+    },
+    "finalCta": {
+      "title": "Casa ta de vis este la doar o conversație distantă",
+      "subtitle": "Încearcă asistentul AI acum:",
+      "button": "Înregistrează-te gratuit"
+    },
+    "footer": {
+      "brand": "DOORS",
+      "slogan": "Găsește casa perfectă rapid, sigur și inteligent.",
+      "navigation": {
+        "benefits": "Beneficii",
+        "demo": "Demo",
+        "pricing": "Prețuri",
+        "faq": "Întrebări frecvente"
+      },
+      "legal": {
+        "terms": "Termeni și condiții",
+        "privacy": "Politica și confidențialitate"
+      },
+      "copyright": "© DOORS 2025. Toate drepturile rezervate."
+    }
+  },
+  "register-page": {
+    "title": "Înregistrează-te",
+    "subtitle": "Creează-ți contul pentru a începe",
+    "form": {
+      "email": "Email",
+      "password": "Parolă",
+      "confirmPassword": "Confirmă Parola",
+      "firstName": "Prenume",
+      "lastName": "Nume",
+      "button": "Creează Cont",
+      "haveAccount": "Ai deja un cont?",
+      "signIn": "Conectează-te"
+    }
+  },
+  "login-page": {
+    "title": "Conectează-te",
+    "subtitle": "Conectează-te la contul tău",
+    "form": {
+      "email": "Email",
+      "password": "Parolă",
+      "button": "Conectează-te",
+      "forgotPassword": "Ți-ai uitat parola?",
+      "noAccount": "Nu ai un cont?",
+      "signUp": "Înregistrează-te"
+    }
+  },
+  "profile-page": {
+    "title": "Profil",
+    "subtitle": "Gestionează setările contului",
+    "settings": "Setări",
+    "sections": {
+      "personal": "Informații Personale",
+      "preferences": "Preferințe",
+      "security": "Securitate",
+      "language": "Limbă"
+    },
+    "language": {
+      "title": "Setări Limbă",
+      "subtitle": "Alege limba ta preferată",
+      "english": "Engleză",
+      "romanian": "Română"
+    },
+    "theme": {
+      "title": "Setări Temă",
+      "subtitle": "Alege tema ta preferată"
+    },
+    "account": {
+      "title": "Cont"
+    }
+  },
+  "privacy-policy": {
+    "title": "Politica de Confidențialitate",
+    "lastUpdated": "Ultima actualizare: {date}",
+    "introduction": "Această Politică de Confidențialitate descrie modul în care colectăm, folosim și protejăm informațiile dvs."
+  },
+  "terms-of-service": {
+    "title": "Termenii Serviciului",
+    "lastUpdated": "Ultima actualizare: {date}",
+    "introduction": "Acești Termeni de Serviciu guvernează utilizarea platformei și serviciilor noastre."
+  },
+  "common": {
+    "loading": "Se încarcă...",
+    "save": "Salvează",
+    "cancel": "Anulează",
+    "edit": "Editează",
+    "delete": "Șterge",
+    "confirm": "Confirmă",
+    "close": "Închide"
+  },
+  "auth-ui": {
+    "signIn": "Conectează-te",
+    "signUp": "Înregistrează-te",
+    "signOut": "Deconectează-te",
+    "forgotPassword": "Parolă Uitată",
+    "resetPassword": "Resetează Parola",
+    "changePassword": "Schimbă Parola",
+    "updateProfile": "Actualizează Profilul",
+    "settings": "Setări",
+    "profile": "Profil",
+    "account": "Cont",
+    "email": "Email",
+    "password": "Parolă",
+    "confirmPassword": "Confirmă Parola",
+    "newPassword": "Parolă Nouă",
+    "currentPassword": "Parola Curentă",
+    "firstName": "Prenume",
+    "lastName": "Nume",
+    "name": "Nume",
+    "displayName": "Nume Afișat",
+    "phoneNumber": "Număr de Telefon",
+    "dateOfBirth": "Data Nașterii",
+    "gender": "Gen",
+    "bio": "Biografie",
+    "website": "Site Web",
+    "location": "Locație",
+    "timezone": "Fus Orar",
+    "language": "Limbă",
+    "theme": "Temă",
+    "notifications": "Notificări",
+    "privacy": "Confidențialitate",
+    "security": "Securitate",
+    "sessions": "Sesiuni",
+    "devices": "Dispozitive",
+    "continue": "Continuă",
+    "byContinuingYouAgree": "Prin continuare, ești de acord cu",
+    "termsOfService": "Termenii Serviciului",
+    "privacyPolicy": "Politica de Confidențialitate",
+    "and": "și",
+    "or": "sau",
+    "rememberMe": "Ține-mă Minte",
+    "staySignedIn": "Rămâi conectat",
+    "alreadyHaveAccount": "Ai deja un cont?",
+    "dontHaveAccount": "Nu ai un cont?",
+    "backToSignIn": "Înapoi la Conectare",
+    "createAccount": "Creează Cont",
+    "enterEmail": "Introdu email-ul",
+    "enterPassword": "Introdu parola",
+    "enterNewPassword": "Introdu parola nouă",
+    "confirmNewPassword": "Confirmă parola nouă",
+    "sendResetLink": "Trimite Link de Resetare",
+    "checkEmail": "Verifică email-ul",
+    "resetLinkSent": "Ți-am trimis un link de resetare a parolei",
+    "passwordUpdated": "Parola a fost actualizată cu succes",
+    "profileUpdated": "Profilul a fost actualizat cu succes",
+    "emailVerified": "Email-ul a fost verificat cu succes",
+    "verifyEmail": "Verifică Email",
+    "resendVerification": "Retrimite Verificarea",
+    "verificationSent": "Email de verificare trimis",
+    "emailNotVerified": "Email neverificat",
+    "pleaseVerifyEmail": "Te rugăm să îți verifici adresa de email",
+    "loading": "Se încarcă...",
+    "saving": "Se salvează...",
+    "submitting": "Se trimite...",
+    "processing": "Se procesează...",
+    "optional": "Opțional",
+    "required": "Obligatoriu"
+  }
+}
