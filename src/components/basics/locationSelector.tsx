@@ -71,8 +71,7 @@ export function LocationSelector(
     }, [locationObject])
 
 
-    useEffect(() => {
-        if (!isLoaded || loadError) return;
+    if (isLoaded && !loadError) {
 
         const autocomplete = new google.maps.places.Autocomplete(inputRef.current as any, {
             componentRestrictions: { country: "ro" },
@@ -82,8 +81,8 @@ export function LocationSelector(
 
         autocomplete.addListener("place_changed", () => handlePlaceChanged(autocomplete));
 
-        // return () => autocomplete.removeListener("place_changed", handlePlaceChanged);
-    }, [isLoaded, loadError]);
+    }
+
 
 
 

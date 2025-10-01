@@ -1,8 +1,8 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { createFileRoute, Link } from '@tanstack/react-router';
-import { Search, Bot, Zap, Eye, DollarSign, Home, Star, ArrowRight, Menu, X } from 'lucide-react';
-import { useEffect } from 'react';
+import { Search, Bot, Zap, Eye, DollarSign, Home, Star, ArrowRight, Menu, X, Shield, Atom, Focus, CheckCircle, ChevronDown } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Header } from "src/components/headerLanding";
 import { useTRPC } from 'trpc/react';
@@ -16,15 +16,40 @@ export const Route = createFileRoute('/')({
 
 function HomePage() {
 
+    const blobs = Array.from({ length: 10 }, (_, i) => ({
+        id: i,
+        x: i % 2 === 0 ? 10 : 90, // alternates left (20%) and right (80%)
+        y: i * 600, // fixed spacing, 400px apart
+    }));
+
     return (
-        <>
+        <div className='bg-[#0B0014] text-white overflow-x-clip overflow-y-clip relative'>
+
+
+            {blobs.map(blob => (
+                <div
+                    key={blob.id}
+                    className="absolute w-[700px] h-[700px] rounded-full blur-[100px] pointer-events-none -z10"
+                    style={{
+                        left: `${blob.x}%`,
+                        top: `calc(${blob.y}px + 150dvh)`,
+                        background: 'radial-gradient(circle, rgba(138, 64, 182, 0.3) 0%, transparent 70%)',
+                        transform: 'translate(-50%, -50%)',
+                    }}
+                />
+            ))}
+
+
             <Header />
             <HeroSection />
-            <FeaturesSection />
+            <BenefitsSection />
             <DemoSection />
+            <AboutSection />
             <PricingSection />
+            <FAQSection />
+            <FinalCTASection />
             <Footer />
-        </>
+        </div>
     );
 }
 
@@ -33,132 +58,95 @@ function HomePage() {
 
 // Hero Section Component
 const HeroSection: React.FC = () => {
-    const { t: heroT } = useTranslation('translation', { keyPrefix: 'landing-page.hero', });
-
-    const trpc = useTRPC()
-
-    const response = useQuery(trpc.guitars.list.queryOptions())
-
-
-    const { data } = authClient.useSession()
-
+    const { data } = authClient.useSession();
 
     return (
-        <section className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center relative overflow-hidden">
-            {/* Background Effects */}
-            <div className="absolute inset-0">
-                <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse"></div>
-                <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
-            </div>
+        <section className="min-h-[95dvh] bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-end relative md:overflow-hidden h-fit">
+            <img src="/landing/chat.png" className="absolute hidden md:block z-40 top-0 bottom-0 my-auto left-10 w-[30vw] opacity-50" />
+            <img src="/landing/hero.png" className="absolute brightness-75 inset-0 bg-black/50 object-right-bottom object-cover h-[70dvh] md:h-auto scale-110" />
+            <img src="/landing/heroLayer.png" className="absolute brightness-75 hidden md:block z-20 inset-0 object-right-bottom object-cover h-[70dvh] md:h-auto scale-110 " />
+            <div className='bg-gradient-to-r hidden md:block from-[#0B0014]/90 from-20% to-black/0 to-50% absolute z-30 inset-0'></div>
+            <div className='bg-gradient-to-t from-[#0B0014] from-20% to-black/0 to-50% absolute z-30 inset-0'></div>
 
-            <div className="max-w-7xl mx-auto px-6 py-20 text-center relative z-10">
-                <div className="mb-8 inline-block">
-                    <span className="bg-gradient-to-r from-blue-400 to-purple-600 text-transparent bg-clip-text text-sm font-semibold uppercase tracking-wider">
-                        {heroT('badge')}
-                        {response.status}
-                        {response.data ?? 10000}
+
+            <div className="md:max-w-[75vw] md:px-6 absolute bottom-0 md:mt-0 md:top-[25%] md:right-[10%] mx-auto">
+                <div className="z-10 px-3 text-center">
+                    <span className="text-4xl md:text-2xl md:block text-center md:pl-5 font-light text-white mb-4">
+                        Găsește-ți casa de vis cu ajutorul
+                    </span>
+                    <span className="text-4xl md:text-[13rem]/15 font-semibold text-white mb-8 ml-2 md:ml-0">
+                        Doors
                     </span>
                 </div>
+                <div className='z-40 relative md:absolute px-3'>
+                    <p className="text-xl md:text-[26px] text-center md:-mx-5 mt-4 md:mt-8 mb-8 ">
+                        fără agenți, fără comisioane uriașe, fără bătai de cap
+                    </p>
 
-                <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
-                    {heroT('title.line1')}
-                    <span className="bg-gradient-to-r from-blue-400 to-purple-600 text-transparent bg-clip-text"> {heroT('title.line2')}</span>
-                </h1>
+                    <p className="md:text-sm font-light mt-6 md:mt-16 mb-8 md:mb-4 max-w-3xl mx-auto text-[#C4CDD5]">
+                        Asistentul tău imobiliar AI te ajută imediat să descoperi, să selectezi și să programezi
+                        vizionări - la o fracțiune din costul unei agenții tradiționale.
+                    </p>
 
-                <p className="text-xl text-slate-300 mb-8 max-w-3xl mx-auto leading-relaxed">
-                    {heroT('description')}
-                </p>
-
-                <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
-
-                    {data ? <Link
-                        to="/app"
-                        className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:from-blue-600 hover:to-purple-700 transition-all transform hover:scale-105 shadow-2xl"
-                    >
-                        Go to App
-                    </Link> : <Link
-                        to="/auth/$path"
-                        params={{ path: "sign-in" }}
-                        className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:from-blue-600 hover:to-purple-700 transition-all transform hover:scale-105 shadow-2xl"
-                    >
-                        {heroT('buttons.getStarted')}
-                    </Link>}
-                    <button className="border-2 border-slate-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:border-slate-400 hover:bg-slate-800/50 transition-all">
-                        {heroT('buttons.watchDemo')}
-                    </button>
-                </div>
-
-                {/* Stats */}
-                <div className="grid grid-cols-3 gap-8 max-w-2xl mx-auto">
-                    <div className="text-center">
-                        <div className="text-3xl font-bold text-white mb-2">{heroT('stats.properties')}</div>
-                        <div className="text-slate-400">{heroT('stats.propertiesLabel')}</div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-6 justify-center items-center">
+                        <Link
+                            to={data ? "/app" : "/auth/$path"}
+                            params={data ? {} : { path: "sign-in" }}
+                            className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-4 py-3 md:py-[9px] rounded-sm text-lg md:text-base hover:from-blue-600 hover:to-purple-700 transition-all transform shadow-2xl text-center"
+                        >
+                            Înregistrează-te gratuit
+                        </Link>
+                        <button className="outline-1 outline-white text-white px-4 py-3 md:py-2 rounded-sm text-lg md:text-base hover:outline-slate-400 hover:bg-slate-800/50 transition-all text-center">
+                            Autentificare
+                        </button>
                     </div>
-                    <div className="text-center">
-                        <div className="text-3xl font-bold text-white mb-2">{heroT('stats.satisfaction')}</div>
-                        <div className="text-slate-400">{heroT('stats.satisfactionLabel')}</div>
-                    </div>
-                    <div className="text-center">
-                        <div className="text-3xl font-bold text-white mb-2">{heroT('stats.support')}</div>
-                        <div className="text-slate-400">{heroT('stats.supportLabel')}</div>
-                    </div>
+
                 </div>
             </div>
         </section>
     );
 };
 
-// Features/Pitch Section Component
-const FeaturesSection: React.FC = () => {
-    const { t: featuresT } = useTranslation('translation', { keyPrefix: 'landing-page.features' });
-
-    const features = [
+// Benefits Section Component
+const BenefitsSection: React.FC = () => {
+    const benefits = [
         {
-            icon: <Bot className="w-8 h-8" />,
-            title: featuresT('items.aiAssistant.title'),
-            description: featuresT('items.aiAssistant.description')
+            icon: <img src="/icons/landing/personalAssistent.png" className="w-28 h-28 object-contain" />,
+            title: "Asistentul tău personal AI",
+            description: "Disponibil 24/7, îti retine preferințele, vorbește limba ta (RO/EN)."
         },
         {
-            icon: <Zap className="w-8 h-8" />,
-            title: featuresT('items.lightningSearch.title'),
-            description: featuresT('items.lightningSearch.description')
+            icon: <img src="/icons/landing/personalizedSearch.png" className="w-28 h-28 object-contain" />,
+            title: "Căutare rapidă și personalizată",
+            description: "Sugestii instant pe baza nevoilor tale - fără căutări nesfarsite."
         },
         {
-            icon: <Star className="w-8 h-8" />,
-            title: featuresT('items.personalizedListings.title'),
-            description: featuresT('items.personalizedListings.description')
+            icon: <img src="/icons/landing/correctPrice.png" className="w-28 h-28 object-contain" />,
+            title: "Preț corect și transparent",
+            description: "Plătești sub 0.5% din cat ai platii unei agenții imobiliare."
         },
         {
-            icon: <Eye className="w-8 h-8" />,
-            title: featuresT('items.transparentPricing.title'),
-            description: featuresT('items.transparentPricing.description')
+            icon: <img src="/icons/landing/betterExperience.png" className="w-28 h-28 object-contain" />,
+            title: "O experiență mai bună",
+            description: "De la căutare la ofertă, ai parte de un proces intuitiv și simplu - fără agenți."
         }
     ];
 
     return (
-        <section id="features" className="py-20 bg-slate-800">
-            <div className="max-w-7xl mx-auto px-6">
-                <div className="text-center mb-16">
-                    <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-                        {featuresT('title.prefix')}
-                        <span className="bg-gradient-to-r from-blue-400 to-purple-600 text-transparent bg-clip-text">{featuresT('title.brand')}</span>
-                        {featuresT('title.suffix')}
-                    </h2>
-                    <p className="text-xl text-slate-300 max-w-3xl mx-auto">
-                        {featuresT('subtitle')}
-                    </p>
-                </div>
+        <section className="py-16 md:py-20 ">
+            <div className="max-w-5xl mx-auto px-6">
+                <h2 className="text-3xl md:text-4xl font-semibold text-center mx-auto text-white mb-6">
+                    Beneficii
+                </h2>
 
-                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-                    {features.map((feature, index) => (
-                        <div key={index} className="group relative">
-                            <div className="bg-slate-700/50 backdrop-blur-sm border border-slate-600/50 rounded-2xl p-8 h-full hover:border-purple-500/50 transition-all duration-300 hover:transform hover:scale-105">
-                                <div className="bg-gradient-to-br from-blue-500 to-purple-600 text-white p-4 rounded-xl mb-6 w-fit group-hover:shadow-2xl group-hover:shadow-purple-500/25 transition-all">
-                                    {feature.icon}
-                                </div>
-                                <h3 className="text-xl font-bold text-white mb-4">{feature.title}</h3>
-                                <p className="text-slate-300 leading-relaxed">{feature.description}</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    {benefits.map((benefit, index) => (
+                        <div key={index} className="text-center bg-[#120826] rounded-lg p-4 mb-4">
+                            <div className="p-6 rounded-full mx-auto flex items-center justify-center">
+                                {benefit.icon}
                             </div>
+                            <h3 className="text-xl font-normal text-white mb-4">{benefit.title}</h3>
+                            <p className="text-[#919EAB] leading-relaxed">{benefit.description}</p>
                         </div>
                     ))}
                 </div>
@@ -167,67 +155,73 @@ const FeaturesSection: React.FC = () => {
     );
 };
 
-// Demo Preview Section Component
+// Demo Section Component
 const DemoSection: React.FC = () => {
-    const { t: demoT } = useTranslation('translation', { keyPrefix: 'landing-page.demo' });
     return (
-        <section id="demo" className="py-20 bg-gradient-to-br from-slate-900 to-slate-800">
+        <section className="md:py-10 ">
             <div className="max-w-7xl mx-auto px-6">
-                <div className="text-center mb-16">
-                    <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-                        {demoT('title.prefix')}<span className="bg-gradient-to-r from-blue-400 to-purple-600 text-transparent bg-clip-text">{demoT('title.highlight')}</span>
+                <h2 className="text-3xl md:text-4xl font-semibold text-white mb-7 md:mb-12 text-center mx-auto "> Demo </h2>
+
+                <img src="/landing/demo.png" className="w-full max-w-[800px] mx-auto h-auto mb-16 z-50 relative" />
+            </div>
+        </section>
+    );
+};
+
+// About Section Component
+const AboutSection: React.FC = () => {
+    const features = [
+        {
+            icon: <img src="/icons/landing/protectedData.png" className="w-12 h-12" />,
+            title: "Datele tale sunt protejate conform GDPR."
+        },
+        {
+            icon: <img src="/icons/landing/aiTechnology.png" className='w-12 h-12' />,
+            title: "Tehnologie AI de ultimă generație"
+        },
+        {
+            icon: <img src="/icons/landing/localFocus.png" className='w-12 h-12' />,
+            title: "Focus local: imobiliare din România, în limba ta"
+        },
+        {
+            icon: <img src="/icons/landing/verifiedListings.png" className='w-12 h-12' />,
+            title: "Anunțuri verificate și plăți sigure pentru o experiență fără riscuri."
+        }
+    ];
+
+    return (
+        <section className="py-12 md:py-20 max-w-4xl mx-auto">
+            <div className="grid lg:grid-cols-2 gap-12 items-stretch mx-4">
+                {/* Left side - Blue card */}
+                <div className="bg-gradient-to-br from-blue-500/50 to-purple-600/50 rounded-[18px] p-6 text-white">
+                    <h2 className="text-3xl md:text-4xl font-medium mb-6">
+                        Despre noi
                     </h2>
-                    <p className="text-xl text-slate-300 max-w-3xl mx-auto">
-                        {demoT('subtitle')}
+                    <p className="text-sm leading-relaxed mb-3">
+                        La DOORS, credem că achizița sau vânzarea unei locuințe
+                        trebuie să fie corectă, transparentă și lipsită de stres.
+                        Asistentul nostru AI face procesul imobiliar mai simplu, mai
+                        accesibil și mai prietenos decât metodele tradiționale.
+                    </p>
+                    <p className="text-sm leading-relaxed">
+                        Suntem hotărâți să aducem această soluție fiecărui
+                        cumpărător și vânzător din România, combinând inteligența
+                        artificială de ultimă generație cu increderea și claritatea de
+                        care industria imobiliară are atât de multă nevoie.
                     </p>
                 </div>
 
-                <div className="max-w-4xl mx-auto">
-                    {/* Demo Content */}
-                    <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-600/50 rounded-2xl p-8">
-                        <div className="space-y-4">
-                            <div className="flex items-start space-x-4">
-                                <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0">
-                                    <Bot className="w-4 h-4 text-white" />
-                                </div>
-                                <div className="bg-slate-700 rounded-2xl rounded-tl-sm p-4 max-w-md">
-                                    <p className="text-white">{demoT('conversation.aiGreeting')}</p>
-                                </div>
+                <div className="grid grid-cols-2 gap-1.5">
+                    {features.map((feature, index) => (
+                        <div key={index} className="text-center bg-[#120826] rounded-lg">
+                            <div className="mx-auto my-4 flex flex-col items-center">
+                                {feature.icon}
                             </div>
-                            <div className="flex items-start space-x-4 flex-row-reverse">
-                                <div className="w-8 h-8 bg-slate-600 rounded-full flex items-center justify-center flex-shrink-0">
-                                    <span className="text-white text-sm">U</span>
-                                </div>
-                                <div className="bg-blue-600 rounded-2xl rounded-tr-sm p-4 max-w-md">
-                                    <p className="text-white">{demoT('conversation.userRequest')}</p>
-                                </div>
-                            </div>
-                            <div className="flex items-start space-x-4">
-                                <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0">
-                                    <Bot className="w-4 h-4 text-white" />
-                                </div>
-                                <div className="bg-slate-700 rounded-2xl rounded-tl-sm p-4 max-w-md">
-                                    <p className="text-white">{demoT('conversation.aiResponse')}</p>
-                                </div>
-                            </div>
-                            <div className="flex items-start space-x-4 flex-row-reverse">
-                                <div className="w-8 h-8 bg-slate-600 rounded-full flex items-center justify-center flex-shrink-0">
-                                    <span className="text-white text-sm">U</span>
-                                </div>
-                                <div className="bg-blue-600 rounded-2xl rounded-tr-sm p-4 max-w-md">
-                                    <p className="text-white">{demoT('conversation.userFollowup')}</p>
-                                </div>
-                            </div>
-                            <div className="flex items-start space-x-4">
-                                <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0">
-                                    <Bot className="w-4 h-4 text-white" />
-                                </div>
-                                <div className="bg-slate-700 rounded-2xl rounded-tl-sm p-4 max-w-md">
-                                    <p className="text-white">{demoT('conversation.aiFinal')}</p>
-                                </div>
-                            </div>
+                            <p className="text-slate-300 mx-3 text-sm leading-relaxed">
+                                {feature.title}
+                            </p>
                         </div>
-                    </div>
+                    ))}
                 </div>
             </div>
         </section>
@@ -236,90 +230,131 @@ const DemoSection: React.FC = () => {
 
 // Pricing Section Component
 const PricingSection: React.FC = () => {
-    const { t: pricingT } = useTranslation('translation', { keyPrefix: 'landing-page.pricing' });
-    const pricingTiers = [
+    return (
+        <section className="py-12 md:py-20 max-w-5xl mx-auto w-full px-4">
+            <div className="text-center mb-8">
+                <h2 className="text-3xl md:text-4xl font-medium text-white mb-6">
+                    Preturi
+                </h2>
+                <p className="text-sm text-slate-300 max-w-3xl mx-auto mb-2">
+                    Simplu, corect, pe bază de tokeni
+                </p>
+
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 items-stretch w-full gap-4 max-w-4xl mx-auto">
+                <div className="grid grid-cols-1 gap-2 md:gap-4">
+                    {["Incepi gratuit cu un pachet de tokeni inclusi", "Fiecare interacțiune cu AI-ul consumă câțiva tokeni", "Reîncarci doar când ai nevoie"].map((text, index) => (
+                        <p key={index} className="text-slate-300 text-center flex flex-row items-center justify-center px-6 py-4 rounded-lg bg-[#120826]">
+                            {text}
+                        </p>
+                    ))}
+                </div>
+                <div className="rounded-lg bg-[#120826] p-8 text-center">
+                    <h3 className="text-xl font-light text-white mb-4">Starter</h3>
+                    <span className="text-3xl font-light text-white ">$49.99</span>
+                    <p className="text-[#919EAB] mt-3">500 tokeni</p>
+
+                </div>
+            </div>
+        </section>
+    );
+};
+
+// FAQ Section Component
+const FAQSection: React.FC = () => {
+    const [openFAQ, setOpenFAQ] = useState<number | null>(null);
+
+    const faqs = [
         {
-            name: pricingT('plans.explorer.name'),
-            price: pricingT('plans.explorer.price'),
-            tokens: pricingT('plans.explorer.tokens'),
-            features: pricingT('plans.explorer.features', { returnObjects: true })
+            question: "Ce sunt tokenii și cum funcționează?",
+            answer: "Tokenii sunt credite virtuale pentru interacțiunile cu AI-ul. Primești gratuit la început și poți cumpăra mai mulți oricând."
         },
         {
-            name: pricingT('plans.professional.name'),
-            price: pricingT('plans.professional.price'),
-            tokens: pricingT('plans.professional.tokens'),
-            features: pricingT('plans.professional.features', { returnObjects: true }),
-            popular: true,
-            badge: pricingT('plans.professional.badge')
+            question: "Datele mele sunt în siguranță?",
+            answer: "Da, toate datele sunt protejate conform standardelor si nu sunt impartasite decat cu tertii mentionati."
         },
         {
-            name: pricingT('plans.premium.name'),
-            price: pricingT('plans.premium.price'),
-            tokens: pricingT('plans.premium.tokens'),
-            features: pricingT('plans.premium.features', { returnObjects: true })
+            question: "Pot folosi platforma și ca vânzător, și ca cumpărător?",
+            answer: "Da, platforma este concepută pentru ambele roluri și oferă funcționalități complete pentru vânzarea și cumpărarea proprietăților."
+        },
+        {
+            question: "De ce să aleg DOORS și nu o agenție clasică?",
+            answer: "DOORS oferă transparență completă, costuri reduse și acces imediat la informații, eliminând intermediarii și comisioanele mari."
         }
     ];
 
+    const seeAllButton = <button className="border-1 border-white text-white w-full md:w-fit px-16 py-2.5 rounded-md font-semibold text-md hover:border-purple-500 hover:bg-slate-800/50 transition-all">
+        Vezi toate întrebările
+    </button>
     return (
-        <section id="pricing" className="py-20 bg-slate-800">
-            <div className="max-w-7xl mx-auto px-6">
-                <div className="text-center mb-16">
-                    <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-                        {pricingT('title.simple')}<span className="bg-gradient-to-r from-blue-400 to-purple-600 text-transparent bg-clip-text">{pricingT('title.transparent')}</span>{pricingT('title.suffix')}
+        <section className="py-12 md:py-20 mx-4">
+            <div className="max-w-4xl mx-auto">
+                <div className="flex flex-row items-center justify-center md:justify-between mb-4">
+                    <h2 className="text-3xl md:text-4xl text-center font-medium text-white mb-6">
+                        Întrebări frecvente
                     </h2>
-                    <p className="text-xl text-slate-300 max-w-3xl mx-auto">
-                        {pricingT('subtitle')}
-                    </p>
+                    <div className='hidden md:block'>{seeAllButton}</div>
                 </div>
 
-                <div className="grid lg:grid-cols-3 gap-8 max-w-5xl mx-auto">
-                    {pricingTiers.map((tier, index) => (
-                        <div key={index} className={`relative group ${tier.popular ? 'scale-105' : ''}`}>
-                            {tier.popular && (
-                                <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                                    <span className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-2 rounded-full text-sm font-semibold">
-                                        {tier.badge}
-                                    </span>
+                <div className="space-y-4">
+                    {faqs.map((faq, index) => (
+                        <div key={index} className="bg-[#120826] rounded-md">
+                            <button
+                                onClick={() => setOpenFAQ(openFAQ === index ? null : index)}
+                                className="w-full px-6 py-4 text-left flex items-center justify-between text-white hover:bg-slate-700/50 transition-colors rounded-md"
+                            >
+                                <span className="font-medium">{faq.question}</span>
+                                <ChevronDown
+                                    className={`w-5 h-5 transition-transform ${openFAQ === index ? 'rotate-180' : ''
+                                        }`}
+                                />
+                            </button>
+                            {openFAQ === index && (
+                                <div className="px-6 pb-4">
+                                    <p className="text-slate-300 leading-relaxed">
+                                        {faq.answer}
+                                    </p>
                                 </div>
                             )}
-                            <div className={`bg-slate-700/50 backdrop-blur-sm border rounded-2xl p-8 h-full hover:transform hover:scale-105 transition-all duration-300 ${tier.popular ? 'border-purple-500/50 shadow-2xl shadow-purple-500/10' : 'border-slate-600/50 hover:border-purple-500/50'
-                                }`}>
-                                <div className="text-center mb-8">
-                                    <h3 className="text-2xl font-bold text-white mb-2">{tier.name}</h3>
-                                    <div className="mb-4">
-                                        <span className="text-4xl font-bold text-white">{tier.price}</span>
-                                        {tier.price !== "Free" && <span className="text-slate-400">/month</span>}
-                                    </div>
-                                    <p className="text-slate-300">{tier.tokens}</p>
-                                </div>
-
-                                <ul className="space-y-4 mb-8">
-                                    {(tier.features as any).map((feature: any, featureIndex: number) => (
-                                        <li key={featureIndex} className="flex items-center text-slate-300">
-                                            <div className="w-5 h-5 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0 mr-3">
-                                                <ArrowRight className="w-3 h-3 text-white" />
-                                            </div>
-                                            {feature}
-                                        </li>
-                                    ))}
-                                </ul>
-
-                                <button className={`w-full py-4 rounded-xl font-semibold transition-all ${tier.popular
-                                    ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:from-blue-600 hover:to-purple-700 shadow-lg'
-                                    : 'border-2 border-slate-600 text-white hover:border-purple-500 hover:bg-slate-800/50'
-                                    }`}>
-                                    {pricingT('button')}
-                                </button>
-                            </div>
                         </div>
                     ))}
+                    <div className='md:hidden mx-auto flex flex-row justify-center'>{seeAllButton}</div>
                 </div>
 
-                <div className="text-center mt-12">
-                    <p className="text-slate-400">
-                        {pricingT('contact.text')}<a href="#" className="text-purple-400 hover:text-purple-300 underline">{pricingT('contact.link')}</a>
-                    </p>
-                </div>
+            </div>
+        </section>
+    );
+};
+
+// Final CTA Section Component
+const FinalCTASection: React.FC = () => {
+    const { data } = authClient.useSession();
+
+    return (
+        <section className="py-5 min-h-[70dvh] md:min-h-fit relative flex flex-row bg-gradient-to-br items-center from-[#120826] to-[#32215A] from-[70%] md:to-[80%] max-w-5xl rounded-2xl mx-3 md:mx-auto mb-20 overflow-x-clip">
+            <div>
+                <img src="/landing/aiRealEstate.png" className="absolute left-[-10%] md:left-0 top-[0%] bottom-[10%] h-[70%] md:relative md:w-96 md:h-96 object-contain rounded-full scale-125 ml-12" />
+                <div className="hidden md:block absolute top-0 left-0 w-full h-full bg-gradient-to-r rounded-2xl from-[#120826] to-transparent from-7% to-25%" />
+
+            </div>
+
+            <div className="max-w-4xl mx-auto px-6 text-center absolute bottom-[5%] md:relative z-10">
+                <h2 className="text-4xl md:text-5xl font-medium text-white mb-6 leading-tight">
+                    Casa ta de vis este la doar o conversație distantă
+                </h2>
+
+                <p className="text-md text-slate-300 mb-2 max-w-2xl mx-auto">
+                    Încearcă asistentul AI acum:
+                </p>
+
+                <Link
+                    to={data ? "/app" : "/auth/$path"}
+                    params={data ? {} : { path: "sign-in" }}
+                    className="inline-block bg-gradient-to-r from-blue-500 to-purple-600 text-white px-5 py-3 rounded-md font-semibold text-md hover:from-blue-600 hover:to-purple-700 transition-all transform hover:scale-105 shadow-2xl"
+                >
+                    Înregistrează-te gratuit
+                </Link>
             </div>
         </section>
     );
@@ -327,64 +362,41 @@ const PricingSection: React.FC = () => {
 
 // Footer Component
 const Footer: React.FC = () => {
-    const { t: footerT } = useTranslation('translation', { keyPrefix: 'landing-page.footer' });
     return (
-        <footer className="bg-slate-900 border-t border-slate-700/50 py-16">
-            <div className="max-w-7xl mx-auto px-6">
-                <div className="grid md:grid-cols-4 gap-8 mb-8">
-                    <div className="col-span-2">
-                        <div className="flex items-center space-x-2 mb-4">
-                            <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-purple-600 rounded-lg flex items-center justify-center">
-                                <Home className="w-5 h-5 text-white" />
-                            </div>
-                            <span className="text-xl font-bold text-white">{footerT('brand')}</span>
-                        </div>
-                        <p className="text-slate-300 mb-6 max-w-md">
-                            {footerT('description')}
-                        </p>
-                        <div className="flex space-x-4">
-                            <div className="w-10 h-10 bg-slate-700 hover:bg-slate-600 rounded-lg flex items-center justify-center cursor-pointer transition-colors">
-                                <span className="text-white text-sm">tw</span>
-                            </div>
-                            <div className="w-10 h-10 bg-slate-700 hover:bg-slate-600 rounded-lg flex items-center justify-center cursor-pointer transition-colors">
-                                <span className="text-white text-sm">li</span>
-                            </div>
-                            <div className="w-10 h-10 bg-slate-700 hover:bg-slate-600 rounded-lg flex items-center justify-center cursor-pointer transition-colors">
-                                <span className="text-white text-sm">fb</span>
-                            </div>
-                        </div>
+        <footer className="bg-black relative py-5">
+            <img src="/landing/footerAnimation.gif" loading='lazy' className="absolute z-0 top-0 left-0 right-0 mx-auto max-w-5xl w-full h-full object-cover object-center scale-[0.9] opacity-30" />
+            <div className="max-w-5xl mx-auto px-6 relative">
+                <div className="flex flex-row justify-between md:items-center mb-8">
+                    {/* Logo */}
+                    <div className="flex items-center space-x-2 -ml-4">
+                        <img src="/doors-logo.png" className="w-28 h-16 object-cover object-center flex items-center justify-center" />
                     </div>
 
-                    <div>
-                        <h4 className="text-white font-semibold mb-4">{footerT('sections.about.title')}</h4>
-                        <ul className="space-y-3">
-                            <li><a href="#" className="text-slate-300 hover:text-white transition-colors">{footerT('sections.about.links.story')}</a></li>
-                            <li><a href="#" className="text-slate-300 hover:text-white transition-colors">{footerT('sections.about.links.team')}</a></li>
-                            <li><a href="#" className="text-slate-300 hover:text-white transition-colors">{footerT('sections.about.links.careers')}</a></li>
-                            <li><a href="#" className="text-slate-300 hover:text-white transition-colors">{footerT('sections.about.links.press')}</a></li>
-                        </ul>
-                    </div>
-
-                    <div>
-                        <h4 className="text-white font-semibold mb-4">{footerT('sections.support.title')}</h4>
-                        <ul className="space-y-3">
-                            <li><a href="#" className="text-slate-300 hover:text-white transition-colors">{footerT('sections.support.links.contact')}</a></li>
-                            <li><a href="#" className="text-slate-300 hover:text-white transition-colors">{footerT('sections.support.links.help')}</a></li>
-                            <li><a href="#" className="text-slate-300 hover:text-white transition-colors">{footerT('sections.support.links.privacy')}</a></li>
-                            <li><a href="#" className="text-slate-300 hover:text-white transition-colors">{footerT('sections.support.links.terms')}</a></li>
-                        </ul>
+                    {/* Navigation */}
+                    <div className="flex flex-col md:flex-row space-y-3 md:space-y-0 md:space-x-5">
+                        {[
+                            { text: "Beneficii", href: "#benefits" },
+                            { text: "Demo", href: "#demo" },
+                            { text: "Prețuri", href: "#pricing" },
+                            { text: "Întrebări frecvente", href: "#faqs" },
+                        ].map(({ text, href }, index) => (
+                            <a key={index} href="#" className="text-white hover:text-slate-400 text-sm transition-colors">{text}</a>
+                        ))}
                     </div>
                 </div>
 
+                <h3 className="text-2xl md:text-4xl font-bold text-white mt-16 mb-12">
+                    Găsește casa perfectă rapid, sigur și inteligent.
+                </h3>
+
                 <div className="border-t border-slate-700 pt-8">
                     <div className="flex flex-col md:flex-row justify-between items-center">
-                        <p className="text-slate-400 text-sm">
-                            {footerT('copyright')}
+                        <p className="text-white text-xs mb-4 md:mb-0">
+                            © DOORS 2025. Toate drepturile rezervate.
                         </p>
-                        <div className="flex space-x-6 mt-4 md:mt-0">
-                            <a href="#" className="text-slate-400 hover:text-white text-sm transition-colors">{footerT('legal.legal')}</a>
-                            <a href="#" className="text-slate-400 hover:text-white text-sm transition-colors">{footerT('legal.privacy')}</a>
-                            <a href="#" className="text-slate-400 hover:text-white text-sm transition-colors">{footerT('legal.cookies')}</a>
+                        <div className="flex space-x-6">
+                            <a href="#" className="hover:text-slate-400 text-white text-xs transition-colors">Termeni și condiții</a>
+                            <a href="#" className="hover:text-slate-400 text-white text-xs transition-colors">Politica și confidențialitate</a>
                         </div>
                     </div>
                 </div>

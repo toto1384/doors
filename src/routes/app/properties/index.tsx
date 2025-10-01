@@ -11,8 +11,8 @@ import { PropertyType } from 'utils/validation/propertySchema'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { MultiSelect, MultiSelectContent, MultiSelectItem, MultiSelectSeparator, MultiSelectTrigger, MultiSelectValue } from '@/components/ui/multi-select'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { PropertyFilterContext, UpdatePropertyFiltersContext } from '@/routes/__root'
 import { ChevronDownIcon } from 'lucide-react'
+import { usePropertyFilterStore } from '@/routes/__root'
 
 
 export const getPropertiesWithFilters = createServerFn().validator((d) => propertyFiltersSchema.parse(d)).handler(async ({ data: filters, }) => {
@@ -36,19 +36,12 @@ function PropertiesRoute() {
     const propertiesReceived = Route.useLoaderData()
     const trpcClient = useTRPCClient()
 
-    const { propertyFilters, setPropertyFilters } = useContext(PropertyFilterContext)
-
-    const [location, setLocation] = useState<LocationObject | undefined>(propertyFilters?.location)
-
-    useEffect(() => {
-        setPropertyFilters({ ...propertyFilters, location })
-    }, [location,])
-
-    useEffect(() => {
-        setLocation(propertyFilters?.location)
-    }, [propertyFilters?.location])
-
-    const { updatePropertyFilters, setUpdatePropertyFilters } = useContext(UpdatePropertyFiltersContext)
+    const { updatePropertyFilters, setUpdatePropertyFilters, propertyFilters, setPropertyFilters } = usePropertyFilterStore(state => ({
+        propertyFilters: state.propertyFilters,
+        setPropertyFilters: state.setPropertyFilters,
+        updatePropertyFilters: state.updatePropertyFilters,
+        setUpdatePropertyFilters: state.setUpdatePropertyFilters,
+    }))
 
     const [properties, setProperties] = useState<PropertyObject[]>(propertiesReceived)
 
@@ -56,20 +49,20 @@ function PropertiesRoute() {
     // Set up the updatePropertyFilters function to work with context instead of URL
     useEffect(() => {
         setUpdatePropertyFilters(() => async (filters: PropertyFilters) => {
-            console.log('setUpdatePropertyFilters', { ...propertyFilters, location, ...filters })
+            console.log('setUpdatePropertyFilters', { ...propertyFilters, ...filters })
 
             // Update context instead of URL
-            setPropertyFilters({ ...propertyFilters, location, ...filters })
+            setPropertyFilters({ ...propertyFilters, ...filters })
 
-            const newProps = await trpcClient.properties.list.query({ ...propertyFilters, location, ...filters })
+            const newProps = await trpcClient.properties.list.query({ ...propertyFilters, ...filters })
             setProperties(newProps)
 
             return JSON.stringify(newProps)
         })
-    }, [setUpdatePropertyFilters, setPropertyFilters, trpcClient])
+    }, [propertyFilters])
 
     const handleFilterChange = async (newFilters: Partial<PropertyFilters>) => {
-        await updatePropertyFilters(newFilters)
+        updatePropertyFilters(newFilters)
     }
 
 
@@ -142,7 +135,7 @@ function PropertiesRoute() {
                         setLocationObject={(l) => {
                             console.log('in loc', propertyFilters)
                             // handleFilterChange({ location: l })
-                            setLocation(l)
+                            handleFilterChange({ location: l })
                         }}
                     />
 
@@ -204,26 +197,35 @@ function PropertiesRoute() {
 
 
 export const PropertyCard = ({ property }: { property: PropertyObject }) => {
-    return <Link to='/app/properties/$id' params={{ id: property._id }} key={property._id} className="relative bg-[#f7f7f7] dark:bg-[#262626] rounded-[6px] overflow-hidden">
+    return <Link
+        to='/app/properties/$id'
+        params={{ id: property._id }}
+        key={property._id}
+        className="relative bg-[#f7f7f7] dark:bg-[#2B1C37]/20 rounded-[6px] overflow-hidden"
+    >
         <div className=" h-48 flex items-center justify-center">
             <img src={property.imageUrls[0]} className="w-full h-full object-cover" />
         </div>
 
         <div className="p-4">
             <div className="flex items-center absolute top-2 left-2 justify-between mb-2">
-                <span className="bg-[#737373] text-white flex flex-row font-light items-center text-xs px-2 py-1 rounded">
+                <span className="bg-[#32215A] text-white flex flex-row font-light items-center text-xs px-2 py-1 rounded">
                     <img src="/icons/checkIcon.svg" className="w-3 h-3 mr-1" />
                     100% Match
                 </span>
             </div>
 
             <h3 className="text-lg font-normal mb-2">{property.title}</h3>
-            <p className="text-[22px] font-light mb-2 text-[#a3a3a3]">€{property.price.value.toLocaleString()}</p>
+            <p className="text-[22px] font-light mb-2 text-[#8A4FFF]">€{property.price.value.toLocaleString()}</p>
 
             <div className="flex items-center gap-4 text-sm text-[#a3a3a3]">
-                <span className='flex flex-row items-center gap-1'><img src="/icons/surfaceArea.svg" className="w-4 h-4" /> {property.surfaceArea}m²</span>
-                <span className='flex flex-row items-center gap-1'><img src="/icons/bedIcon.svg" className="w-4 h-4" /> {property.numberOfRooms} rooms</span>
-                <span className='flex flex-row items-center gap-1'><img src="/icons/locationIcon.svg" className="w-4 h-4" /> {property.location.city}</span>
+                {[
+                    { icon: "/icons/surfaceArea.svg", text: `${property.surfaceArea}m²` },
+                    { icon: "/icons/bedIcon.svg", text: `${property.numberOfRooms} rooms` },
+                    { icon: "/icons/locationIcon.svg", text: `${property.location.city}` },
+                ].map(i =>
+                    <span className='flex flex-row items-center gap-1 rounded bg-[#32215A]'><img src={i.icon} className="w-4 h-4" /> {i.text} </span>
+                )}
             </div>
         </div>
     </Link>

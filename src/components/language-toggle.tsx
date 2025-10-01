@@ -17,6 +17,34 @@ interface LanguageToggleProps {
     variant?: 'default' | 'outline' | 'ghost' | 'minimal';
 }
 
+
+export function LanguageToggleVariant() {
+
+
+    // const {t} = useTranslation('translation', {keyPrefix: 'profile-page.language'})
+
+    const locale = i18n.language;
+
+    const handleLanguageChange = (newLocale: string) => {
+        i18n.changeLanguage(newLocale);
+    };
+
+    return <div className='rounded-[5px] border-white border flex flex-row items-center p-0.5'>
+        <button
+            className={(locale == 'ro' ? 'bg-gradient-to-br from-[#4C7CED] to-[#7B31DC]' : '') + ` text-white text-xs px-2.5 py-[3px] rounded hover:from-blue-600 hover:to-purple-700 transition-all`}
+            onClick={() => handleLanguageChange('ro')}
+        >
+            RO
+        </button>
+        <button
+            className={(locale.includes('en') ? 'bg-gradient-to-br from-[#4C7CED] to-[#7B31DC]' : '') + ` text-white text-xs px-2.5 py-[3px] rounded hover:from-blue-600 hover:to-purple-700 transition-all`}
+            onClick={() => handleLanguageChange('en')}
+        >
+            EN
+        </button>
+    </div>
+}
+
 export function LanguageToggle({ className, variant = 'ghost' }: LanguageToggleProps) {
     const { t } = useTranslation('translation', { keyPrefix: 'profile-page.language' });
     const locale = i18n.language

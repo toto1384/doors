@@ -30,11 +30,12 @@ import i18n from './i18n';
 import { nanoid } from 'nanoid';
 import { useClientToolChoice } from 'utils/hooks/aiChatbotButtonHook';
 import { searchLocationByString } from 'utils/googleMapsUtils';
-import { PropertyFilterContext, UpdatePropertyFiltersContext } from '@/routes/__root';
+import { PropertyFilterContext, UpdatePropertyFiltersContext, usePropertyAddStore, usePropertyFilterStore } from '@/routes/__root';
 import { PropertyFilters } from 'utils/validation/types';
 import { useRouter, useRouterState } from '@tanstack/react-router';
 import { useTRPC, useTRPCClient } from 'trpc/react';
 import { useQuery } from '@tanstack/react-query';
+import { PropertyFeaturesType } from 'utils/validation/propertySchema';
 
 
 type Message = { source: 'user' | 'ai', message: string | ReactNode, id: string }
@@ -81,12 +82,21 @@ export const ElevenLabsChatBotDemo = ({ conversationToken }: { conversationToken
 
     const [locale, setLocale] = useState(i18n.language as "ro" | "en");
 
-    const { propertyFilters, } = useContext(PropertyFilterContext);
 
     const [messages, setMessages] = useState<Message[]>([]);
 
-    const { updatePropertyFilters, sendUpdate, setSendUpdate } = useContext(UpdatePropertyFiltersContext);
+    const { partialProperty, setPartialProperty } = usePropertyAddStore(state => ({
+        partialProperty: state.partialProperty,
+        setPartialProperty: state.setPartialProperty,
+    }))
 
+    const { propertyFilters, setPropertyFilters, updatePropertyFilters, sendUpdate, setSendUpdate } = usePropertyFilterStore(state => ({
+        propertyFilters: state.propertyFilters,
+        setPropertyFilters: state.setPropertyFilters,
+        updatePropertyFilters: state.updatePropertyFilters,
+        sendUpdate: state.sendUpdate,
+        setSendUpdate: state.setSendUpdate,
+    }))
 
 
     useEffect(() => {
@@ -115,6 +125,7 @@ export const ElevenLabsChatBotDemo = ({ conversationToken }: { conversationToken
     const conversation = useConversation({
 
         clientTools: {
+            //apply filters tools
             chooseHouseOrApartment, chooseBudget, chooseFacilities,
             chooseAndSelectLocation: async ({ location }) => {
                 const locationResult = await searchLocationByString(location);
@@ -130,6 +141,68 @@ export const ElevenLabsChatBotDemo = ({ conversationToken }: { conversationToken
                 // setPropertyFilters(propertyFilters.filterObject)
                 return await updatePropertyFilters(propertyFilters.filterObject)
             },
+
+
+            //add posting tools
+            // this tool displays a photo select interface for the user to add their photos
+            selectPropertyPhotos: () => {
+
+            },
+
+            // this tool opens a displays an takes 2 titles and 2 descriptions that they are formed by the properties inputed by the user. the user can choose from those or write custom ones
+            setPropertyTitleAndDescription: () => {
+
+            },
+
+            // this tools displays buttons in the ai chat to select the facilities of the property that he wants to post
+            selectPropertyFacilities: () => {
+
+            },
+
+            // this sets the price of the property after the user tells it to the agent
+            setPropertyPrice: ({ value, price }: { value: number, price: 'EUR' | 'USD' | 'RON' }) => {
+            },
+
+            // this sets the number the rooms of the property after the user tells it to the agent
+            setPropertyNumberOfRooms: (rooms: number) => {
+            },
+
+            // this sets the surface area of the property after the user tells it to the agent
+            setPropertySurfaceArea: (surfaceArea: number) => {
+            },
+
+
+            // this sets the furnishing status of the property after the user tells it to the agent
+            setPropertyFurnished: (furnished: boolean) => {
+            },
+
+
+            //todo: have to test for the specific streets to see that they are inputed correctly
+            // this sets the location of the property after the user tells it to the agent
+            setPropertyLocation: ({ location }) => {
+            },
+
+            // this displays the buttons in the ai chat to select the type of the property that he wants to post
+            setPropertyType: (propertyType: 'apartment' | 'house' | 'hotel' | 'office') => {
+            },
+
+            // this displays the buttons in the ai chat to select the heating of the property that he wants to post
+            setPropertyHeating: (heating: 'gas' | 'fireplace' | 'electric' | '3rd_party') => {
+            },
+
+            // this displays the buttons in the ai chat to select the number of floors of the property that he wants to post
+            setPropertyFeatures: (features: PropertyFeaturesType[]) => {
+            },
+
+            // this sets the floor of the property after the user tells it to the agent
+            setPropertyFloor: (floor: number) => {
+            },
+
+            // this sets the building year of the property after the user tells it to the agent
+            setBuildingYear: (year: number) => {
+            },
+
+
         },
         dynamicVariables: {
             'User_Name': "Alex",
