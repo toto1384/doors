@@ -107,29 +107,38 @@
     }
   },
   "register-page": {
-    "title": "Înregistrează-te",
-    "subtitle": "Creează-ți contul pentru a începe",
+    "title": "Înscrie-te",
+    "subtitle": "Creează un cont",
     "form": {
-      "email": "Email",
+      "fullName": "Numele complet",
+      "fullNamePlaceholder": "Introduceți numele dvs.",
+      "email": "Adresă de e-mail",
+      "emailPlaceholder": "Introduceți e-mailul dvs.",
+      "phoneNumber": "Număr de telefon",
       "password": "Parolă",
-      "confirmPassword": "Confirmă Parola",
-      "firstName": "Prenume",
-      "lastName": "Nume",
-      "button": "Creează Cont",
+      "confirmPassword": "Confirmă parola",
+      "button": "Creează cont",
       "haveAccount": "Ai deja un cont?",
-      "signIn": "Conectează-te"
+      "signIn": "Autentificare",
+      "continueWithGoogle": "Continuă cu Google",
+      "or": "Sau",
+      "dataProtection": "Datele tale sunt în siguranță și nu sunt partajate niciodată"
     }
   },
   "login-page": {
-    "title": "Conectează-te",
-    "subtitle": "Conectează-te la contul tău",
+    "title": "Autentificare",
+    "subtitle": "Bine te-am regăsit! Te rugăm să te autentifici",
     "form": {
-      "email": "Email",
+      "email": "Număr de telefon / adresă de e-mail",
       "password": "Parolă",
-      "button": "Conectează-te",
-      "forgotPassword": "Ți-ai uitat parola?",
+      "button": "Autentificare",
+      "rememberMe": "Ține-mă minte",
+      "forgotPassword": "Ai uitat parola?",
       "noAccount": "Nu ai un cont?",
-      "signUp": "Înregistrează-te"
+      "signUp": "Înregistrează-te",
+      "continueWithGoogle": "Continuă cu Google",
+      "or": "Sau",
+      "dataProtection": "Datele tale sunt în siguranță și nu sunt partajate niciodată"
     }
   },
   "profile-page": {
@@ -153,7 +162,92 @@
       "subtitle": "Alege tema ta preferată"
     },
     "account": {
-      "title": "Cont"
+      "title": "Cont",
+      "subtitle": "Gestionează setările contului",
+      "signOut": "Deconectează-te"
+    },
+    "view": {
+      "accountSettings": "Setări cont",
+      "quickOverview": "Prezentare generală",
+      "favoriteProperties": "Proprietăți favorite",
+      "savedProperties": "Proprietăți salvate",
+      "offersMade": "Oferte făcute",
+      "viewingsScheduled": "Vizitări programate",
+      "thisWeek": "săptămâna aceasta",
+      "pending": "în așteptare",
+      "nextTomorrow": "Următoarea: Mâine",
+      "viewDetails": "Vezi detalii",
+      "rooms": "camere",
+      "bathrooms": "băi"
+    }
+  },
+  "forgot-password-page": {
+    "title": "Parolă Uitată",
+    "subtitle": "Introdu adresa de email și îți vom trimite un link pentru resetarea parolei",
+    "form": {
+      "email": "Adresa de email",
+      "emailPlaceholder": "Introdu emailul tău",
+      "button": "Trimite link de resetare",
+      "sending": "Se trimite...",
+      "backToLogin": "Înapoi la conectare"
+    },
+    "success": {
+      "title": "Verifică-ți emailul",
+      "subtitle": "Ți-am trimis un link de resetare a parolei la adresa de email",
+      "backToLogin": "Înapoi la conectare"
+    }
+  },
+  "reset-password-page": {
+    "title": "Resetează Parola",
+    "subtitle": "Introdu noua ta parolă",
+    "form": {
+      "newPassword": "Parolă nouă",
+      "confirmPassword": "Confirmă parola",
+      "button": "Resetează parola",
+      "resetting": "Se resetează...",
+      "backToLogin": "Înapoi la conectare"
+    }
+  },
+  "app-wrapper": {
+    "loading": "Se încarcă...",
+    "profile": "Profil",
+    "signOut": "Deconectează-te",
+    "notifications": "Notificări",
+    "credits": "Credite",
+    "viewProfile": "Vizualizare profil",
+    "accountSettings": "Setări account",
+    "helpCenter": "Centru de ajutor",
+    "termsConditions": "Termeni și condiții",
+    "privacyPolicy": "Politica de confidențialitate",
+    "logout": "Deconectare",
+    "buyer": "Cumpărător",
+    "seller": "Vânzător"
+  },
+  "ai-chatbot": {
+    "propertyTypes": {
+      "house": "Casa",
+      "apartment": "Apartament"
+    },
+    "budgetRanges": {
+      "under100k": "Sub 100.000 €",
+      "between100k200k": "Intre 100.000 € și 200.000 €",
+      "over200k": "Peste 200.000 €"
+    },
+    "facilities": {
+      "parking": "Parking",
+      "balcony": "Balcon",
+      "terrace": "Terasă",
+      "garden": "Grădină",
+      "elevator": "Lift",
+      "airConditioning": "Aer condiționat",
+      "centralHeating": "Încălzire centrală",
+      "furnished": "Mobilat"
+    },
+    "actions": {
+      "retry": "Reîncercă",
+      "stop": "Oprește",
+      "copy": "Copiază",
+      "regenerate": "Regenerează"
     }
   },
   "privacy-policy": {

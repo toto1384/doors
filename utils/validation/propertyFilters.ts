@@ -1,5 +1,5 @@
 import { z } from 'zod/v3';
-import { PropertyType } from './propertySchema';
+import { PropertyType } from './dbSchemas';
 import { LocationSchema } from './location';
 
 // Available facility options based on common real estate features

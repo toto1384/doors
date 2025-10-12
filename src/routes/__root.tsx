@@ -1,20 +1,17 @@
-import { HeadContent, Outlet, Scripts, createRootRoute, useRouterState } from '@tanstack/react-router'
-import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
-import { TanstackDevtools } from '@tanstack/react-devtools'
+import { TanstackDevtools } from '@tanstack/react-devtools';
+import { HeadContent, Outlet, Scripts, createRootRoute, useRouterState } from '@tanstack/react-router';
+import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools';
 import '../components/i18n';
+import { AutumnProvider } from "autumn-js/react";
 
-import Header from '../components/Header'
-
-import appCss from '../styles.css?url'
-import { getThemeServerFn } from 'utils/theme';
-import { Theme, ThemeProvider, useTheme } from "@/components/providers/ThemeProvider";
 import AppRouteWrapper from '@/components/appWrapper';
-import { TRPCWrapper } from '@/components/providers/TrpcWrapper';
-import { AuthProvider } from '@/components/providers/BetterAuthProvider';
 import { GoogleMapsProvider } from '@/components/providers/GoogleMapsProvider';
+import { TRPCWrapper } from '@/components/providers/TrpcWrapper';
+import { createContext, useState } from 'react';
 import { PropertyFilters, PropertyObject } from 'utils/validation/types';
-import { createContext, useContext, useState } from 'react';
 import { create } from 'zustand';
+import appCss from '../styles.css?url';
+import { ThemeProvider, useTheme } from '@/components/providers/ThemeProvider';
 
 
 export const Route = createRootRoute({
@@ -39,7 +36,7 @@ export const Route = createRootRoute({
         ],
     }),
     loader: async () => {
-        const theme = await getThemeServerFn()
+        // const theme = await getThemeServerFn()
 
         const response = await fetch(
             `https://api.elevenlabs.io/v1/convai/conversation/token?agent_id=${process.env.VITE_AGENT_ID}`,
@@ -47,13 +44,21 @@ export const Route = createRootRoute({
         );
         const body = await response.json();
 
-        return { theme, token: body.token };
+        return {
+            // theme,
+            token: body.token,
+        };
     },
 
     shellComponent: RootComponent,
 })
 
 
+
+
+export const usePopoversOpenStore = create<{ aiChatbotOpen: boolean, setAiChatbotOpen: (open: boolean) => void, menuOpen: boolean, setMenuOpen: (open: boolean) => void, }>()((set) => ({
+    aiChatbotOpen: false, setAiChatbotOpen: (p) => set({ aiChatbotOpen: p }), menuOpen: false, setMenuOpen: (p) => set({ menuOpen: p }),
+}));
 
 export const usePropertyAddStore = create<{
     partialProperty: Partial<PropertyObject>,
@@ -100,10 +105,10 @@ export const usePropertyFilterStore = create<{
 export const ElevenlabsTokenContext = createContext<{ token: string | undefined, setToken: (token: string | undefined) => void }>({ token: undefined, setToken: () => { } });
 
 function RootComponent() {
-    const { theme } = Route.useLoaderData();
+    // const { theme } = Route.useLoaderData();
 
     return (
-        <ThemeProvider theme={theme}>
+        <ThemeProvider theme={'dark'}>
             <RootDocument>
                 <Outlet />
             </RootDocument>
@@ -112,15 +117,11 @@ function RootComponent() {
 }
 
 function RootDocument({ children }: { children: React.ReactNode }) {
-    const { theme, token: receivedToken } = Route.useLoaderData();
+    const { token: receivedToken } = Route.useLoaderData();
+    const { theme } = useTheme();
+
 
     const [token, setToken] = useState<string>(receivedToken);
-
-    //add filters
-    // const [updatePropertyFilters, setUpdatePropertyFilters] = useState<UpdateFiltersFunction>(async () => '');
-    // const [sendUpdate, setSendUpdate] = useState<(str: string) => void>(() => { });
-    // const [propertyFilters, setPropertyFilters] = useState<PropertyFilters | undefined>();
-
 
     const routerState = useRouterState();
 
@@ -133,11 +134,11 @@ function RootDocument({ children }: { children: React.ReactNode }) {
             </head>
             <body>
                 <GoogleMapsProvider>
-                    <TRPCWrapper>
-                        <AuthProvider>
+                    <AutumnProvider betterAuthUrl={import.meta.env.VITE_BETTER_AUTH_URL}>
+                        <TRPCWrapper>
                             {appWrapper ? <AppRouteWrapper token={token}>{children}</AppRouteWrapper> : children}
-                        </AuthProvider>
-                    </TRPCWrapper>
+                        </TRPCWrapper>
+                    </AutumnProvider>
                 </GoogleMapsProvider>
                 {!import.meta.env.PROD && <TanstackDevtools
                     config={{

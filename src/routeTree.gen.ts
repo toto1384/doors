@@ -15,12 +15,16 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as TermsOfServiceIndexRouteImport } from './routes/terms-of-service/index'
 import { Route as PrivacyPolicyIndexRouteImport } from './routes/privacy-policy/index'
 import { Route as AppIndexRouteImport } from './routes/app/index'
+import { Route as AuthResetPasswordIndexRouteImport } from './routes/auth/reset-password/index'
+import { Route as AuthForgotPasswordIndexRouteImport } from './routes/auth/forgot-password/index'
 import { Route as AuthPathIndexRouteImport } from './routes/auth/$path/index'
 import { Route as AppPropertiesIndexRouteImport } from './routes/app/properties/index'
 import { Route as AppProfileIndexRouteImport } from './routes/app/profile/index'
-import { Route as DemoStartServerFuncsRouteImport } from './routes/demo.start.server-funcs'
-import { Route as DemoStartApiRequestRouteImport } from './routes/demo.start.api-request'
+import { Route as AppNotificationsIndexRouteImport } from './routes/app/notifications/index'
+import { Route as AppBillingIndexRouteImport } from './routes/app/billing/index'
+import { Route as AppPropertiesAddRouteImport } from './routes/app/properties/add'
 import { Route as AppPropertiesIdRouteImport } from './routes/app/properties/$id'
+import { Route as AppProfileSettingsRouteImport } from './routes/app/profile/settings'
 import { ServerRoute as ApiUploadthingServerRouteImport } from './routes/api/uploadthing'
 import { ServerRoute as ApiTrpcSplatServerRouteImport } from './routes/api/trpc/$'
 import { ServerRoute as ApiAuthSplatServerRouteImport } from './routes/api/auth/$'
@@ -47,6 +51,16 @@ const AppIndexRoute = AppIndexRouteImport.update({
   path: '/app/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthResetPasswordIndexRoute = AuthResetPasswordIndexRouteImport.update({
+  id: '/auth/reset-password/',
+  path: '/auth/reset-password/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthForgotPasswordIndexRoute = AuthForgotPasswordIndexRouteImport.update({
+  id: '/auth/forgot-password/',
+  path: '/auth/forgot-password/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthPathIndexRoute = AuthPathIndexRouteImport.update({
   id: '/auth/$path/',
   path: '/auth/$path/',
@@ -62,19 +76,29 @@ const AppProfileIndexRoute = AppProfileIndexRouteImport.update({
   path: '/app/profile/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DemoStartServerFuncsRoute = DemoStartServerFuncsRouteImport.update({
-  id: '/demo/start/server-funcs',
-  path: '/demo/start/server-funcs',
+const AppNotificationsIndexRoute = AppNotificationsIndexRouteImport.update({
+  id: '/app/notifications/',
+  path: '/app/notifications/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DemoStartApiRequestRoute = DemoStartApiRequestRouteImport.update({
-  id: '/demo/start/api-request',
-  path: '/demo/start/api-request',
+const AppBillingIndexRoute = AppBillingIndexRouteImport.update({
+  id: '/app/billing/',
+  path: '/app/billing/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppPropertiesAddRoute = AppPropertiesAddRouteImport.update({
+  id: '/app/properties/add',
+  path: '/app/properties/add',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppPropertiesIdRoute = AppPropertiesIdRouteImport.update({
   id: '/app/properties/$id',
   path: '/app/properties/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppProfileSettingsRoute = AppProfileSettingsRouteImport.update({
+  id: '/app/profile/settings',
+  path: '/app/profile/settings',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiUploadthingServerRoute = ApiUploadthingServerRouteImport.update({
@@ -98,24 +122,32 @@ export interface FileRoutesByFullPath {
   '/app': typeof AppIndexRoute
   '/privacy-policy': typeof PrivacyPolicyIndexRoute
   '/terms-of-service': typeof TermsOfServiceIndexRoute
+  '/app/profile/settings': typeof AppProfileSettingsRoute
   '/app/properties/$id': typeof AppPropertiesIdRoute
-  '/demo/start/api-request': typeof DemoStartApiRequestRoute
-  '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
+  '/app/properties/add': typeof AppPropertiesAddRoute
+  '/app/billing': typeof AppBillingIndexRoute
+  '/app/notifications': typeof AppNotificationsIndexRoute
   '/app/profile': typeof AppProfileIndexRoute
   '/app/properties': typeof AppPropertiesIndexRoute
   '/auth/$path': typeof AuthPathIndexRoute
+  '/auth/forgot-password': typeof AuthForgotPasswordIndexRoute
+  '/auth/reset-password': typeof AuthResetPasswordIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/app': typeof AppIndexRoute
   '/privacy-policy': typeof PrivacyPolicyIndexRoute
   '/terms-of-service': typeof TermsOfServiceIndexRoute
+  '/app/profile/settings': typeof AppProfileSettingsRoute
   '/app/properties/$id': typeof AppPropertiesIdRoute
-  '/demo/start/api-request': typeof DemoStartApiRequestRoute
-  '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
+  '/app/properties/add': typeof AppPropertiesAddRoute
+  '/app/billing': typeof AppBillingIndexRoute
+  '/app/notifications': typeof AppNotificationsIndexRoute
   '/app/profile': typeof AppProfileIndexRoute
   '/app/properties': typeof AppPropertiesIndexRoute
   '/auth/$path': typeof AuthPathIndexRoute
+  '/auth/forgot-password': typeof AuthForgotPasswordIndexRoute
+  '/auth/reset-password': typeof AuthResetPasswordIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -123,12 +155,16 @@ export interface FileRoutesById {
   '/app/': typeof AppIndexRoute
   '/privacy-policy/': typeof PrivacyPolicyIndexRoute
   '/terms-of-service/': typeof TermsOfServiceIndexRoute
+  '/app/profile/settings': typeof AppProfileSettingsRoute
   '/app/properties/$id': typeof AppPropertiesIdRoute
-  '/demo/start/api-request': typeof DemoStartApiRequestRoute
-  '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
+  '/app/properties/add': typeof AppPropertiesAddRoute
+  '/app/billing/': typeof AppBillingIndexRoute
+  '/app/notifications/': typeof AppNotificationsIndexRoute
   '/app/profile/': typeof AppProfileIndexRoute
   '/app/properties/': typeof AppPropertiesIndexRoute
   '/auth/$path/': typeof AuthPathIndexRoute
+  '/auth/forgot-password/': typeof AuthForgotPasswordIndexRoute
+  '/auth/reset-password/': typeof AuthResetPasswordIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -137,36 +173,48 @@ export interface FileRouteTypes {
     | '/app'
     | '/privacy-policy'
     | '/terms-of-service'
+    | '/app/profile/settings'
     | '/app/properties/$id'
-    | '/demo/start/api-request'
-    | '/demo/start/server-funcs'
+    | '/app/properties/add'
+    | '/app/billing'
+    | '/app/notifications'
     | '/app/profile'
     | '/app/properties'
     | '/auth/$path'
+    | '/auth/forgot-password'
+    | '/auth/reset-password'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/app'
     | '/privacy-policy'
     | '/terms-of-service'
+    | '/app/profile/settings'
     | '/app/properties/$id'
-    | '/demo/start/api-request'
-    | '/demo/start/server-funcs'
+    | '/app/properties/add'
+    | '/app/billing'
+    | '/app/notifications'
     | '/app/profile'
     | '/app/properties'
     | '/auth/$path'
+    | '/auth/forgot-password'
+    | '/auth/reset-password'
   id:
     | '__root__'
     | '/'
     | '/app/'
     | '/privacy-policy/'
     | '/terms-of-service/'
+    | '/app/profile/settings'
     | '/app/properties/$id'
-    | '/demo/start/api-request'
-    | '/demo/start/server-funcs'
+    | '/app/properties/add'
+    | '/app/billing/'
+    | '/app/notifications/'
     | '/app/profile/'
     | '/app/properties/'
     | '/auth/$path/'
+    | '/auth/forgot-password/'
+    | '/auth/reset-password/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -174,12 +222,16 @@ export interface RootRouteChildren {
   AppIndexRoute: typeof AppIndexRoute
   PrivacyPolicyIndexRoute: typeof PrivacyPolicyIndexRoute
   TermsOfServiceIndexRoute: typeof TermsOfServiceIndexRoute
+  AppProfileSettingsRoute: typeof AppProfileSettingsRoute
   AppPropertiesIdRoute: typeof AppPropertiesIdRoute
-  DemoStartApiRequestRoute: typeof DemoStartApiRequestRoute
-  DemoStartServerFuncsRoute: typeof DemoStartServerFuncsRoute
+  AppPropertiesAddRoute: typeof AppPropertiesAddRoute
+  AppBillingIndexRoute: typeof AppBillingIndexRoute
+  AppNotificationsIndexRoute: typeof AppNotificationsIndexRoute
   AppProfileIndexRoute: typeof AppProfileIndexRoute
   AppPropertiesIndexRoute: typeof AppPropertiesIndexRoute
   AuthPathIndexRoute: typeof AuthPathIndexRoute
+  AuthForgotPasswordIndexRoute: typeof AuthForgotPasswordIndexRoute
+  AuthResetPasswordIndexRoute: typeof AuthResetPasswordIndexRoute
 }
 export interface FileServerRoutesByFullPath {
   '/api/uploadthing': typeof ApiUploadthingServerRoute
@@ -241,6 +293,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/auth/reset-password/': {
+      id: '/auth/reset-password/'
+      path: '/auth/reset-password'
+      fullPath: '/auth/reset-password'
+      preLoaderRoute: typeof AuthResetPasswordIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/forgot-password/': {
+      id: '/auth/forgot-password/'
+      path: '/auth/forgot-password'
+      fullPath: '/auth/forgot-password'
+      preLoaderRoute: typeof AuthForgotPasswordIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth/$path/': {
       id: '/auth/$path/'
       path: '/auth/$path'
@@ -262,18 +328,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppProfileIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/demo/start/server-funcs': {
-      id: '/demo/start/server-funcs'
-      path: '/demo/start/server-funcs'
-      fullPath: '/demo/start/server-funcs'
-      preLoaderRoute: typeof DemoStartServerFuncsRouteImport
+    '/app/notifications/': {
+      id: '/app/notifications/'
+      path: '/app/notifications'
+      fullPath: '/app/notifications'
+      preLoaderRoute: typeof AppNotificationsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/demo/start/api-request': {
-      id: '/demo/start/api-request'
-      path: '/demo/start/api-request'
-      fullPath: '/demo/start/api-request'
-      preLoaderRoute: typeof DemoStartApiRequestRouteImport
+    '/app/billing/': {
+      id: '/app/billing/'
+      path: '/app/billing'
+      fullPath: '/app/billing'
+      preLoaderRoute: typeof AppBillingIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app/properties/add': {
+      id: '/app/properties/add'
+      path: '/app/properties/add'
+      fullPath: '/app/properties/add'
+      preLoaderRoute: typeof AppPropertiesAddRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/app/properties/$id': {
@@ -281,6 +354,13 @@ declare module '@tanstack/react-router' {
       path: '/app/properties/$id'
       fullPath: '/app/properties/$id'
       preLoaderRoute: typeof AppPropertiesIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app/profile/settings': {
+      id: '/app/profile/settings'
+      path: '/app/profile/settings'
+      fullPath: '/app/profile/settings'
+      preLoaderRoute: typeof AppProfileSettingsRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -316,12 +396,16 @@ const rootRouteChildren: RootRouteChildren = {
   AppIndexRoute: AppIndexRoute,
   PrivacyPolicyIndexRoute: PrivacyPolicyIndexRoute,
   TermsOfServiceIndexRoute: TermsOfServiceIndexRoute,
+  AppProfileSettingsRoute: AppProfileSettingsRoute,
   AppPropertiesIdRoute: AppPropertiesIdRoute,
-  DemoStartApiRequestRoute: DemoStartApiRequestRoute,
-  DemoStartServerFuncsRoute: DemoStartServerFuncsRoute,
+  AppPropertiesAddRoute: AppPropertiesAddRoute,
+  AppBillingIndexRoute: AppBillingIndexRoute,
+  AppNotificationsIndexRoute: AppNotificationsIndexRoute,
   AppProfileIndexRoute: AppProfileIndexRoute,
   AppPropertiesIndexRoute: AppPropertiesIndexRoute,
   AuthPathIndexRoute: AuthPathIndexRoute,
+  AuthForgotPasswordIndexRoute: AuthForgotPasswordIndexRoute,
+  AuthResetPasswordIndexRoute: AuthResetPasswordIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

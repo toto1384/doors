@@ -67,8 +67,8 @@ const HeroSection: React.FC = () => {
     return (
         <section className="min-h-[95dvh] bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-end relative md:overflow-hidden h-fit">
             <img src="/landing/chat.png" className="absolute hidden md:block z-40 top-0 bottom-0 my-auto left-10 w-[30vw] opacity-50" />
-            <img src="/landing/hero.png" className="absolute brightness-75 inset-0 bg-black/50 object-right-bottom object-cover h-[70dvh] md:h-auto scale-110" />
-            <img src="/landing/heroLayer.png" className="absolute brightness-75 hidden md:block z-20 inset-0 object-right-bottom object-cover h-[70dvh] md:h-auto scale-110 " />
+            <img src="/landing/hero.png" className="absolute brightness-75 right-0 top-0 md:left-[15%] md:w-[90%] bg-black/50 object-cover h-[70dvh] md:h-auto" />
+            <img src="/landing/heroLayer.png" className="absolute brightness-75 hidden md:block z-20 right-0 top-0 md:left-[15%] md:w-[90%] object-cover h-[70dvh] md:h-auto " />
             <div className='bg-gradient-to-r hidden md:block from-[#0B0014]/90 from-20% to-black/0 to-50% absolute z-30 inset-0'></div>
             <div className='bg-gradient-to-t from-[#0B0014] from-20% to-black/0 to-50% absolute z-30 inset-0'></div>
 

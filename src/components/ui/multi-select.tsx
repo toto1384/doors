@@ -118,7 +118,7 @@ export function MultiSelectTrigger({
                 role={props.role ?? "combobox"}
                 aria-expanded={props["aria-expanded"] ?? open}
                 className={cn(
-                    `flex h-auto min-h-9 w-fit items-center justify-between gap-2 overflow-hidden rounded bg-input/30 px-3 py-1.5 text-sm whitespace-nowrap shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 data-[placeholder]:text-muted-foreground hover:bg-input/50 dark:hover:bg-input/50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 [&_svg:not([class*='text-'])]:text-muted-foreground dark:bg-[#404040] ${ringClassName}`,
+                    `flex h-auto min-h-9 w-fit items-center justify-between gap-2 overflow-hidden rounded bg-input/30 px-3 py-1.5 text-sm whitespace-nowrap shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 data-[placeholder]:text-muted-foreground hover:bg-input/50 dark:hover:bg-input/50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 [&_svg:not([class*='text-'])]:text-muted-foreground dark:bg-[#241540] ${ringClassName}`,
                     className,
                 )}
             >
@@ -195,7 +195,7 @@ export function MultiSelectValue({
 
     if (selectedValues.size === 0 && placeholder) {
         return (
-            <span className="min-w-0 overflow-hidden font-normal text-muted-foreground">
+            <span className={cn("min-w-0 overflow-hidden font-normal text-muted-foreground", className)}>
                 {placeholder}
             </span>
         )

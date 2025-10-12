@@ -1,6 +1,6 @@
 import mongoose, { Document, Model, } from 'mongoose'
 import { PropertyObject, UserObject } from "./types";
-import { PropertySchema, UserSchema } from "./propertySchema";
+import { PropertySchema, UserSchema } from "./dbSchemas";
 
 
 import { zodSchema } from "@zodyac/zod-mongoose";

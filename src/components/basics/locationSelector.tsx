@@ -4,6 +4,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { useLoadScript } from "@react-google-maps/api";
 import { LocationObject } from "utils/validation/types";
 import { formatPlaceToLocationObject } from "utils/googleMapsUtils";
+import { cn } from "@/lib/utils";
 
 //https://medium.com/@mangergeorgepraise/integrating-google-places-autocomplete-api-for-form-filling-in-next-js-137ef1a2b7ee
 
@@ -33,7 +34,7 @@ export const libraries = ["places"] as any;
 
 
 export function LocationSelector(
-    { locationObject, setLocationObject, width }:
+    { locationObject, setLocationObject, width, className }:
         {
             locationObject: LocationObject | undefined,
             setLocationObject: (l: LocationObject | undefined) => void,
@@ -101,7 +102,7 @@ export function LocationSelector(
             }}
             ref={inputRef}
             style={{ width: width }}
-            className={' bg-input/30 dark:bg-[#404040] px-3 py-1.5 rounded'}
+            className={cn(' bg-input/30 dark:bg-[#241540] px-3 py-1.5 rounded placeholder-white', className)}
             placeholder="Enter Street Address"
             required
         />

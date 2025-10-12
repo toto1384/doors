@@ -1,6 +1,7 @@
 
 import { createServerFileRoute } from "@tanstack/react-start/server";
 import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
+import { createTRPCContextServer } from "trpc/init";
 import { trpcRouter } from "trpc/router";
 
 function handler({ request }: { request: Request }) {
@@ -8,9 +9,7 @@ function handler({ request }: { request: Request }) {
         req: request,
         router: trpcRouter,
         endpoint: "/api/trpc",
-        createContext: () => ({
-            req: request
-        }),
+        createContext: () => (createTRPCContextServer({ headers: request.headers })),
     });
 }
 

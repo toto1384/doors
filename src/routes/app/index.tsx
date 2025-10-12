@@ -44,23 +44,23 @@ function Dashboard() {
 
     return (
         <div className="flex flex-col items-center justify-center ">
-            <div className='flex flex-col gap-2 w-full border-b dark:border-[#404040] dark:bg-[#262626] pt-4 pb-5 px-6'>
+            <div className='flex w-full flex-col gap-2 border-b px-6 pt-4 pb-5 dark:border-[#404040] '>
                 <h1 className="text-2xl font-light">Ce vrei să faci astăzi pe DOORS?</h1>
 
-                <p className={`max-w-2xl before:content-['•'] before:dark:text-[#737373] before:text-3xl/1 pl-4 before:absolute before:mt-1 before:left-0 relative  before:text-gray-500 text-xs dark:text-[#a3a3a3]`}>
+                <p className={`relative max-w-2xl pl-4 text-xs before:absolute before:left-0 before:mt-1 before:text-3xl/1 before:text-gray-500  before:content-['•'] dark:text-[#a3a3a3] before:dark:text-[#737373]`}>
                     Alege dacă vrei să explorezi proprietăți sau să adaugi una pe platformă.
                 </p>
             </div>
             {/* <LocationSelector locationObject={locationObject as any} setLocationObject={setLocationObject} /> */}
 
             {/* Properties Grid */}
-            {<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 p-4">
+            {<div className="grid grid-cols-2 gap-1 md:gap-3 p-4 md:grid-cols-2 lg:grid-cols-3">
                 {properties?.map((property) => (<PropertyCard key={property._id} property={property} />))}
             </div>}
 
             {
                 properties && properties.length === 0 && (
-                    <div className="text-center h-full py-8">
+                    <div className="h-full py-8 text-center">
                         <p className="text-gray-400">No properties found matching your criteria.</p>
                     </div>
                 )

@@ -1,7 +1,3 @@
-'use client';
-
-// NextAuth imports commented out for BetterAuth migration
-// import { signIn, signOut } from "next-auth/react";
 import { useEffect, useState } from "react";
 
 

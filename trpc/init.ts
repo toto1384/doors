@@ -4,7 +4,23 @@ import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
 import { auth } from "../utils/auth";
 
-const t = initTRPC.create({
+
+
+// Create the tRPC context, which includes the database client and the potentially authenticated user. This will provide convenient access to both within our tRPC procedures.
+export const createTRPCContextServer = async (opts: { headers: Headers }) => {
+    const authSession = await auth.api.getSession({
+        headers: opts.headers
+    })
+
+    return {
+        user: authSession?.user,
+        headers: opts.headers as (typeof opts.headers | undefined),
+    }
+}
+type Context = Awaited<ReturnType<typeof createTRPCContextServer>>
+
+
+const t = initTRPC.context<Context>().create({
     transformer: superjson,
 });
 
@@ -12,38 +28,13 @@ export const createTRPCRouter = t.router;
 export const publicProcedure = t.procedure;
 
 export const authProcedure = t.procedure.use(async ({ ctx, next }) => {
-    // Get the request from the procedure context
-    const request = ctx.req || (globalThis as any).request;
 
-    let session = null;
-    let user = null;
-
-    if (request) {
-        try {
-            session = await auth.api.getSession({
-                headers: request.headers
-            });
-
-            if (session) {
-                user = session.user;
-            }
-        } catch (error) {
-            console.warn("Failed to get session:", error);
-        }
-    }
-
-    if (!session || !user) {
+    if (!ctx.user) {
         throw new TRPCError({
             code: "UNAUTHORIZED",
             message: "Authentication required"
         });
     }
 
-    return next({
-        ctx: {
-            ...ctx,
-            session,
-            user
-        },
-    });
+    return next({ ctx: { ...ctx, user: ctx.user }, });
 });

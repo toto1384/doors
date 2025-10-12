@@ -108,28 +108,37 @@
   },
   "register-page": {
     "title": "Sign Up",
-    "subtitle": "Create your account to get started",
+    "subtitle": "Create an account",
     "form": {
-      "email": "Email",
+      "fullName": "Full name",
+      "fullNamePlaceholder": "Enter your name",
+      "email": "Email address",
+      "emailPlaceholder": "Enter your email",
+      "phoneNumber": "Phone number",
       "password": "Password",
-      "confirmPassword": "Confirm Password",
-      "firstName": "First Name",
-      "lastName": "Last Name",
-      "button": "Create Account",
+      "confirmPassword": "Confirm password",
+      "button": "Create account",
       "haveAccount": "Already have an account?",
-      "signIn": "Sign in"
+      "signIn": "Sign in",
+      "continueWithGoogle": "Continue with Google",
+      "or": "Or",
+      "dataProtection": "Your data is secure and not shared with anyone"
     }
   },
   "login-page": {
     "title": "Sign In",
-    "subtitle": "Sign in to your account",
+    "subtitle": "Welcome back! Please sign in to your account",
     "form": {
-      "email": "Email",
+      "email": "Phone number / email address",
       "password": "Password",
       "button": "Sign In",
+      "rememberMe": "Remember me",
       "forgotPassword": "Forgot your password?",
       "noAccount": "Don't have an account?",
-      "signUp": "Sign up"
+      "signUp": "Register",
+      "continueWithGoogle": "Continue with Google",
+      "or": "Or",
+      "dataProtection": "Your data is secure and not shared with anyone"
     }
   },
   "profile-page": {
@@ -153,7 +162,92 @@
       "subtitle": "Choose your preferred theme"
     },
     "account": {
-      "title": "Account"
+      "title": "Account",
+      "subtitle": "Manage your account settings",
+      "signOut": "Sign Out"
+    },
+    "view": {
+      "accountSettings": "Account Settings",
+      "quickOverview": "Quick Overview",
+      "favoriteProperties": "Favorite Properties",
+      "savedProperties": "Saved Properties",
+      "offersMade": "Offers Made",
+      "viewingsScheduled": "Viewings Scheduled",
+      "thisWeek": "this week",
+      "pending": "pending",
+      "nextTomorrow": "Next: Tomorrow",
+      "viewDetails": "View Details",
+      "rooms": "rooms",
+      "bathrooms": "bathrooms"
+    }
+  },
+  "forgot-password-page": {
+    "title": "Forgot Password",
+    "subtitle": "Enter your email address and we'll send you a link to reset your password",
+    "form": {
+      "email": "Email address",
+      "emailPlaceholder": "Enter your email",
+      "button": "Send reset link",
+      "sending": "Sending...",
+      "backToLogin": "Back to sign in"
+    },
+    "success": {
+      "title": "Check your email",
+      "subtitle": "We've sent a password reset link to your email address",
+      "backToLogin": "Back to sign in"
+    }
+  },
+  "reset-password-page": {
+    "title": "Reset Password",
+    "subtitle": "Enter your new password",
+    "form": {
+      "newPassword": "New password",
+      "confirmPassword": "Confirm password",
+      "button": "Reset password",
+      "resetting": "Resetting...",
+      "backToLogin": "Back to sign in"
+    }
+  },
+  "app-wrapper": {
+    "loading": "Loading...",
+    "profile": "Profile",
+    "signOut": "Sign out",
+    "notifications": "Notifications",
+    "credits": "Credits",
+    "viewProfile": "View Profile",
+    "accountSettings": "Account Settings",
+    "helpCenter": "Help Center",
+    "termsConditions": "Terms & Conditions",
+    "privacyPolicy": "Privacy Policy",
+    "logout": "Logout",
+    "buyer": "Buyer",
+    "seller": "Seller"
+  },
+  "ai-chatbot": {
+    "propertyTypes": {
+      "house": "House",
+      "apartment": "Apartment"
+    },
+    "budgetRanges": {
+      "under100k": "Under €100,000",
+      "between100k200k": "Between €100,000 and €200,000",
+      "over200k": "Over €200,000"
+    },
+    "facilities": {
+      "parking": "Parking",
+      "balcony": "Balcony",
+      "terrace": "Terrace",
+      "garden": "Garden",
+      "elevator": "Elevator",
+      "airConditioning": "Air Conditioning",
+      "centralHeating": "Central Heating",
+      "furnished": "Furnished"
+    },
+    "actions": {
+      "retry": "Retry",
+      "stop": "Stop",
+      "copy": "Copy",
+      "regenerate": "Regenerate"
     }
   },
   "privacy-policy": {

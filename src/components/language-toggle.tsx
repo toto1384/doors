@@ -1,12 +1,12 @@
 'use client';
 
-import { Button } from 'components/ui/button';
+import { Button } from 'src/components/ui/button';
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
-} from 'components/ui/dropdown-menu';
+} from 'src/components/ui/dropdown-menu';
 import { Languages } from 'lucide-react';
 import { cn } from 'lib/utils';
 import { useTranslation } from 'react-i18next';
@@ -53,7 +53,7 @@ export function LanguageToggle({ className, variant = 'ghost' }: LanguageToggleP
         i18n.changeLanguage(newLocale);
     };
 
-    const currentLanguageName = locale === 'en' ? t('english') : t('romanian');
+    const currentLanguageName = locale.includes('en') ? t('english') : t('romanian');
 
     if (variant === 'minimal') {
         return (

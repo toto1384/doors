@@ -5,7 +5,6 @@ import { Home, Menu, X } from 'lucide-react';
 import { Link } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { useTRPC } from 'trpc/react';
-import { SignedIn, SignedOut } from '@daveyplate/better-auth-ui';
 import { authClient } from 'utils/auth-client';
 import { LanguageToggle, LanguageToggleVariant } from './language-toggle';
 
@@ -36,15 +35,15 @@ export const Header: React.FC = () => {
             }`}>
             <div className="max-w-[1000px] mx-auto md:px-6 py-1">
                 <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
+                    <Link to='/' className="flex items-center space-x-2">
                         <img src="/doors-logo.png" className="w-28 h-16 object-cover object-center flex items-center justify-center" />
-                    </div>
+                    </Link>
 
                     <nav className='space-x-7 hidden md:block'>
-                        <a href="#benefits" className="hover:text-slate-300 transition-colors">{t('footer.navigation.benefits')}</a>
-                        <a href="#demo" className="hover:text-slate-300 transition-colors">{t('footer.navigation.demo')}</a>
-                        <a href="#pricing" className="hover:text-slate-300 transition-colors">{t('footer.navigation.pricing')}</a>
-                        <a href="#faq" className="hover:text-slate-300 transition-colors">{t('footer.navigation.faq')}</a>
+                        <a href="/#benefits" className="hover:text-slate-300 transition-colors">{t('footer.navigation.benefits')}</a>
+                        <a href="/#demo" className="hover:text-slate-300 transition-colors">{t('footer.navigation.demo')}</a>
+                        <a href="/#pricing" className="hover:text-slate-300 transition-colors">{t('footer.navigation.pricing')}</a>
+                        <a href="/#faq" className="hover:text-slate-300 transition-colors">{t('footer.navigation.faq')}</a>
 
                     </nav>
 
