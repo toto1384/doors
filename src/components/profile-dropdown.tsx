@@ -17,6 +17,11 @@ interface ProfileDropdownProps {
 const ProfileContent = ({ session, isSeller, setIsSeller }: { session: any, isSeller: boolean, setIsSeller: (isSeller: boolean) => void }) => {
 
     const { t } = useTranslation('translation', { keyPrefix: 'app-wrapper' });
+
+    const { profileMenuOpen, setProfileMenuOpen } = usePopoversOpenStore(useShallow(state => ({
+        profileMenuOpen: state.menuOpen,
+        setProfileMenuOpen: state.setMenuOpen,
+    })));
     return <>
         {/* User Profile Section */}
         <div className="pb-6 text-center">
@@ -63,7 +68,7 @@ const ProfileContent = ({ session, isSeller, setIsSeller }: { session: any, isSe
             { divider: true },
         ].map((item, index) => (
             item.divider ? <div key={index} className="h-px bg-[#637381]/20 hidden md:block mx-5 my-2" /> :
-                <Link key={index} to={item.href} className="px-4 md:px-6 py-4 my-1.5 md:my-0 md:py-2 rounded-lg bg-[#241540] md:bg-transparent text-white hover:bg-purple-800/50 flex flex-row items-center justify-between">
+                <Link key={index} onClick={() => setProfileMenuOpen(false)} to={item.href} className="px-4 md:px-6 py-4 my-1.5 md:my-0 md:py-2 rounded-lg bg-[#241540] md:bg-transparent text-white hover:bg-purple-800/50 flex flex-row items-center justify-between">
                     {item.name}
                     <ChevronRight className="w-4 h-4 md:hidden" />
                 </Link>

@@ -56,7 +56,7 @@ export const propertiesRouter = {
         const PropertyModel = getPropertyModel(db);
 
         try {
-            const user = await UserModel.findById(ctx.user._id);
+            const user = await UserModel.findById(ctx.user.id);
             if (!user || !user.favoriteProperties || user.favoriteProperties.length === 0) {
                 return [];
             }
@@ -175,7 +175,7 @@ export const propertiesRouter = {
                 // Check if user is authenticated and has this property favorited
                 if (ctx.user) {
                     const UserModel = getUserModel(db);
-                    const user = await UserModel.findById(ctx.user._id);
+                    const user = await UserModel.findById(ctx.user.id);
                     favorited = user?.favoriteProperties?.includes(input.id) || false;
                 }
 
@@ -183,7 +183,7 @@ export const propertiesRouter = {
             } catch (error) {
                 throw new TRPCError({
                     code: "INTERNAL_SERVER_ERROR",
-                    message: "Failed to fetch property"
+                    message: `Failed to fetch property ${error}`
                 });
             }
         }),
