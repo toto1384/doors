@@ -22,6 +22,7 @@ const getProperty = createServerFn().validator((params) => z.object({ id: z.stri
 export const Route = createFileRoute('/app/properties/$id')({
     component: PropertyDetailRoute,
     loader: async ({ params }) => {
+        console.log('params', params)
         const result = await getProperty({ data: params })
 
         return result

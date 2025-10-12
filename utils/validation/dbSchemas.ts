@@ -71,7 +71,7 @@ const PropertyFeatures = z.enum([
 
 // Main Property schema
 export const PropertySchema = z.object({
-    // _id: z.string(),
+    _id: z.string(),
 
     title: z.string(),
 

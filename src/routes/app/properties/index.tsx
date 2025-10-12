@@ -18,10 +18,12 @@ import { Input } from '@/components/ui/input'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Slider } from '@/components/ui/slider'
 import { cn } from 'lib/utils'
+import { auth } from 'utils/auth'
 
 
 export const getPropertiesWithFilters = createServerFn().validator((d) => propertyFiltersSchema.parse(d)).handler(async ({ data: filters, }) => {
-    const caller = trpcRouter.createCaller({})
+    // auth.api.getSession()
+    const caller = trpcRouter.createCaller({ headers: undefined, user: undefined })
     const res = await caller.properties.list(filters)
     return res as PropertyObject[]
 })
@@ -71,7 +73,7 @@ function PropertiesRoute() {
     }
 
 
-    const [showFilters, setShowFilters] = useState(true)
+    const [showFilters, setShowFilters] = useState(false)
 
 
     const filterButton = <button onClick={() => setShowFilters(!showFilters)} className="flex flex-row cursor-pointer touch-none select-none items-center gap-3 w-fit border rounded-[6px] border-[#C1A7FF] text-xs text-[#C1A7FF] px-3 py-2.5">
