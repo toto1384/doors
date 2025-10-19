@@ -19,11 +19,20 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Slider } from '@/components/ui/slider'
 import { cn } from 'lib/utils'
 import { auth } from 'utils/auth'
+import { getHeaders } from '@tanstack/react-start/server'
+import z from 'zod/v3'
+import { useNavigate } from '@tanstack/react-router'
 
 
 export const getPropertiesWithFilters = createServerFn().validator((d) => propertyFiltersSchema.parse(d)).handler(async ({ data: filters, }) => {
-    // auth.api.getSession()
-    const caller = trpcRouter.createCaller({ headers: undefined, user: undefined })
+    const headers = getHeaders()
+
+    const h = new Headers()
+    Object.entries(headers).filter(r => r[1]).map(r => h.append(r[0], r[1]!))
+
+    const sessionData = await auth.api.getSession({ headers: h })
+
+    const caller = trpcRouter.createCaller({ headers: h, user: sessionData?.user })
     const res = await caller.properties.list(filters)
     return res as PropertyObject[]
 })
@@ -35,13 +44,27 @@ export const Route = createFileRoute('/app/properties/')({
         const data = await getPropertiesWithFilters({ data: {} })
         console.log('getPropertiesWithFilters', data.length)
         return data
-    }
+    },
+    validateSearch: z.object({
+        search: z.string().optional(),
+        sort: z.enum(['newest', 'oldest', 'price-asc', 'price-desc']).optional(),
+        page: z.number().optional(),
+    }),
 })
 
 
 function PropertiesRoute() {
     const propertiesReceived = Route.useLoaderData()
     const trpcClient = useTRPCClient()
+
+    const navigate = useNavigate()
+
+
+    const params = Route.useSearch()
+
+    // navigate({
+    //     search: (prev) => ({ ...prev, page: prev.page + 1 }),
+    // })
 
     const { updatePropertyFilters, setUpdatePropertyFilters, propertyFilters, setPropertyFilters } = usePropertyFilterStore(useShallow(state => ({
         propertyFilters: state.propertyFilters,
@@ -230,7 +253,7 @@ function PropertiesRoute() {
 }
 
 
-export const PropertyCard = ({ property, match }: { property: PropertyObject, match?: number }) => {
+export const PropertyCard = ({ property, match }: { property: PropertyObject, match?: number | 'hide' }) => {
     return <Link
         to='/app/properties/$id'
         params={{ id: property._id }}
@@ -241,7 +264,7 @@ export const PropertyCard = ({ property, match }: { property: PropertyObject, ma
             <img src={property.imageUrls[0]} className="max-h-42 w-full rounded-[6px] h-full object-cover" />
         </div>
 
-        {match && <div className="flex items-center absolute left-3 top-3 md:top-5 md:left-5 justify-between mb-2">
+        {match && match !== 'hide' && <div className="flex items-center absolute left-3 top-3 md:top-5 md:left-5 justify-between mb-2">
             <span className="bg-[#623398] text-white flex flex-row font-light items-center text-[9px] px-2 py-1 rounded">
                 <img src="/icons/checkIcon.svg" className="w-2 h-2 mr-1" />
                 {match}% Match

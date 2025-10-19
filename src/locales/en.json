@@ -179,6 +179,24 @@
       "viewDetails": "View Details",
       "rooms": "rooms",
       "bathrooms": "bathrooms"
+    },
+    "settings": {
+      "accountInformation": "Account Information",
+      "changePassword": "Change Password",
+      "language": "Language",
+      "languageDescription": "Application language",
+      "notifications": "Notifications",
+      "emailNotifications": "Email Notifications",
+      "emailNotificationsDescription": "Receive updates and alerts via email",
+      "pushNotifications": "Push Notifications", 
+      "pushNotificationsDescription": "Get instant notifications in your browser",
+      "aiNotifications": "AI Assistant Notifications",
+      "aiNotificationsDescription": "Receive notifications from your AI assistant",
+      "currentPassword": "Current password",
+      "newPassword": "New password", 
+      "confirmNewPassword": "Confirm new password",
+      "cancel": "Cancel",
+      "saveChanges": "Save changes"
     }
   },
   "forgot-password-page": {
@@ -233,16 +251,6 @@
       "between100k200k": "Between €100,000 and €200,000",
       "over200k": "Over €200,000"
     },
-    "facilities": {
-      "parking": "Parking",
-      "balcony": "Balcony",
-      "terrace": "Terrace",
-      "garden": "Garden",
-      "elevator": "Elevator",
-      "airConditioning": "Air Conditioning",
-      "centralHeating": "Central Heating",
-      "furnished": "Furnished"
-    },
     "actions": {
       "retry": "Retry",
       "stop": "Stop",
@@ -260,6 +268,36 @@
     "lastUpdated": "Last updated: {date}",
     "introduction": "These Terms of Service govern your use of our platform and services."
   },
+  "property-page": {
+    "share": {
+      "title": "Share Property",
+      "linkCopied": "Link copied to clipboard!",
+      "shareError": "Unable to share property",
+      "copyError": "Unable to copy link"
+    }
+  },
+  "facilities": {
+    "pet-friendly": "Pet Friendly",
+    "balcony": "Balcony",
+    "terrace": "Terrace",
+    "first-floor": "First Floor",
+    "ground-floor": "Ground Floor",
+    "top-floor": "Top Floor",
+    "elevator": "Elevator",
+    "air-conditioning": "Air Conditioning",
+    "garden": "Garden",
+    "pool": "Pool",
+    "gym": "Gym",
+    "security-system": "Security System",
+    "basement": "Basement",
+    "recently-renovated": "Recently Renovated",
+    "new-construction": "New Construction",
+    "city-center": "City Center",
+    "furnished": "Furnished",
+    "central_heating": "Central Heating",
+    "internet": "Internet",
+    "parking": "Parking"
+  },
   "common": {
     "loading": "Loading...",
     "save": "Save",
@@ -268,6 +306,34 @@
     "delete": "Delete",
     "confirm": "Confirm",
     "close": "Close"
+  },
+  "property-add": {
+    "title": "Your listing is taking shape",
+    "subtitle": "As you respond, we transform the details into a complete listing, ready for publication",
+    "buildingListing": "Building your listing",
+    "detailsCompleted": "details completed",
+    "completedPercent": "completed",
+    "yourPreferences": "Your preferences:",
+    "addImage": "Add an image",
+    "fields": {
+      "title": "Title",
+      "description": "Description",
+      "price": "Price",
+      "location": "Location",
+      "numberOfRooms": "Number of rooms",
+      "facilities": "Facilities",
+      "propertyType": "Property type",
+      "imageUpload": "Image upload",
+      "surfaceArea": "Surface area",
+      "furnished": "Furnished",
+      "heating": "Heating",
+      "buildingYear": "Building year",
+      "floor": "Floor"
+    },
+    "status": {
+      "waiting": "waiting",
+      "inProgress": "in progress"
+    }
   },
   "auth-ui": {
     "signIn": "Sign In",

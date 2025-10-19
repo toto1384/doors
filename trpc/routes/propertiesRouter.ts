@@ -5,6 +5,7 @@ import dbConnect from 'utils/db/mongodb';
 import { getPropertyModel, getUserModel } from 'utils/validation/mongooseModels';
 import { propertyFiltersSchema } from 'utils/validation/propertyFilters';
 import { PropertyObject } from 'utils/validation/types';
+import { ObjectId } from 'mongodb';
 import z from 'zod/v3';
 
 
@@ -160,26 +161,28 @@ export const propertiesRouter = {
         .query(async ({ input, ctx }) => {
             const db = await dbConnect();
             const PropertyModel = getPropertyModel(db);
+            const UserModel = getUserModel(db);
 
             try {
                 const property = await PropertyModel.findById(input.id).lean();
                 if (!property) {
-                    throw new TRPCError({
-                        code: "NOT_FOUND",
-                        message: "Property not found"
-                    });
+                    throw new TRPCError({ code: "NOT_FOUND", message: "Property not found" });
                 }
+
+                const propertyUser = await UserModel.findById(property.postedByUserId == '-1' ? '68e4fb510a3ece1a5839a59b' : property.postedByUserId, { favoriteProperties: -1 }).lean();
+
+                console.log('propertyUser', propertyUser)
+
 
                 let favorited = false;
 
                 // Check if user is authenticated and has this property favorited
                 if (ctx.user) {
-                    const UserModel = getUserModel(db);
                     const user = await UserModel.findById(ctx.user.id);
                     favorited = user?.favoriteProperties?.includes(input.id) || false;
                 }
 
-                return { property, favorited };
+                return { property, favorited, propertyUser: JSON.parse(JSON.stringify(propertyUser)) as UserObject };
             } catch (error) {
                 throw new TRPCError({
                     code: "INTERNAL_SERVER_ERROR",

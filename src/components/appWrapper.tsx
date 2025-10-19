@@ -14,11 +14,13 @@ import { NotificationsDropdown } from "./notifications-dropdown";
 import { HeartIcon, HomeIcon, NotificationsOutlineIcon, TokensOutlineIcon } from "./icons/homeIcons";
 import { usePopoversOpenStore } from "@/routes/__root";
 import { useShallow } from "zustand/react/shallow";
+import { UserType } from "utils/validation/dbSchemas";
+import { UserObject } from "utils/validation/types";
 
 
 export default function AppRouteWrapper({
     children,
-    token
+    token,
 }: Readonly<{
     children: React.ReactNode;
     token: string;
@@ -29,9 +31,11 @@ export default function AppRouteWrapper({
     const { data: session, isPending } = authClient.useSession();
     const { t } = useTranslation('translation', { keyPrefix: 'app-wrapper' });
 
-    const { aiChatbotOpen, setAiChatbotOpen } = usePopoversOpenStore(useShallow(state => ({
+    const { aiChatbotOpen, setAiChatbotOpen, userType, setUserType } = usePopoversOpenStore(useShallow(state => ({
         aiChatbotOpen: state.aiChatbotOpen,
         setAiChatbotOpen: state.setAiChatbotOpen,
+        userType: state.userType,
+        setUserType: state.setUserType,
     })))
 
 
@@ -41,6 +45,7 @@ export default function AppRouteWrapper({
         if (!isPending && !session) {
             router.navigate({ to: "/auth/$path", params: { path: 'sign-in' } });
         }
+        if (session?.user) setUserType(session.user.userType as typeof UserType[number])
     }, [session, isPending, router]);
 
     if (isPending) {
@@ -48,7 +53,7 @@ export default function AppRouteWrapper({
     }
 
     if (!session) {
-        return null;
+        return <></>;
     }
 
 
@@ -82,13 +87,13 @@ export default function AppRouteWrapper({
                             <img src={'/icons/credits.svg'} className="w-[18px] h-[18px] invert-[85] dark:invert-0" />
                             <span className="text-xs font-light"> 5009 </span>
                         </Link>
-                        <ProfileDropdown session={session} />
+                        <ProfileDropdown />
 
                     </div>
                 </div>
                 <div className="flex flex-row items-stretch grow-1 flex-1 min-h-0 relative" >
                     <div className={` ${!aiChatbotOpen ? 'hidden' : 'flex '} absolute top-0 bottom-20 z-30 mx-3 md:mx-0 md:z-auto w-[calc(100%-24px)] md:relative md:flex flex-col border rounded-lg dark:border-[#1C252E] md:w-[30vw] md:ml-2 mb-2 bg-gray-100 dark:bg-[#120826] `}>
-                        <ElevenLabsChatBotDemo conversationToken={token} />
+                        <ElevenLabsChatBotDemo user={session.user} conversationToken={token} />
                     </div>
                     <div className='flex flex-col w-full max-h-full overflow-y-auto'>
                         <div className="pb-28 md:pb-0">

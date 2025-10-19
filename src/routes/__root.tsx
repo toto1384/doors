@@ -12,6 +12,24 @@ import { PropertyFilters, PropertyObject } from 'utils/validation/types';
 import { create } from 'zustand';
 import appCss from '../styles.css?url';
 import { ThemeProvider, useTheme } from '@/components/providers/ThemeProvider';
+import { UserType } from 'utils/validation/dbSchemas';
+import { Toaster } from '@/components/ui/sonner';
+import { getHeaders } from '@tanstack/react-start/server';
+import { auth } from 'utils/auth';
+import { createServerFn } from '@tanstack/react-start';
+
+
+export const getRootObjectsServerFn = createServerFn().handler(async ({ data: filters, }) => {
+
+    const response = await fetch(
+        `https://api.elevenlabs.io/v1/convai/conversation/token?agent_id=${process.env.VITE_AGENT_ID}`,
+        { headers: { "xi-api-key": process.env.ELEVENLABS_API_KEY, } as any }
+    );
+    const body = await response.json();
+
+
+    return { token: body.token as string, }
+})
 
 
 export const Route = createRootRoute({
@@ -38,16 +56,8 @@ export const Route = createRootRoute({
     loader: async () => {
         // const theme = await getThemeServerFn()
 
-        const response = await fetch(
-            `https://api.elevenlabs.io/v1/convai/conversation/token?agent_id=${process.env.VITE_AGENT_ID}`,
-            { headers: { "xi-api-key": process.env.ELEVENLABS_API_KEY, } as any }
-        );
-        const body = await response.json();
 
-        return {
-            // theme,
-            token: body.token,
-        };
+        return await getRootObjectsServerFn()
     },
 
     shellComponent: RootComponent,
@@ -56,8 +66,9 @@ export const Route = createRootRoute({
 
 
 
-export const usePopoversOpenStore = create<{ aiChatbotOpen: boolean, setAiChatbotOpen: (open: boolean) => void, menuOpen: boolean, setMenuOpen: (open: boolean) => void, }>()((set) => ({
+export const usePopoversOpenStore = create<{ aiChatbotOpen: boolean, setAiChatbotOpen: (open: boolean) => void, menuOpen: boolean, setMenuOpen: (open: boolean) => void, userType: typeof UserType[number], setUserType: (p: typeof UserType[number]) => void, }>()((set) => ({
     aiChatbotOpen: false, setAiChatbotOpen: (p) => set({ aiChatbotOpen: p }), menuOpen: false, setMenuOpen: (p) => set({ menuOpen: p }),
+    userType: 'buyer', setUserType: (p) => set({ userType: p }),
 }));
 
 export const usePropertyAddStore = create<{
@@ -140,6 +151,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                         </TRPCWrapper>
                     </AutumnProvider>
                 </GoogleMapsProvider>
+                <Toaster />
                 {!import.meta.env.PROD && <TanstackDevtools
                     config={{
                         position: 'bottom-right',

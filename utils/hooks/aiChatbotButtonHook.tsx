@@ -3,7 +3,7 @@ import { useState, useCallback, useEffect, useContext } from 'react';
 
 
 export function useClientToolChoice<T extends boolean>({ choices, onShowButtons, fullWidth, multiple, }: {
-    choices: string[];
+    choices: { key: string, value: string }[];
     onShowButtons: (buttonsNode: React.ReactNode) => void;
     fullWidth?: boolean;
     multiple?: T;
@@ -33,7 +33,7 @@ export function useClientToolChoice<T extends boolean>({ choices, onShowButtons,
 
 
 const Buttons = <T extends boolean>({ choices, resolve, fullWidth, multiple, }: {
-    choices: string[];
+    choices: { key: string, value: string }[];
     resolve: (choice: (T extends true ? string[] : string)) => void;
     fullWidth?: boolean
     multiple?: T;
@@ -49,25 +49,25 @@ const Buttons = <T extends boolean>({ choices, resolve, fullWidth, multiple, }: 
     return <div className={`flex gap-2 px-3 mt-3 flex-wrap`}>
         {choices.map((choice) => (
             <button
-                key={choice}
+                key={choice.key}
                 disabled={!isConnected}
                 onClick={() => {
                     if (isConnected) {
                         console.log('clicked', choice, selectedChoice);
                         if (multiple === true) {
-                            if (!done) setSelectedChoices(prev => [...prev, choice]);
+                            if (!done) setSelectedChoices(prev => [...prev, choice.key]);
                         } else {
                             if (resolve && !selectedChoice) {
-                                setSelectedChoice(choice);
-                                resolve(choice as T extends true ? string[] : string);
+                                setSelectedChoice(choice.key);
+                                resolve(choice.key as T extends true ? string[] : string);
                             }
                         }
 
                     }
                 }}
-                className={`px-4 py-2 text-white rounded hover:opacity-90 bg-gradient-to-br ${fullWidth && 'w-full'}  ${(choice === selectedChoice || selectedChoices?.includes(choice)) ? 'from-[#4C7CED] to-[#7B31DC]' : 'bg-[#404040]'}`}
+                className={`px-4 py-2 text-white rounded hover:opacity-90 bg-gradient-to-br ${fullWidth && 'w-full'}  ${(choice.key === selectedChoice || selectedChoices?.includes(choice.key)) ? 'from-[#4C7CED] to-[#7B31DC]' : 'bg-[#404040]'}`}
             >
-                {choice}
+                {choice.value}
             </button>
         ))}
         {multiple && <button

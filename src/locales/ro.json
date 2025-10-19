@@ -179,6 +179,24 @@
       "viewDetails": "Vezi detalii",
       "rooms": "camere",
       "bathrooms": "băi"
+    },
+    "settings": {
+      "accountInformation": "Informații cont",
+      "changePassword": "Modifică parola",
+      "language": "Limbă",
+      "languageDescription": "Limba aplicației",
+      "notifications": "Notificări",
+      "emailNotifications": "Notificări email",
+      "emailNotificationsDescription": "Primește actualizări și alerte prin email",
+      "pushNotifications": "Notificări push",
+      "pushNotificationsDescription": "Primește notificări instant în browser",
+      "aiNotifications": "Notificări asistent AI",
+      "aiNotificationsDescription": "Primește notificări de la asistentul tău AI",
+      "currentPassword": "Parola actuală",
+      "newPassword": "Parola nouă",
+      "confirmNewPassword": "Confirmă noua parolă",
+      "cancel": "Anulează",
+      "saveChanges": "Salvează modificările"
     }
   },
   "forgot-password-page": {
@@ -233,16 +251,6 @@
       "between100k200k": "Intre 100.000 € și 200.000 €",
       "over200k": "Peste 200.000 €"
     },
-    "facilities": {
-      "parking": "Parking",
-      "balcony": "Balcon",
-      "terrace": "Terasă",
-      "garden": "Grădină",
-      "elevator": "Lift",
-      "airConditioning": "Aer condiționat",
-      "centralHeating": "Încălzire centrală",
-      "furnished": "Mobilat"
-    },
     "actions": {
       "retry": "Reîncercă",
       "stop": "Oprește",
@@ -260,6 +268,36 @@
     "lastUpdated": "Ultima actualizare: {date}",
     "introduction": "Acești Termeni de Serviciu guvernează utilizarea platformei și serviciilor noastre."
   },
+  "property-page": {
+    "share": {
+      "title": "Distribuie proprietatea",
+      "linkCopied": "Link copiat în clipboard!",
+      "shareError": "Nu se poate distribui proprietatea",
+      "copyError": "Nu se poate copia linkul"
+    }
+  },
+  "facilities": {
+    "pet-friendly": "Prietenos cu animalele",
+    "balcony": "Balcon",
+    "terrace": "Terasă",
+    "first-floor": "Primul etaj",
+    "ground-floor": "Parter",
+    "top-floor": "Ultimul etaj",
+    "elevator": "Lift",
+    "air-conditioning": "Aer condiționat",
+    "garden": "Grădină",
+    "pool": "Piscină",
+    "gym": "Sală de sport",
+    "security-system": "Sistem de securitate",
+    "basement": "Subsol",
+    "recently-renovated": "Recent renovat",
+    "new-construction": "Construcție nouă",
+    "city-center": "Centrul orașului",
+    "furnished": "Mobilat",
+    "central_heating": "Încălzire centrală",
+    "internet": "Internet",
+    "parking": "Parking"
+  },
   "common": {
     "loading": "Se încarcă...",
     "save": "Salvează",
@@ -268,6 +306,34 @@
     "delete": "Șterge",
     "confirm": "Confirmă",
     "close": "Închide"
+  },
+  "property-add": {
+    "title": "Anuntul tau prinde forma",
+    "subtitle": "Pe masura ce raspunzi, transformam detaliile intr-un anunt complet, gata de publicare",
+    "buildingListing": "Construim anuntul tau",
+    "detailsCompleted": "detalii completate",
+    "completedPercent": "completat",
+    "yourPreferences": "Preferințele tale:",
+    "addImage": "Adaugă o imagine",
+    "fields": {
+      "title": "Titlu",
+      "description": "Descriere",
+      "price": "Preț",
+      "location": "Locație",
+      "numberOfRooms": "Numărul de camere",
+      "facilities": "Facilități",
+      "propertyType": "Tipul proprietății",
+      "imageUpload": "Încărcare imagini",
+      "surfaceArea": "Suprafață",
+      "furnished": "Mobilat",
+      "heating": "Încălzire",
+      "buildingYear": "Anul de construire",
+      "floor": "Etaj"
+    },
+    "status": {
+      "waiting": "în așteptare",
+      "inProgress": "în curs de adăugare"
+    }
   },
   "auth-ui": {
     "signIn": "Conectează-te",

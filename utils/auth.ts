@@ -6,6 +6,7 @@ import { mongodbAdapter } from "better-auth/adapters/mongodb";
 import { reactStartCookies } from "better-auth/react-start";
 import { phoneNumber } from "better-auth/plugins";
 import { autumn } from "autumn-js/better-auth";
+import { authAdditionalFields } from "./constants";
 
 const client = new MongoClient(process.env.MONGODB_CONNECTION_URI!)
 const db = client.db();
@@ -47,22 +48,7 @@ export const auth = betterAuth({
         reactStartCookies()
     ],
 
-    user: {
-        additionalFields: {
-            _id: {
-                type: "string",
-                input: false
-            },
-            favoriteProperties: {
-                type: "string[]",
-                input: false
-            },
-            preferences: {
-                type: "json",
-                input: false
-            }
-        }
-    },
+    user: { additionalFields: authAdditionalFields },
 
     logger: {
         disabled: false,

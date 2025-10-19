@@ -5,6 +5,7 @@ import { LocationSchema } from './location';
 import { zDate } from './zodUtils';
 import { Facilities } from './propertyFilters';
 import { extendZod } from '@zodyac/zod-mongoose';
+import { ObjectId } from 'mongodb';
 
 
 extendZod(z as any)
@@ -33,6 +34,11 @@ export const UserSchema = z.object({
         numberOfRooms: z.array(z.number()).optional(), // Number of rooms
         facilities: z.array(z.string()).optional(), // Facilities/amenities from property features
     }).optional(),
+    notifications: z.object({
+        emailNotifications: z.boolean().optional(),
+        pushNotifications: z.boolean().optional(),
+        aiNotifications: z.boolean().optional(),
+    }),
     favoriteProperties: z.array(z.string()).optional(),
     name: z.string(),
     email: z.string(),
@@ -41,6 +47,25 @@ export const UserSchema = z.object({
     createdAt: zDate,
     updatedAt: zDate,
 })
+
+
+export const UserType = ['buyer', 'seller', 'admin'] as const
+
+export const AccountSchema = z.object({
+    _id: z.instanceof(ObjectId),
+    id: z.string(),
+    accountId: z.string(),
+    providerId: z.string(),
+    userId: z.instanceof(ObjectId),
+    accessToken: z.string(),
+    idToken: z.string(),
+    accessTokenExpiresAt: z.string().datetime(),
+    scope: z.string(),
+    createdAt: z.string().datetime(),
+    updatedAt: z.string().datetime(),
+});
+
+export type AccountObject = z.infer<typeof AccountSchema>;
 
 // Enum for common property features
 const PropertyFeatures = z.enum([
@@ -53,17 +78,15 @@ const PropertyFeatures = z.enum([
     'elevator',
     'air-conditioning',
     'garden',
-    'yard',
     'pool',
     'gym',
     'security-system',
     'basement',
     'recently-renovated',
     'new-construction',
-    'large-windows',
-    'near-public-transport',
     'city-center',
-    'garage',
+    'furnished',
+    'central_heating',
     'internet',
 ]);
 
@@ -108,3 +131,4 @@ export const PropertySchema = z.object({
 
 // Type inference
 export type Property = z.infer<typeof PropertySchema>;
+

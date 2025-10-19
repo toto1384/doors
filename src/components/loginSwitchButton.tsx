@@ -16,7 +16,6 @@ export default function LoginSwitchButton() {
         <div>
             <button
                 onClick={() => {
-                    // session.status === "authenticated" ? signOut() : signIn("google") // Commented out for BetterAuth migration
                     console.log("Auth functionality to be implemented with BetterAuth")
                 }}
                 className="mx-5 my-5 text-3xl"
