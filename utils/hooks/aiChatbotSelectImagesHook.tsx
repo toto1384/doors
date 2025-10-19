@@ -1,37 +1,64 @@
+
 import { IsConnectedContext } from '@/components/aiChatbot';
+import { MultiImageUpload } from '@/components/ui/multiImageUpload';
 import { useState, useCallback, useEffect, useContext, ReactNode } from 'react';
+import { useUploadThing } from 'utils/uploadThingClient';
 
 
-export function useClientToolChoice<T extends boolean>({ choices, onShowButtons, fullWidth, multiple, additionalOnClick }: {
-    choices: { key: string, value: string, icon?: ReactNode }[];
-    onShowButtons: (buttonsNode: React.ReactNode) => void;
-    fullWidth?: boolean;
-    additionalOnClick?: (value: T extends true ? string[] : string) => void;
-    multiple?: T;
+export function useClientToolSelectPhotos({ onShowPhotoSelector }: {
+    onShowPhotoSelector: (photosSelectorNode: React.ReactNode) => void;
 }) {
 
 
     const clientToolFunction = useCallback(async ({ message }: { message: string }) => {
         console.log(message);
 
-        return new Promise<string>((resolve) => {
+        return new Promise<string[]>((resolve) => {
 
-            // Create buttons node
-            onShowButtons(<Buttons choices={choices} resolve={(ch) => {
-
-                console.log('additionalOnClick', additionalOnClick, ch)
-                if (additionalOnClick) additionalOnClick(ch);
-                if (multiple === true) resolve(ch as string);
-                //elevenlabs only accepts strings not arrays
-                else resolve(ch.toString());
-            }}
-                multiple={multiple} fullWidth={fullWidth} />);
+            onShowPhotoSelector(<PhotoSelector resolve={resolve} />);
         });
-    }, [choices, onShowButtons,]);
+    }, [onShowPhotoSelector]);
 
     return {
         clientToolFunction,
     };
+}
+
+
+const PhotoSelector = ({ resolve }: { resolve: (photos: string[]) => void }) => {
+
+    const [images, setImages] = useState<string[]>([])
+
+
+    const isConnected = useContext(IsConnectedContext);
+
+    const { startUpload, isUploading, } = useUploadThing("imageUploader", {
+        onClientUploadComplete: (e) => {
+            setImages(prev => [...prev, ...e.map(i => i.ufsUrl)])
+        }
+    });
+
+
+    return <>
+        <MultiImageUpload
+            uploadFiles={async (f) => { return startUpload(f) }}
+            deleteFile={async () => { }}
+            value={images}
+            className='mb-3'
+        />
+        {isUploading ? <>Loading...</> : <button
+            key={'done'}
+            disabled={images.length === 0}
+            onClick={() => {
+                console.log('images', images, isConnected)
+                if (isConnected) {
+                    resolve(images);
+                }
+            }}
+            className={`px-4 py-2 text-white rounded-[6px] hover:opacity-90 bg-gradient-to-br w-full from-[#4C7CED] to-[#7B31DC] disabled:from-[#79a0fc] disabled:to-[#a561ff]`}
+        >Done</button>}
+    </>
+
 }
 
 

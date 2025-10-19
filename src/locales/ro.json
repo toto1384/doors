@@ -244,7 +244,9 @@
   "ai-chatbot": {
     "propertyTypes": {
       "house": "Casa",
-      "apartment": "Apartament"
+      "apartment": "Apartament",
+      "hotel": "Hotel",
+      "office": "Birou"
     },
     "budgetRanges": {
       "under100k": "Sub 100.000 €",

@@ -14,9 +14,11 @@ export const Route = createFileRoute("/app/properties/add")({
 function PropertyAdd() {
     const { t } = useTranslation('translation', { keyPrefix: 'property-add' })
 
-    const { partialProperty, setPartialProperty } = usePropertyAddStore(useShallow(state => ({
+    const { partialProperty, setPartialProperty, titlesAndDescriptions, setTitlesAndDescriptions } = usePropertyAddStore(useShallow(state => ({
         partialProperty: state.partialProperty,
         setPartialProperty: state.setPartialProperty,
+        titlesAndDescriptions: state.titlesAndDescriptions,
+        setTitlesAndDescriptions: state.setTitlesAndDescriptions,
     })))
 
     const [displayMode, setDisplayMode] = useState<'edit' | 'add photos'>('edit')
@@ -60,13 +62,13 @@ function PropertyAdd() {
             <div className="flex justify-between items-start">
                 <div className="flex-1">
                     <h2 className="text-lg font-medium text-white mb-4">{t('buildingListing')}</h2>
-                    
+
                     <div className="mb-3">
                         <div className="flex justify-between items-center mb-2">
                             <span className="text-sm text-gray-400">{completedSteps}/{totalSteps} {t('detailsCompleted')}</span>
                         </div>
                         <div className="w-full bg-gray-700 rounded-full h-2">
-                            <div 
+                            <div
                                 className="bg-gradient-to-r from-purple-500 to-blue-500 h-2 rounded-full transition-all duration-300 ease-out"
                                 style={{ width: `${progressPercentage}%` }}
                             ></div>
@@ -130,7 +132,7 @@ function PropertyAdd() {
 
             <div className="space-y-4">
                 <h3 className="text-base font-medium text-white mb-4">{t('yourPreferences')}</h3>
-                
+
                 {/* First 5 items displayed normally */}
                 <div className="space-y-3">
                     {checkedSteps.slice(0, 5).map(({ label, isChecked }, index) => (
@@ -145,8 +147,8 @@ function PropertyAdd() {
                 {checkedSteps.length > 5 && (
                     <div className="relative mt-4">
                         {checkedSteps.slice(5).map(({ label, isChecked }, index) => (
-                            <div 
-                                key={index + 5} 
+                            <div
+                                key={index + 5}
                                 className="absolute bg-gray-800 border border-gray-700 rounded-lg p-3 w-full"
                                 style={{
                                     top: `${index * 4}px`,

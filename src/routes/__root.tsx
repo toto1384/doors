@@ -77,6 +77,9 @@ export const usePropertyAddStore = create<{
     updatePropertyPhotos: (images: string[]) => Promise<void>,
     setUpdatePropertyPhotos: (fn: (images: string[]) => Promise<void>) => void,
 
+    titlesAndDescriptions: { title: string, description: string }[],
+    setTitlesAndDescriptions: (p: { title: string, description: string }[]) => void,
+
 
     propertyType: 'edit' | 'add-photos', setPropertyType: (p: 'edit' | 'add-photos') => void
 }>()((set) => ({
@@ -85,6 +88,10 @@ export const usePropertyAddStore = create<{
 
     updatePropertyPhotos: async () => { },
     setUpdatePropertyPhotos: (fn) => set({ updatePropertyPhotos: fn }),
+
+    titlesAndDescriptions: [],
+    setTitlesAndDescriptions: (p) => set({ titlesAndDescriptions: p }),
+
 
     propertyType: 'edit', setPropertyType: () => set({ propertyType: 'edit' }),
 }));
