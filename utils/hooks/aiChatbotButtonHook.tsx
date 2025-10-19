@@ -1,9 +1,9 @@
 import { IsConnectedContext } from '@/components/aiChatbot';
-import { useState, useCallback, useEffect, useContext } from 'react';
+import { useState, useCallback, useEffect, useContext, ReactNode } from 'react';
 
 
 export function useClientToolChoice<T extends boolean>({ choices, onShowButtons, fullWidth, multiple, }: {
-    choices: { key: string, value: string }[];
+    choices: { key: string, value: string, icon?: ReactNode }[];
     onShowButtons: (buttonsNode: React.ReactNode) => void;
     fullWidth?: boolean;
     multiple?: T;
@@ -33,7 +33,7 @@ export function useClientToolChoice<T extends boolean>({ choices, onShowButtons,
 
 
 const Buttons = <T extends boolean>({ choices, resolve, fullWidth, multiple, }: {
-    choices: { key: string, value: string }[];
+    choices: { key: string, value: string, icon?: ReactNode }[];
     resolve: (choice: (T extends true ? string[] : string)) => void;
     fullWidth?: boolean
     multiple?: T;
@@ -65,8 +65,9 @@ const Buttons = <T extends boolean>({ choices, resolve, fullWidth, multiple, }: 
 
                     }
                 }}
-                className={`px-4 py-2 text-white rounded hover:opacity-90 bg-gradient-to-br ${fullWidth && 'w-full'}  ${(choice.key === selectedChoice || selectedChoices?.includes(choice.key)) ? 'from-[#4C7CED] to-[#7B31DC]' : 'bg-[#404040]'}`}
+                className={`px-4 py-2 text-white rounded-[6px] flex flex-row items-center gap-1.5 hover:opacity-90 bg-gradient-to-br ${fullWidth && 'w-full'}  ${(choice.key === selectedChoice || selectedChoices?.includes(choice.key)) ? 'from-[#4C7CED] to-[#7B31DC]' : 'bg-[#1C252E]'}`}
             >
+                {choice.icon}
                 {choice.value}
             </button>
         ))}
