@@ -17,9 +17,9 @@ import { UserObject } from "utils/validation/types";
 import { useTRPC, useTRPCClient } from "trpc/react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import i18n from "@/components/i18n";
-import { UserTypeSwitch } from "@/components/user/userTypeSwitch";
 import { UserType } from "utils/validation/dbSchemas";
 import { ChangeProfilePictureImageButton } from "@/components/ui/imageUploaders";
+import { UserTypeSwitch } from "@/components/userAndAi/userTypeSwitch";
 
 export const Route = createFileRoute('/app/profile/settings')({
     component: ProfileSettings,

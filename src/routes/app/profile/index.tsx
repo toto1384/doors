@@ -6,7 +6,6 @@ import { useState } from "react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Heart, Calendar, Eye, LogOut } from "lucide-react";
 import { ChangeProfilePictureImageButton } from "@/components/ui/imageUploaders";
-import { UserTypeSwitch } from "@/components/user/userTypeSwitch";
 import { auth } from "utils/auth";
 import z from "zod/v3";
 import { createServerFn, useServerFn } from "@tanstack/react-start";
@@ -15,6 +14,7 @@ import dbConnect from "utils/db/mongodb";
 import { getPropertyModel } from "utils/validation/mongooseModels";
 import { PropertyObject } from "utils/validation/types";
 import { PropertyCard } from "../properties";
+import { UserTypeSwitch } from "@/components/userAndAi/userTypeSwitch";
 
 
 export const getFavouritesProperties = createServerFn().validator((params) => z.object({ skip: z.number().optional() }).parse(params)).handler(async ({ data }) => {
