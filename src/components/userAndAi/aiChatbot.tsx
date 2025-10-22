@@ -33,6 +33,7 @@ export const ElevenLabsChatBotDemo = ({ conversationToken, user }: { conversatio
 
     const [messages, setMessages] = useState<MessageType[]>([]);
 
+
     const { partialProperty, setPartialProperty } = usePropertyAddStore(useShallow(state => ({
         partialProperty: state.partialProperty,
         setPartialProperty: state.appendPartialProperty,

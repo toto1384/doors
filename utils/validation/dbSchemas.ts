@@ -3,7 +3,6 @@
 import { z } from 'zod/v3';
 import { LocationSchema } from './location';
 import { zDate } from './zodUtils';
-import { Facilities } from './propertyFilters';
 import { extendZod } from '@zodyac/zod-mongoose';
 import { ObjectId } from 'mongodb';
 
@@ -109,17 +108,17 @@ const ToPostPropertySchemaZod = {
     numberOfBathrooms: z.number().optional(),
     surfaceArea: z.number(),
     furnished: z.boolean(),
-    features: z.array(PropertyFeatures).default([]),
-    propertyType: z.enum(PropertyType).optional(),
+    features: z.array(PropertyFeatures).default([]).optional(),
+    propertyType: z.enum(PropertyType),
     heating: z.enum(['gas', 'fireplace', 'electric', '3rd_party']).optional(),
     buildingYear: z.number().optional(),
     buildingFloors: z.number().optional(),
 
-    floor: z.number().optional(),
+    floor: z.number(),
 
     imageUrls: z.array(z.string()),
 
-    tags: z.array(z.string()).default([]),
+    tags: z.array(z.string()).default([]).optional(),
 }
 
 export const ToPostPropertySchema = z.object(ToPostPropertySchemaZod)

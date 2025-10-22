@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router"
+import { createFileRoute, useRouter } from "@tanstack/react-router"
 import { usePopoversOpenStore, usePropertyAddStore } from "@/routes/__root"
 import { useShallow } from "zustand/react/shallow"
 import { useEffect, useState } from "react"
@@ -38,10 +38,11 @@ function PropertyAdd() {
         setTitlesAndDescriptions: state.setTitlesAndDescriptions,
         titleAndDescResolver: state.titleAndDescResolver,
         setTitleAndDescResolver: state.setTitleAndDescResolver,
-        postedStatus: state.setPostedStatus,
+        postedStatus: state.postedStatus,
     })))
 
 
+    const router = useRouter()
     const size = useSize(true)
     const cutSize = size.gmd ? 5 : 3
 
@@ -176,7 +177,11 @@ function PropertyAdd() {
 
                 {(displayMode === 'edit' && !titlesAndDescriptions.length) && <div className='flex flex-col w-full pt-4 pb-5 px-6 space-y-2'>
 
-                    {completedSteps === totalSteps && <h3 className="text-base font-medium text-white mb-4"> Property details filled successfully</h3>}
+                    {postedStatus && <h3 className="text-base font-medium text-white mb-4"> {postedStatus.success ? <div>
+                        Property saved successfully
+                        <button onClick={() => router.navigate({ to: '/app/my-properties' })} className="ml-2 text-xs text-white hover:underline bg-gradient-to-br from-[#4C7CED] to-[#7B31DC] hover:bg-[#6A2BC4] px-2 py-1 rounded-[6px]">Go to my properties</button>
+                    </div> : 'Failed to save property details'}</h3>}
+                    {(!postedStatus && completedSteps === totalSteps) && <h3 className="text-base font-medium text-white mb-4"> Property details filled successfully</h3>}
                     {completedSteps !== totalSteps && <>
                         <h3 className="text-base font-medium text-white mb-4">{t('yourPreferences')}</h3>
 

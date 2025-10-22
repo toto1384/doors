@@ -68,6 +68,7 @@ export const propertiesRouter = {
                 _id: { $in: user.favoriteProperties }
             }).lean() as PropertyObject[];
 
+
             return properties;
         } catch (error) {
             throw new TRPCError({
@@ -91,13 +92,15 @@ export const propertiesRouter = {
                 status: "available",
             } as PropertyObject);
 
+            console.log('property', property, input.property)
+
             console.log('property', property)
 
             return { success: true, message: 'Property created successfully' };
         } catch (error) {
             throw new TRPCError({
                 code: "INTERNAL_SERVER_ERROR",
-                message: "Failed to update favorite status"
+                message: `Failed to post property ${error}`
             });
         }
     }),
