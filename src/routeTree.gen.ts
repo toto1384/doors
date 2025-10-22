@@ -15,6 +15,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as TermsOfServiceIndexRouteImport } from './routes/terms-of-service/index'
 import { Route as PrivacyPolicyIndexRouteImport } from './routes/privacy-policy/index'
 import { Route as AppIndexRouteImport } from './routes/app/index'
+import { Route as AppMyPropertiesRouteImport } from './routes/app/my-properties'
 import { Route as AuthResetPasswordIndexRouteImport } from './routes/auth/reset-password/index'
 import { Route as AuthForgotPasswordIndexRouteImport } from './routes/auth/forgot-password/index'
 import { Route as AuthPathIndexRouteImport } from './routes/auth/$path/index'
@@ -49,6 +50,11 @@ const PrivacyPolicyIndexRoute = PrivacyPolicyIndexRouteImport.update({
 const AppIndexRoute = AppIndexRouteImport.update({
   id: '/app/',
   path: '/app/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppMyPropertiesRoute = AppMyPropertiesRouteImport.update({
+  id: '/app/my-properties',
+  path: '/app/my-properties',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthResetPasswordIndexRoute = AuthResetPasswordIndexRouteImport.update({
@@ -119,6 +125,7 @@ const ApiAuthSplatServerRoute = ApiAuthSplatServerRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/app/my-properties': typeof AppMyPropertiesRoute
   '/app': typeof AppIndexRoute
   '/privacy-policy': typeof PrivacyPolicyIndexRoute
   '/terms-of-service': typeof TermsOfServiceIndexRoute
@@ -135,6 +142,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/app/my-properties': typeof AppMyPropertiesRoute
   '/app': typeof AppIndexRoute
   '/privacy-policy': typeof PrivacyPolicyIndexRoute
   '/terms-of-service': typeof TermsOfServiceIndexRoute
@@ -152,6 +160,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/app/my-properties': typeof AppMyPropertiesRoute
   '/app/': typeof AppIndexRoute
   '/privacy-policy/': typeof PrivacyPolicyIndexRoute
   '/terms-of-service/': typeof TermsOfServiceIndexRoute
@@ -170,6 +179,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/app/my-properties'
     | '/app'
     | '/privacy-policy'
     | '/terms-of-service'
@@ -186,6 +196,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/app/my-properties'
     | '/app'
     | '/privacy-policy'
     | '/terms-of-service'
@@ -202,6 +213,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/app/my-properties'
     | '/app/'
     | '/privacy-policy/'
     | '/terms-of-service/'
@@ -219,6 +231,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AppMyPropertiesRoute: typeof AppMyPropertiesRoute
   AppIndexRoute: typeof AppIndexRoute
   PrivacyPolicyIndexRoute: typeof PrivacyPolicyIndexRoute
   TermsOfServiceIndexRoute: typeof TermsOfServiceIndexRoute
@@ -291,6 +304,13 @@ declare module '@tanstack/react-router' {
       path: '/app'
       fullPath: '/app'
       preLoaderRoute: typeof AppIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app/my-properties': {
+      id: '/app/my-properties'
+      path: '/app/my-properties'
+      fullPath: '/app/my-properties'
+      preLoaderRoute: typeof AppMyPropertiesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth/reset-password/': {
@@ -393,6 +413,7 @@ declare module '@tanstack/react-start/server' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AppMyPropertiesRoute: AppMyPropertiesRoute,
   AppIndexRoute: AppIndexRoute,
   PrivacyPolicyIndexRoute: PrivacyPolicyIndexRoute,
   TermsOfServiceIndexRoute: TermsOfServiceIndexRoute,

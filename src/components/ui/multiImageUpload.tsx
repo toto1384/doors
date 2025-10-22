@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef } from "react";
-import { X, File } from "lucide-react";
+import { X, File, Loader2Icon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -25,6 +25,7 @@ interface ImagePreviewProps {
     progress?: number;
     fileType: string;
     isDeleting?: boolean;
+    disabled?: boolean;
 }
 
 // --- Image Preview Component ---
@@ -36,6 +37,7 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
     progress = 0,
     fileType,
     isDeleting = false,
+    disabled = false,
 }) => {
     const isImage = fileType.startsWith("image/");
     return (
@@ -59,10 +61,10 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
             )}
             {isUploading && (
                 <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-md">
-                    <span className="text-white text-xs sm:text-sm">{progress}%</span>
+                    <span className="text-white text-xs sm:text-sm"><Loader2Icon className="w-4 h-4 animate-spin" /> {progress}%</span>
                 </div>
             )}
-            {onDelete && !isUploading && !isDeleting && (
+            {onDelete && !isUploading && !isDeleting && !disabled && (
                 <button
                     onClick={onDelete}
                     className="absolute right-1 top-1 rounded-full bg-gray-200 p-1 text-gray-600 hover:bg-gray-300 focus:outline-none"
@@ -87,6 +89,7 @@ export const MultiImageUpload: React.FC<{
     accept?: string;
     uploadFiles: (file: File[]) => Promise<any>;
     deleteFile: (url: string) => Promise<void>;
+    disabled?: boolean;
 }> = ({
     value = [],
     onChange,
@@ -97,6 +100,7 @@ export const MultiImageUpload: React.FC<{
     uploadFiles,
     imageRegex = /\.(jpeg|jpg|png|gif|webp|avif)$/i,
     accept = "image/*",
+    disabled = false,
 }) => {
         // Initialize state with value directly
         const [files, setFiles] = React.useState<UploadedFile[]>(() =>
@@ -218,6 +222,7 @@ export const MultiImageUpload: React.FC<{
                         <ImagePreview
                             key={file.id}
                             src={file.url}
+                            disabled={disabled}
                             alt={`File ${file.id}`}
                             fileType={file.fileType}
                             isUploading={file.isUploading}
@@ -226,7 +231,7 @@ export const MultiImageUpload: React.FC<{
                             onDelete={() => handleDeleteImage(file.id)}
                         />
                     ))}
-                    {(maxImages === undefined || files.length < maxImages) && (
+                    {((maxImages === undefined || files.length < maxImages) && !disabled) && (
                         <Button
                             variant="outline"
                             className="h-20 w-20 sm:h-24 sm:w-24 flex-shrink-0"

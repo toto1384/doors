@@ -64,30 +64,55 @@ export const Route = createRootRoute({
 })
 
 
+type ProgressBarTypeValues = { progress: number, totalSteps: number, checkedSteps: number }
 
+export const usePopoversOpenStore = create<{
+    aiChatbotOpen: boolean,
+    setAiChatbotOpen: (open: boolean) => void,
+    menuOpen: boolean,
+    setMenuOpen: (open: boolean) => void,
+    userType: typeof UserType[number],
+    setUserType: (p: typeof UserType[number]) => void,
 
-export const usePopoversOpenStore = create<{ aiChatbotOpen: boolean, setAiChatbotOpen: (open: boolean) => void, menuOpen: boolean, setMenuOpen: (open: boolean) => void, userType: typeof UserType[number], setUserType: (p: typeof UserType[number]) => void, }>()((set) => ({
+    progressBar: ProgressBarTypeValues | undefined,
+    setProgressBar: (p: ProgressBarTypeValues | undefined) => void,
+}>()((set) => ({
     aiChatbotOpen: false, setAiChatbotOpen: (p) => set({ aiChatbotOpen: p }), menuOpen: false, setMenuOpen: (p) => set({ menuOpen: p }),
     userType: 'buyer', setUserType: (p) => set({ userType: p }),
+    progressBar: undefined, setProgressBar: (p) => set({ progressBar: p }),
 }));
 
 export const usePropertyAddStore = create<{
     partialProperty: Partial<PropertyObject>,
+    getPartialProperty: () => Partial<PropertyObject>,
     setPartialProperty: (p: Partial<PropertyObject>) => void,
     updatePropertyPhotos: (images: string[]) => Promise<void>,
     setUpdatePropertyPhotos: (fn: (images: string[]) => Promise<void>) => void,
+    appendPartialProperty: (p: Partial<PropertyObject>) => void,
+
+    titleAndDescResolver: ((title: string, description: string) => void) | undefined,
+    setTitleAndDescResolver: (fn: ((title: string, description: string) => void) | undefined) => void,
 
     titlesAndDescriptions: { title: string, description: string }[],
     setTitlesAndDescriptions: (p: { title: string, description: string }[]) => void,
 
 
+    postedStatus: { success: boolean, message: string } | undefined,
+    setPostedStatus: (p: { success: boolean, message: string } | undefined) => void,
+
     propertyType: 'edit' | 'add-photos', setPropertyType: (p: 'edit' | 'add-photos') => void
-}>()((set) => ({
+}>()((set, get) => ({
     partialProperty: {},
     setPartialProperty: (p) => set({ partialProperty: p }),
+    appendPartialProperty: (p) => { console.log('app', { ...get().partialProperty, ...p }); set({ partialProperty: { ...get().partialProperty, ...p } }) },
+    getPartialProperty: () => get().partialProperty,
+
+    postedStatus: undefined, setPostedStatus: (p) => set({ postedStatus: p }),
 
     updatePropertyPhotos: async () => { },
     setUpdatePropertyPhotos: (fn) => set({ updatePropertyPhotos: fn }),
+
+    titleAndDescResolver: undefined, setTitleAndDescResolver: (fn) => set({ titleAndDescResolver: fn }),
 
     titlesAndDescriptions: [],
     setTitlesAndDescriptions: (p) => set({ titlesAndDescriptions: p }),

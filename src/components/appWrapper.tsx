@@ -2,7 +2,7 @@
 
 
 import { auth } from "utils/auth";
-import { ElevenLabsChatBotDemo } from "./aiChatbot";
+import { ElevenLabsChatBotDemo } from "./userAndAi/aiChatbot";
 import { Link, useRouter } from "@tanstack/react-router";
 import { useTheme } from './providers/ThemeProvider';
 import { Button } from "./ui/button";

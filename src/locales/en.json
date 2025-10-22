@@ -253,6 +253,21 @@
       "between100k200k": "Between €100,000 and €200,000",
       "over200k": "Over €200,000"
     },
+    "heating": {
+      "gas": "Gas",
+      "electric": "Electric",
+      "3rd_party": "Central"
+    },
+    "facilities": {
+      "parking": "Parking",
+      "balcony": "Balcony",
+      "terrace": "Terrace",
+      "garden": "Garden",
+      "elevator": "Elevator",
+      "airConditioning": "Air Conditioning",
+      "centralHeating": "Central Heating",
+      "furnished": "Furnished"
+    },
     "actions": {
       "retry": "Retry",
       "stop": "Stop",
@@ -287,6 +302,7 @@
     "top-floor": "Top Floor",
     "elevator": "Elevator",
     "air-conditioning": "Air Conditioning",
+    "airConditioning": "Air Conditioning",
     "garden": "Garden",
     "pool": "Pool",
     "gym": "Gym",
@@ -297,6 +313,7 @@
     "city-center": "City Center",
     "furnished": "Furnished",
     "central_heating": "Central Heating",
+    "centralHeating": "Central Heating",
     "internet": "Internet",
     "parking": "Parking"
   },

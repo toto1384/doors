@@ -106,11 +106,6 @@ function PropertyDetailRoute() {
 }
 
 
-
-// Utility functions
-
-
-
 // Component: Property Header
 function PropertyHeader({ isSaved, onFavoriteToggle, property }: {
     isSaved: boolean

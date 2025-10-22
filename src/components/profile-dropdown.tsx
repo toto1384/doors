@@ -1,22 +1,13 @@
-import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { authClient, useSignOutFunction } from "utils/auth-client";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "./ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, } from "./ui/dropdown-menu";
 import { Avatar, AvatarImage, AvatarFallback } from "@radix-ui/react-avatar";
-import { Switch } from "./ui/switch";
-import { Button } from "./ui/button";
-import { ExternalLink, Edit, X, ArrowLeft, LogOut, ChevronRight } from "lucide-react";
+import { ArrowLeft, LogOut, ChevronRight } from "lucide-react";
 import { usePopoversOpenStore } from "@/routes/__root";
 import { useShallow } from "zustand/react/shallow";
-import { useTRPC } from "trpc/react";
-import { useMutation } from "@tanstack/react-query";
-import { UserType } from "utils/validation/dbSchemas";
-import { UserTypeSwitch } from "./user/userTypeSwitch";
+import { UserTypeSwitch } from "./userAndAi/userTypeSwitch";
 
-interface ProfileDropdownProps {
-    session: any;
-}
 
 const ProfileContent = ({ session }: { session: any }) => {
 
@@ -25,8 +16,7 @@ const ProfileContent = ({ session }: { session: any }) => {
 
     const signOut = useSignOutFunction()
 
-    const { profileMenuOpen, setProfileMenuOpen } = usePopoversOpenStore(useShallow(state => ({
-        profileMenuOpen: state.menuOpen,
+    const { setProfileMenuOpen } = usePopoversOpenStore(useShallow(state => ({
         setProfileMenuOpen: state.setMenuOpen,
     })));
     return <>

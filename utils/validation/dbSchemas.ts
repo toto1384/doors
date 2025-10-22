@@ -79,6 +79,7 @@ const PropertyFeatures = z.enum([
     'air-conditioning',
     'garden',
     'pool',
+    'parking',
     'gym',
     'security-system',
     'basement',
@@ -91,10 +92,7 @@ const PropertyFeatures = z.enum([
 ]);
 
 
-
-// Main Property schema
-export const PropertySchema = z.object({
-    _id: z.string(),
+const ToPostPropertySchemaZod = {
 
     title: z.string(),
 
@@ -108,7 +106,7 @@ export const PropertySchema = z.object({
     location: LocationSchema,
 
     numberOfRooms: z.number(),
-    numberOfBathrooms: z.number(),
+    numberOfBathrooms: z.number().optional(),
     surfaceArea: z.number(),
     furnished: z.boolean(),
     features: z.array(PropertyFeatures).default([]),
@@ -122,6 +120,16 @@ export const PropertySchema = z.object({
     imageUrls: z.array(z.string()),
 
     tags: z.array(z.string()).default([]),
+}
+
+export const ToPostPropertySchema = z.object(ToPostPropertySchemaZod)
+
+
+// Main Property schema
+export const PropertySchema = z.object({
+    _id: z.string(),
+
+    ...ToPostPropertySchemaZod,
 
     postedDate: z.date(),
     postedByUserId: z.string(),

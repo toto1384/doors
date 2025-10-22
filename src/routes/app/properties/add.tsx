@@ -1,9 +1,20 @@
 import { createFileRoute } from "@tanstack/react-router"
-import { usePropertyAddStore } from "@/routes/__root"
+import { usePopoversOpenStore, usePropertyAddStore } from "@/routes/__root"
 import { useShallow } from "zustand/react/shallow"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { UploadImageButton } from "@/components/ui/imageUploaders"
 import { useTranslation } from 'react-i18next'
+import TransitionList from "@/components/ui/transitionList"
+import { AnimatePresence, motion } from "framer-motion";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { Label } from "@/components/ui/label"
+import { Controller, useForm } from "react-hook-form"
+
+import { zodResolver } from "@hookform/resolvers/zod";
+
+import z from "zod/v3";
+import useDidMountEffect from "utils/hooks/useDidMountEffect"
+import { useSize } from "utils/hooks/useSize"
 
 
 export const Route = createFileRoute("/app/properties/add")({
@@ -11,38 +22,66 @@ export const Route = createFileRoute("/app/properties/add")({
 })
 
 
+const titleAndDescriptionSchema = z.object({
+    title: z.string().min(2),
+    description: z.string().min(2),
+})
+
+
 function PropertyAdd() {
     const { t } = useTranslation('translation', { keyPrefix: 'property-add' })
 
-    const { partialProperty, setPartialProperty, titlesAndDescriptions, setTitlesAndDescriptions } = usePropertyAddStore(useShallow(state => ({
+    const { partialProperty, setPartialProperty, titlesAndDescriptions, setTitlesAndDescriptions, titleAndDescResolver, setTitleAndDescResolver, postedStatus } = usePropertyAddStore(useShallow(state => ({
         partialProperty: state.partialProperty,
         setPartialProperty: state.setPartialProperty,
         titlesAndDescriptions: state.titlesAndDescriptions,
         setTitlesAndDescriptions: state.setTitlesAndDescriptions,
+        titleAndDescResolver: state.titleAndDescResolver,
+        setTitleAndDescResolver: state.setTitleAndDescResolver,
+        postedStatus: state.setPostedStatus,
     })))
+
+
+    const size = useSize(true)
+    const cutSize = size.gmd ? 5 : 3
 
     const [displayMode, setDisplayMode] = useState<'edit' | 'add photos'>('edit')
 
 
     const checkedSteps = [
-        { label: `${t('fields.title')}${partialProperty.title ? `: ${partialProperty.title}` : `: ${t('status.waiting')}`}`, isChecked: !!partialProperty?.title },
-        { label: `${t('fields.description')}${partialProperty.description ? `: ${partialProperty.description?.substring(0, 10)}...` : `: ${t('status.waiting')}`}`, isChecked: !!partialProperty?.description },
-        { label: `${t('fields.price')}${partialProperty.price ? `: ${partialProperty.price?.value} ${partialProperty.price?.currency}` : `: ${t('status.waiting')}`}`, isChecked: !!partialProperty?.price },
+        { label: `${t('fields.propertyType')}${partialProperty.propertyType ? `: ${partialProperty.propertyType}` : `: ${t('status.waiting')}`}`, isChecked: !!partialProperty?.propertyType },
         { label: `${t('fields.location')}${partialProperty.location ? `: ${partialProperty.location?.city}, ${partialProperty.location?.state}` : `: ${t('status.waiting')}`}`, isChecked: !!partialProperty?.location },
         { label: `${t('fields.numberOfRooms')}${partialProperty.numberOfRooms ? `: ${partialProperty.numberOfRooms}` : `: ${t('status.waiting')}`}`, isChecked: !!partialProperty?.numberOfRooms },
-        { label: `${t('fields.facilities')}${partialProperty.features ? `: ${partialProperty.features?.join(', ')}` : `: ${t('status.waiting')}`}`, isChecked: !!partialProperty?.features },
-        { label: `${t('fields.propertyType')}${partialProperty.propertyType ? `: ${partialProperty.propertyType}` : `: ${t('status.waiting')}`}`, isChecked: !!partialProperty?.propertyType },
-        { label: `${t('fields.imageUpload')}${partialProperty.imageUrls ? `: ${partialProperty.imageUrls?.length}` : `: ${t('status.waiting')}`}`, isChecked: !!partialProperty?.imageUrls?.length },
         { label: `${t('fields.surfaceArea')}${partialProperty.surfaceArea ? `: ${partialProperty.surfaceArea}` : `: ${t('status.waiting')}`}`, isChecked: !!partialProperty?.surfaceArea },
+        { label: `${t('fields.floor')}${partialProperty.floor ? `: ${partialProperty.floor}` : `: ${t('status.waiting')}`}`, isChecked: !!partialProperty?.floor },
+        { label: `${t('fields.buildingYear')}${partialProperty.buildingYear ? `: ${partialProperty.buildingYear}` : `: ${t('status.waiting')}`}`, isChecked: !!partialProperty?.buildingYear },
         { label: `${t('fields.furnished')}${partialProperty.furnished ? `: ${partialProperty.furnished}` : `: ${t('status.waiting')}`}`, isChecked: !!partialProperty?.furnished },
         { label: `${t('fields.heating')}${partialProperty.heating ? `: ${partialProperty.heating}` : `: ${t('status.waiting')}`}`, isChecked: !!partialProperty?.heating },
-        { label: `${t('fields.buildingYear')}${partialProperty.buildingYear ? `: ${partialProperty.buildingYear}` : `: ${t('status.waiting')}`}`, isChecked: !!partialProperty?.buildingYear },
-        { label: `${t('fields.floor')}${partialProperty.floor ? `: ${partialProperty.floor}` : `: ${t('status.waiting')}`}`, isChecked: !!partialProperty?.floor },
+        { label: `${t('fields.facilities')}${partialProperty.features ? `: ${partialProperty.features?.join(', ')}` : `: ${t('status.waiting')}`}`, isChecked: !!partialProperty?.features },
+        { label: `${t('fields.price')}${partialProperty.price ? `: ${partialProperty.price?.value} ${partialProperty.price?.currency}` : `: ${t('status.waiting')}`}`, isChecked: !!partialProperty?.price },
+        { label: `${t('fields.imageUpload')}${partialProperty.imageUrls ? `: ${partialProperty.imageUrls?.length}` : `: ${t('status.waiting')}`}`, isChecked: !!partialProperty?.imageUrls?.length },
+        { label: `${t('fields.title')}${partialProperty.title ? `: ${partialProperty.title}` : `: ${t('status.waiting')}`}`, isChecked: !!partialProperty?.title },
+        { label: `${t('fields.description')}${partialProperty.description ? `: ${partialProperty.description?.substring(0, 10)}...` : `: ${t('status.waiting')}`}`, isChecked: !!partialProperty?.description },
     ]
+
+    const checkedOnSteps = checkedSteps.filter(step => !step.isChecked)
 
     const completedSteps = checkedSteps.filter(step => step.isChecked).length
     const totalSteps = checkedSteps.length
     const progressPercentage = (completedSteps / totalSteps) * 100
+
+    const { setProgressBar } = usePopoversOpenStore(useShallow(state => ({ setProgressBar: state.setProgressBar, })))
+
+
+    useDidMountEffect(() => {
+        if (completedSteps != 0) setProgressBar({ progress: progressPercentage, totalSteps, checkedSteps: completedSteps })
+    }, [completedSteps, totalSteps])
+
+
+    const { control, handleSubmit } = useForm({
+        defaultValues: {},
+        resolver: zodResolver(titleAndDescriptionSchema),
+    })
 
 
     return <div className='flex flex-col border rounded-lg mx-3 min-h-[90dvh]'>
@@ -55,56 +94,166 @@ function PropertyAdd() {
                 </p>
             </div>
 
+
         </div>
 
-        {/* Progress Section */}
-        <div className="border-b px-6 py-4">
-            <div className="flex justify-between items-start">
-                <div className="flex-1">
-                    <h2 className="text-lg font-medium text-white mb-4">{t('buildingListing')}</h2>
 
-                    <div className="mb-3">
-                        <div className="flex justify-between items-center mb-2">
-                            <span className="text-sm text-gray-400">{completedSteps}/{totalSteps} {t('detailsCompleted')}</span>
-                        </div>
-                        <div className="w-full bg-gray-700 rounded-full h-2">
-                            <div
-                                className="bg-gradient-to-r from-purple-500 to-blue-500 h-2 rounded-full transition-all duration-300 ease-out"
-                                style={{ width: `${progressPercentage}%` }}
-                            ></div>
-                        </div>
-                    </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 ">
 
-                    <div className="text-sm text-gray-400 flex items-start gap-2">
-                        <span className="text-purple-400 mt-1">•</span>
-                        <span>{t('subtitle')}</span>
+            <div>
+                {/* Progress Section */}
+                <div className="px-6 py-4">
+                    <div className="flex justify-between items-start">
+                        <div className="flex-1">
+                            <h2 className="text-lg font-medium text-white mb-4">{t('buildingListing')}</h2>
+
+                            <div className="mb-3">
+                                <div className="flex justify-between items-center mb-2">
+                                    <span className="text-sm text-gray-400">{completedSteps}/{totalSteps} {t('detailsCompleted')}</span>
+                                </div>
+                                <div className="w-full bg-gray-700 rounded-full h-2">
+                                    <div
+                                        className="bg-gradient-to-r from-purple-500 to-blue-500 h-2 rounded-full transition-all duration-300 ease-out"
+                                        style={{ width: `${progressPercentage}%` }}
+                                    ></div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
+                {!!(titlesAndDescriptions.length) && <form className="mx-2" onSubmit={handleSubmit((data) => {
+                    titleAndDescResolver?.(data.title, data.description)
+                })}>
+
+                    <Controller
+                        name="title"
+                        control={control}
+                        render={({ field, fieldState }) => (
+                            <RadioGroup
+                                name={field.name}
+                                value={field.value}
+                                onValueChange={field.onChange}
+                                aria-invalid={fieldState.invalid}
+                                className="grid grid-cols-2 gap-2"
+                            >
+                                {titlesAndDescriptions.map((item, index) => (
+                                    <div key={index} className="flex items-center space-x-2 relative rounded-lg border hover:bg-gray-100/20 cursor-pointer" >
+                                        <RadioGroupItem value={item.title} id={`title-${index.toString()}`} className="absolute bottom-1 right-1" />
+                                        <Label htmlFor={`title-${index.toString()}`} className="whitespace-pre-line w-full h-full p-3">{item.title}</Label>
+                                    </div>
+                                ))}
+                            </RadioGroup>
+                        )}
+                        defaultValue={titlesAndDescriptions[0].title}
+                    />
+
+                    <Controller
+                        name="description"
+                        control={control}
+                        render={({ field, fieldState, }) => (
+                            <RadioGroup
+                                name={field.name}
+                                value={field.value}
+                                onValueChange={field.onChange}
+                                aria-invalid={fieldState.invalid}
+                                className="grid grid-cols-2 gap-2 mt-2"
+                            >
+                                {titlesAndDescriptions.map((item, index) => (
+                                    <div key={index} className="flex items-center space-x-2 relative rounded-lg border hover:bg-gray-100/20 cursor-pointer">
+                                        <RadioGroupItem value={item.description} id={`description-${index.toString()}`} className="absolute bottom-1 right-1" />
+                                        <Label htmlFor={`description-${index.toString()}`} className="whitespace-pre-line w-full h-full p-3">{item.description}</Label>
+                                    </div>
+                                ))}
+                            </RadioGroup>
+                        )}
+                        defaultValue={titlesAndDescriptions[0].description}
+                    />
+
+                    <button type="submit" className="w-full mt-2 bg-gradient-to-br from-[#4C7CED] to-[#7B31DC] hover:bg-[#6A2BC4] text-white text-xs px-4 py-2 rounded-[6px]">Done</button>
+
+                </form>}
+
+                {(displayMode === 'edit' && !titlesAndDescriptions.length) && <div className='flex flex-col w-full pt-4 pb-5 px-6 space-y-2'>
+
+                    {completedSteps === totalSteps && <h3 className="text-base font-medium text-white mb-4"> Property details filled successfully</h3>}
+                    {completedSteps !== totalSteps && <>
+                        <h3 className="text-base font-medium text-white mb-4">{t('yourPreferences')}</h3>
+
+                        {/* First 5 items displayed normally */}
+
+                        <AnimatePresence>
+                            {checkedOnSteps.slice(0, cutSize).map((item) => (
+                                <motion.div
+                                    key={item.label}
+                                    animate={{ height: "3rem", scale: 1 }}
+                                    exit={{ height: 0, scale: 0, margin: 0 }}
+                                    transition={{ duration: 0.5 }}
+                                    className="flex items-center gap-3 bg-[#1A0F33] px-2 py-2 rounded-[6px]"
+                                >
+                                    <CheckIcon isChecked={item.isChecked} />
+                                    <p className="text-sm text-light text-gray-300">{item.label}</p>
+                                </motion.div>
+                            ))}
+                        </AnimatePresence>
+
+                        {/* Remaining items stacked like iOS notifications */}
+                        {checkedOnSteps.length > cutSize && (
+                            <div className="relative mt-1">
+                                {checkedOnSteps.slice(cutSize).map(({ label, isChecked }, index) => (
+                                    <div
+                                        key={index + cutSize}
+                                        className="absolute bg-[#1A0F33] rounded-[6px] p-3 w-full"
+                                        style={{
+                                            top: `${index * 4}px`,
+                                            left: `${index * 2}px`,
+                                            transform: `scale(${1 - index * 0.05})`,
+                                            zIndex: checkedOnSteps.length - index,
+                                            opacity: 1 - index * 0.2
+                                        }}
+                                    >
+                                        <div className="flex items-center gap-2">
+                                            <div className="w-3 h-3 flex items-center justify-center">
+                                                <CheckIcon isChecked={isChecked} />
+                                            </div>
+                                            <p className="text-xs text-gray-400 truncate">{label}</p>
+                                        </div>
+                                    </div>
+                                ))}
+                                {/* Spacer to prevent overlap with content below */}
+                                <div style={{ height: `${Math.max(60, (checkedOnSteps.length - 5) * 4 + 40)}px` }}></div>
+                            </div>
+                        )}
+                    </>}
+
+                    <button
+                        type="button"
+                        onClick={() => { }}
+                        className="w-full mt-0 bg-gradient-to-br from-[#4C7CED] to-[#7B31DC] hover:bg-[#6A2BC4] text-white text-xs px-4 py-2 rounded-[6px] md:hidden flex flex-row items-center justify-center gap-2"
+                    >
+                        <svg width="14" height="13" viewBox="0 0 14 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M13.5039 10.1601C13.8494 9.44353 14.0189 8.65486 13.9984 7.85961C13.9779 7.06437 13.7679 6.2855 13.3859 5.5877C13.0039 4.8899 12.4609 4.29333 11.802 3.84752C11.1432 3.40172 10.3875 3.11955 9.59765 3.02447C9.33485 2.41345 8.95278 1.86101 8.47381 1.39949C7.99484 0.937968 7.4286 0.576653 6.80825 0.336699C6.18791 0.096746 5.52591 -0.017022 4.86105 0.00205764C4.19618 0.0211373 3.5418 0.172681 2.93624 0.447815C2.33067 0.722948 1.78608 1.11614 1.33437 1.60437C0.882653 2.09259 0.532891 2.66604 0.305563 3.29113C0.0782351 3.91622 -0.0220889 4.58038 0.0104656 5.24472C0.0430202 5.90906 0.207799 6.56023 0.495153 7.1601L0.0407777 8.70447C-0.0100253 8.87688 -0.0134222 9.05979 0.0309442 9.23397C0.0753107 9.40814 0.1658 9.56714 0.292893 9.69423C0.419986 9.82133 0.578984 9.91182 0.753158 9.95618C0.927333 10.0005 1.11025 9.99715 1.28265 9.94635L2.82703 9.49197C3.32292 9.73023 3.85458 9.88542 4.40078 9.95135C4.66614 10.5731 5.05483 11.1346 5.54334 11.6019C6.03186 12.0691 6.61006 12.4325 7.24298 12.67C7.87591 12.9075 8.55042 13.0141 9.22574 12.9835C9.90106 12.9529 10.5632 12.7857 11.172 12.492L12.7164 12.9463C12.8887 12.9971 13.0716 13.0005 13.2457 12.9561C13.4198 12.9118 13.5787 12.8214 13.7058 12.6944C13.8329 12.5673 13.9234 12.4085 13.9678 12.2344C14.0122 12.0603 14.0089 11.8775 13.9583 11.7051L13.5039 10.1601ZM12.4883 10.252L12.9995 11.9876L11.2645 11.477C11.1392 11.4407 11.0046 11.4548 10.8895 11.5163C9.9688 12.008 8.89245 12.1206 7.88991 11.8301C6.88737 11.5396 6.03794 10.8691 5.52265 9.96135C6.20726 9.8899 6.86972 9.67773 7.46847 9.33817C8.06721 8.99861 8.58933 8.53898 9.00205 7.98811C9.41478 7.43724 9.70921 6.80703 9.86688 6.137C10.0245 5.46697 10.042 4.77159 9.91828 4.09447C10.5148 4.23508 11.071 4.51086 11.544 4.90054C12.017 5.29022 12.3941 5.78337 12.6463 6.34193C12.8984 6.90049 13.0189 7.50952 12.9983 8.12201C12.9777 8.73451 12.8167 9.33409 12.5277 9.87447C12.4654 9.99024 12.4513 10.1259 12.4883 10.252Z" fill="#E9E1FF" />
+                        </svg>
+
+                        Continue in chat
+                    </button>
+
+                </div>}
+
+
+            </div>
+
+            <div className="hidden md:flex flex-row items-center justify-center">
                 {/* Circular Progress Indicator */}
-                <div className="relative ml-8">
-                    <svg width="120" height="120" className="transform -rotate-90">
+                <div className="relative w-[300px] h-[300px]">
+                    <svg width="300" height="300" className="transform -rotate-90">
                         {/* Background circle with blur effect */}
-                        <circle
-                            cx="60"
-                            cy="60"
-                            r="50"
-                            stroke="rgba(139, 92, 246, 0.2)"
-                            strokeWidth="8"
-                            fill="none"
-                            className="blur-sm"
-                        />
+                        <circle cx="150" cy="150" r="120" stroke="rgba(139, 92, 246, 0.2)" strokeWidth="8" fill="none" className="blur-sm" />
                         {/* Progress circle */}
                         <circle
-                            cx="60"
-                            cy="60"
-                            r="50"
-                            stroke="url(#progressGradient)"
-                            strokeWidth="6"
-                            fill="none"
-                            strokeLinecap="round"
-                            strokeDasharray={`${2 * Math.PI * 50}`}
-                            strokeDashoffset={`${2 * Math.PI * 50 * (1 - progressPercentage / 100)}`}
+                            cx="150" cy="150" r="120" stroke="url(#progressGradient)" strokeWidth="6" fill="none" strokeLinecap="round"
+                            strokeDasharray={`${2 * Math.PI * 120}`}
+                            strokeDashoffset={`${2 * Math.PI * 120 * (1 - progressPercentage / 100)}`}
                             className="transition-all duration-500 ease-out drop-shadow-lg"
                             style={{
                                 filter: 'drop-shadow(0 0 8px rgba(139, 92, 246, 0.6))'
@@ -128,60 +277,6 @@ function PropertyAdd() {
             </div>
         </div>
 
-        {displayMode === 'edit' && <div className='flex flex-col gap-2 w-full border-b dark:border-[#404040] dark:bg-[#262626] pt-4 pb-5 px-6'>
-
-            <div className="space-y-4">
-                <h3 className="text-base font-medium text-white mb-4">{t('yourPreferences')}</h3>
-
-                {/* First 5 items displayed normally */}
-                <div className="space-y-3">
-                    {checkedSteps.slice(0, 5).map(({ label, isChecked }, index) => (
-                        <div key={index} className="flex items-center gap-3">
-                            <CheckIcon isChecked={isChecked} />
-                            <p className="text-sm text-gray-300">{label}</p>
-                        </div>
-                    ))}
-                </div>
-
-                {/* Remaining items stacked like iOS notifications */}
-                {checkedSteps.length > 5 && (
-                    <div className="relative mt-4">
-                        {checkedSteps.slice(5).map(({ label, isChecked }, index) => (
-                            <div
-                                key={index + 5}
-                                className="absolute bg-gray-800 border border-gray-700 rounded-lg p-3 w-full"
-                                style={{
-                                    top: `${index * 4}px`,
-                                    left: `${index * 2}px`,
-                                    transform: `scale(${1 - index * 0.05})`,
-                                    zIndex: checkedSteps.length - index,
-                                    opacity: 1 - index * 0.2
-                                }}
-                            >
-                                <div className="flex items-center gap-2">
-                                    <div className="w-3 h-3 flex items-center justify-center">
-                                        {isChecked ? (
-                                            <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                                        ) : (
-                                            <div className="w-2 h-2 border border-gray-500 rounded-full"></div>
-                                        )}
-                                    </div>
-                                    <p className="text-xs text-gray-400 truncate">{label}</p>
-                                </div>
-                            </div>
-                        ))}
-                        {/* Spacer to prevent overlap with content below */}
-                        <div style={{ height: `${Math.max(60, (checkedSteps.length - 5) * 4 + 40)}px` }}></div>
-                    </div>
-                )}
-            </div>
-        </div>}
-
-        {displayMode === 'add photos' && <div className='flex flex-col gap-2 w-full border-b dark:border-[#404040] dark:bg-[#262626] pt-4 pb-5 px-6'>
-            <h1 className="text-2xl font-light">{t('addImage')}</h1>
-
-            <UploadImageButton />
-        </div>}
     </div>
 }
 

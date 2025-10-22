@@ -1,4 +1,4 @@
-import { IsConnectedContext } from '@/components/aiChatbot';
+import { IsConnectedContext } from '@/components/userAndAi/aiChatbot';
 import { useState, useCallback, useEffect, useContext, ReactNode } from 'react';
 
 

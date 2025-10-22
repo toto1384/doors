@@ -7,6 +7,8 @@ import { propertyFiltersSchema } from 'utils/validation/propertyFilters';
 import { PropertyObject } from 'utils/validation/types';
 import { ObjectId } from 'mongodb';
 import z from 'zod/v3';
+import { PropertySchema, ToPostPropertySchema } from 'utils/validation/dbSchemas';
+import { nanoid } from 'nanoid';
 
 
 export const propertiesRouter = {
@@ -71,6 +73,31 @@ export const propertiesRouter = {
             throw new TRPCError({
                 code: "INTERNAL_SERVER_ERROR",
                 message: "Failed to fetch favorite properties"
+            });
+        }
+    }),
+    postProperty: authProcedure.input(z.object({ property: ToPostPropertySchema })).mutation(async ({ input, ctx }) => {
+        const db = await dbConnect();
+        const PropertyModel = getPropertyModel(db);
+
+        try {
+
+
+            const property = await PropertyModel.create({
+                ...input.property,
+                _id: nanoid().toString(),
+                postedDate: new Date(),
+                postedByUserId: ctx.user.id,
+                status: "available",
+            } as PropertyObject);
+
+            console.log('property', property)
+
+            return { success: true, message: 'Property created successfully' };
+        } catch (error) {
+            throw new TRPCError({
+                code: "INTERNAL_SERVER_ERROR",
+                message: "Failed to update favorite status"
             });
         }
     }),

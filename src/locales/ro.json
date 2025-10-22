@@ -253,6 +253,21 @@
       "between100k200k": "Intre 100.000 € și 200.000 €",
       "over200k": "Peste 200.000 €"
     },
+    "heating": {
+      "gas": "Gaz",
+      "electric": "Electric",
+      "3rd_party": "Centrală"
+    },
+    "facilities": {
+      "parking": "Parking",
+      "balcony": "Balcon",
+      "terrace": "Terasă",
+      "garden": "Grădină",
+      "elevator": "Lift",
+      "airConditioning": "Aer condiționat",
+      "centralHeating": "Încălzire centrală",
+      "furnished": "Mobilat"
+    },
     "actions": {
       "retry": "Reîncercă",
       "stop": "Oprește",
@@ -287,6 +302,7 @@
     "top-floor": "Ultimul etaj",
     "elevator": "Lift",
     "air-conditioning": "Aer condiționat",
+    "airConditioning": "Aer condiționat",
     "garden": "Grădină",
     "pool": "Piscină",
     "gym": "Sală de sport",
@@ -297,6 +313,7 @@
     "city-center": "Centrul orașului",
     "furnished": "Mobilat",
     "central_heating": "Încălzire centrală",
+    "centralHeating": "Încălzire centrală",
     "internet": "Internet",
     "parking": "Parking"
   },
