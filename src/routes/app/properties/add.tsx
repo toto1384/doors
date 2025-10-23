@@ -42,6 +42,9 @@ function PropertyAdd() {
     })))
 
 
+
+
+
     const router = useRouter()
     const size = useSize(true)
     const cutSize = size.gmd ? 5 : 3
@@ -71,7 +74,7 @@ function PropertyAdd() {
     const totalSteps = checkedSteps.length
     const progressPercentage = (completedSteps / totalSteps) * 100
 
-    const { setProgressBar } = usePopoversOpenStore(useShallow(state => ({ setProgressBar: state.setProgressBar, })))
+    const { setProgressBar, setAiChatbotOpen } = usePopoversOpenStore(useShallow(state => ({ setProgressBar: state.setProgressBar, setAiChatbotOpen: state.setAiChatbotOpen, })))
 
 
     useDidMountEffect(() => {
@@ -233,8 +236,8 @@ function PropertyAdd() {
 
                     <button
                         type="button"
-                        onClick={() => { }}
-                        className="w-full mt-0 bg-gradient-to-br from-[#4C7CED] to-[#7B31DC] hover:bg-[#6A2BC4] text-white text-xs px-4 py-2 rounded-[6px] md:hidden flex flex-row items-center justify-center gap-2"
+                        onClick={() => { setAiChatbotOpen(true) }}
+                        className="w-full mt-0 bg-gradient-to-br from-[#4C7CED] to-[#7B31DC] text-white text-xs px-4 py-2 rounded-[6px] md:hidden flex flex-row items-center justify-center gap-2 hover:to-[#6A2BC4]/50 hover:from-[#4C7CED]/50 cursor-pointer"
                     >
                         <svg width="14" height="13" viewBox="0 0 14 13" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M13.5039 10.1601C13.8494 9.44353 14.0189 8.65486 13.9984 7.85961C13.9779 7.06437 13.7679 6.2855 13.3859 5.5877C13.0039 4.8899 12.4609 4.29333 11.802 3.84752C11.1432 3.40172 10.3875 3.11955 9.59765 3.02447C9.33485 2.41345 8.95278 1.86101 8.47381 1.39949C7.99484 0.937968 7.4286 0.576653 6.80825 0.336699C6.18791 0.096746 5.52591 -0.017022 4.86105 0.00205764C4.19618 0.0211373 3.5418 0.172681 2.93624 0.447815C2.33067 0.722948 1.78608 1.11614 1.33437 1.60437C0.882653 2.09259 0.532891 2.66604 0.305563 3.29113C0.0782351 3.91622 -0.0220889 4.58038 0.0104656 5.24472C0.0430202 5.90906 0.207799 6.56023 0.495153 7.1601L0.0407777 8.70447C-0.0100253 8.87688 -0.0134222 9.05979 0.0309442 9.23397C0.0753107 9.40814 0.1658 9.56714 0.292893 9.69423C0.419986 9.82133 0.578984 9.91182 0.753158 9.95618C0.927333 10.0005 1.11025 9.99715 1.28265 9.94635L2.82703 9.49197C3.32292 9.73023 3.85458 9.88542 4.40078 9.95135C4.66614 10.5731 5.05483 11.1346 5.54334 11.6019C6.03186 12.0691 6.61006 12.4325 7.24298 12.67C7.87591 12.9075 8.55042 13.0141 9.22574 12.9835C9.90106 12.9529 10.5632 12.7857 11.172 12.492L12.7164 12.9463C12.8887 12.9971 13.0716 13.0005 13.2457 12.9561C13.4198 12.9118 13.5787 12.8214 13.7058 12.6944C13.8329 12.5673 13.9234 12.4085 13.9678 12.2344C14.0122 12.0603 14.0089 11.8775 13.9583 11.7051L13.5039 10.1601ZM12.4883 10.252L12.9995 11.9876L11.2645 11.477C11.1392 11.4407 11.0046 11.4548 10.8895 11.5163C9.9688 12.008 8.89245 12.1206 7.88991 11.8301C6.88737 11.5396 6.03794 10.8691 5.52265 9.96135C6.20726 9.8899 6.86972 9.67773 7.46847 9.33817C8.06721 8.99861 8.58933 8.53898 9.00205 7.98811C9.41478 7.43724 9.70921 6.80703 9.86688 6.137C10.0245 5.46697 10.042 4.77159 9.91828 4.09447C10.5148 4.23508 11.071 4.51086 11.544 4.90054C12.017 5.29022 12.3941 5.78337 12.6463 6.34193C12.8984 6.90049 13.0189 7.50952 12.9983 8.12201C12.9777 8.73451 12.8167 9.33409 12.5277 9.87447C12.4654 9.99024 12.4513 10.1259 12.4883 10.252Z" fill="#E9E1FF" />

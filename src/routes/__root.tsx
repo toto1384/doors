@@ -43,7 +43,7 @@ export const Route = createRootRoute({
                 content: 'width=device-width, initial-scale=1',
             },
             {
-                title: 'TanStack Start Starter',
+                title: 'Doors Imobiliare',
             },
         ],
         links: [
@@ -116,7 +116,6 @@ export const usePropertyAddStore = create<{
 
     titlesAndDescriptions: [],
     setTitlesAndDescriptions: (p) => set({ titlesAndDescriptions: p }),
-
 
     propertyType: 'edit', setPropertyType: () => set({ propertyType: 'edit' }),
 }));
