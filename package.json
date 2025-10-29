@@ -85,6 +85,7 @@
     "tailwindcss": "^4.0.6",
     "tokenlens": "^1.2.1",
     "uploadthing": "^7.7.4",
+    "use-debounce": "^10.0.6",
     "use-stick-to-bottom": "^1.1.1",
     "vite-tsconfig-paths": "^5.1.4",
     "zod": "link:@hookform/resolvers/zod",
