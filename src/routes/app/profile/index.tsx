@@ -43,7 +43,6 @@ export const getFavouritesProperties = createServerFn().validator((params) => z.
 export const Route = createFileRoute('/app/profile/')({
     component: ProfileView,
     loader: async (ctx) => {
-        console.log('ctx', ctx)
 
         return await getFavouritesProperties({ data: {} })
     }

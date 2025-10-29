@@ -1,17 +1,16 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
-import { useState, useEffect, useContext } from 'react'
+import { useState, useEffect, } from 'react'
 import { useTRPCClient } from '../../../../trpc/react'
 import { PropertyFilters } from 'utils/validation/types'
-import { LocationObject, PropertyObject } from 'utils/validation/types'
+import { PropertyObject } from 'utils/validation/types'
 import { LocationSelector } from '@/components/basics/locationSelector'
 import { Facilities, propertyFiltersSchema } from 'utils/validation/propertyFilters.ts'
 import { trpcRouter } from 'trpc/router'
 import { createServerFn } from '@tanstack/react-start'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { MultiSelect, MultiSelectContent, MultiSelectItem, MultiSelectSeparator, MultiSelectTrigger, MultiSelectValue } from '@/components/ui/multi-select'
+import { MultiSelect, MultiSelectContent, MultiSelectItem, MultiSelectTrigger, MultiSelectValue } from '@/components/ui/multi-select'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { ChevronDownIcon, X } from 'lucide-react'
-import { usePropertyFilterStore } from '@/routes/__root'
+import { usePopoversOpenStore, usePropertyFilterStore } from '@/routes/__root'
 import { useShallow } from 'zustand/react/shallow'
 import { BathIcon, BedIcon, ChatIcon, FilterIcon, LocationIcon, priceChartSvg, SurfaceAreaIcon } from '@/components/icons/propertyIcons'
 import { Input } from '@/components/ui/input'
@@ -20,8 +19,12 @@ import { Slider } from '@/components/ui/slider'
 import { cn } from 'lib/utils'
 import { auth } from 'utils/auth'
 import { getHeaders } from '@tanstack/react-start/server'
-import z from 'zod/v3'
 import { useNavigate } from '@tanstack/react-router'
+import { ImageFallback } from '@/components/basics/imageFallback'
+import { PropertyTypeType } from 'utils/constants'
+import { useDebouncedCallback } from 'use-debounce'
+import { useInView } from 'react-intersection-observer'
+import { useInfiniteQuery } from '@tanstack/react-query'
 
 
 export const getPropertiesWithFilters = createServerFn().validator((d) => propertyFiltersSchema.parse(d)).handler(async ({ data: filters, }) => {
@@ -33,70 +36,85 @@ export const getPropertiesWithFilters = createServerFn().validator((d) => proper
     const sessionData = await auth.api.getSession({ headers: h })
 
     const caller = trpcRouter.createCaller({ headers: h, user: sessionData?.user })
-    const res = await caller.properties.list(filters)
-    return res as PropertyObject[]
+    const res = await caller.properties.list({ props: filters, skip: 0 })
+    return res
 })
 
 export const Route = createFileRoute('/app/properties/')({
     component: PropertiesRoute,
-    loader: async () => {
+    loaderDeps: ({ search }) => ({ search }),
+    loader: async ({ deps: { search } }) => {
         // Load initial properties without filters
-        const data = await getPropertiesWithFilters({ data: {} })
-        console.log('getPropertiesWithFilters', data.length)
+        const data = await getPropertiesWithFilters({ data: search })
+        console.log('getPropertiesWithFilters', data.properties.length)
         return data
     },
-    validateSearch: z.object({
-        search: z.string().optional(),
-        sort: z.enum(['newest', 'oldest', 'price-asc', 'price-desc']).optional(),
-        page: z.number().optional(),
-    }),
+    validateSearch: propertyFiltersSchema
 })
 
 
 function PropertiesRoute() {
     const propertiesReceived = Route.useLoaderData()
+    console.log('propertiesReceived', propertiesReceived)
     const trpcClient = useTRPCClient()
 
     const navigate = useNavigate()
+    const searchParams = Route.useSearch()
+
+    const { ref, inView } = useInView()
+
+    const {
+        status,
+        data,
+        error,
+        isFetching,
+        isFetchingNextPage,
+        fetchNextPage,
+        hasNextPage,
+    } = useInfiniteQuery({
+        queryKey: ['properties', searchParams],
+        queryFn: async ({ pageParam, }) => {
+            const res = await fetchProperties({ skip: pageParam * 9 })
+            return res.properties
+        },
+        initialData: { pages: [propertiesReceived.properties], pageParams: [0] },
+        initialPageParam: 0,
+        getNextPageParam: (lastpage, _allPages, lastPageParam) => {
+            if (lastpage.length === 0) { return undefined; }
+            return lastPageParam + 1;
+        },
+    })
 
 
-    const params = Route.useSearch()
-
-    // navigate({
-    //     search: (prev) => ({ ...prev, page: prev.page + 1 }),
-    // })
-
-    const { updatePropertyFilters, setUpdatePropertyFilters, propertyFilters, setPropertyFilters } = usePropertyFilterStore(useShallow(state => ({
-        propertyFilters: state.propertyFilters,
-        setPropertyFilters: state.setPropertyFilters,
-        updatePropertyFilters: state.updatePropertyFilters,
-        setUpdatePropertyFilters: state.setUpdatePropertyFilters,
-    })))
-
-    const [properties, setProperties] = useState<PropertyObject[]>(propertiesReceived)
-
-
-    // Set up the updatePropertyFilters function to work with context instead of URL
     useEffect(() => {
-        setUpdatePropertyFilters(() => async (filters: PropertyFilters) => {
-            console.log('setUpdatePropertyFilters', { ...propertyFilters, ...filters })
+        if (inView && hasNextPage && !isFetchingNextPage) {
+            fetchNextPage()
+        }
+    }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage])
 
-            // Update context instead of URL
-            setPropertyFilters({ ...propertyFilters, ...filters })
+    const [count, setCount] = useState<number>(propertiesReceived.count)
+    const [totalFilteredCount, setTotalFilteredCount] = useState<number>(propertiesReceived.totalFilterCount)
 
-            const newProps = await trpcClient.properties.list.query({ ...propertyFilters, ...filters })
-            setProperties(newProps)
+    async function fetchProperties({ skip = 0 }: { skip?: number }) {
+        const newProps = await trpcClient.properties.list.query({ props: searchParams, skip })
+        setCount(newProps.count)
+        setTotalFilteredCount(newProps.totalFilterCount)
+        return newProps
+    }
 
-            return JSON.stringify(newProps)
-        })
-    }, [propertyFilters])
-
-    const handleFilterChange = async (newFilters: Partial<PropertyFilters>) => {
-        updatePropertyFilters(newFilters)
+    function handleFilterChange(newFilters: Partial<PropertyFilters>) {
+        navigate({ to: '/app/properties', search: (prev) => ({ ...prev, ...newFilters }) })
     }
 
 
     const [showFilters, setShowFilters] = useState(false)
+
+
+
+    const [budget, setBudget] = useState<Partial<PropertyFilters['budget']>>(searchParams?.budget ?? {})
+    const debouncedHandleFilterChange = useDebouncedCallback(async (value: Partial<PropertyFilters>) => {
+        handleFilterChange(value)
+    }, 300);
 
 
     const filterButton = <button onClick={() => setShowFilters(!showFilters)} className="flex flex-row cursor-pointer touch-none select-none items-center gap-3 w-fit border rounded-[6px] border-[#C1A7FF] text-xs text-[#C1A7FF] px-3 py-2.5">
@@ -106,13 +124,13 @@ function PropertiesRoute() {
 
     return (
         <div className='relative'>
-            <div className="flex md:hidden flex-row items-center justify-between mx-3 gap-2">
+            <div className="flex md:hidden flex-row items-center justify-between mx-3 gap-2 mb-2">
                 <Input placeholder="Search" className="w-full bg-transparent border py-[7px] h-auto" />
                 {filterButton}
             </div>
 
 
-            <div className="h-full border flex flex-col rounded-lg mx-3 mt-2 ">
+            <div className="h-full border flex flex-col rounded-lg mx-3 ">
                 <div className='flex flex-row items-center gap-3 px-2 md:px-6 py-2 border-b justify-between'>
                     <div className='flex flex-col gap-2 w-full pt-2 pb-2 md:pt-4 md:pb-5 '>
                         <h1 className="text-xl font-light">Cele mai potrivite proprietăți pentru tine</h1>
@@ -125,128 +143,200 @@ function PropertiesRoute() {
                 </div>
 
                 {/* Filters Section */}
-                {showFilters && <div className='md:flex hidden px-4 pt-4 flex-row items-center gap-3'>
-
-                    <PropertyTypeSelector propertyFilters={propertyFilters} handleFilterChange={handleFilterChange} />
-
-                    <Popover>
-                        <PopoverTrigger className='px-3 py-1.5 bg-input/30 text-black/50 dark:text-white hover:bg-input/50 dark:bg-[#241540] rounded flex flex-row items-center'>
-                            Budget
-                            <ChevronDownIcon className="ml-3 size-4 shrink-0 opacity-50" />
-                        </PopoverTrigger>
-                        <PopoverContent>
-                            <label className="block text-sm font-medium mb-2">Budget Range</label>
-                            <div className="flex gap-2">
-                                <input
-                                    type="number"
-                                    placeholder="Min"
-                                    value={propertyFilters?.budget?.min || ''}
-                                    className="bg-input/50 text-black/50 dark:text-white rounded px-3 py-2 w-24"
-                                    onChange={(e) => {
-                                        const min = e.target.value ? parseInt(e.target.value) : undefined
-                                        handleFilterChange({
-                                            budget: { ...propertyFilters?.budget, min }
-                                        })
-                                    }}
-                                />
-                                <input
-                                    type="number"
-                                    placeholder="Max"
-                                    value={propertyFilters?.budget?.max || ''}
-                                    className="bg-input/50 text-black/50 dark:text-white rounded px-3 py-2 w-24"
-                                    onChange={(e) => {
-                                        const max = e.target.value ? parseInt(e.target.value) : undefined
-                                        handleFilterChange({
-                                            budget: { ...propertyFilters?.budget, max }
-                                        })
-                                    }}
-                                />
-                            </div>
-
-                        </PopoverContent>
-                    </Popover>
+                {showFilters && <div className='md:flex hidden px-4 pt-4 flex-row items-start justify-between gap-3'>
 
 
-                    <LocationSelector
-                        width={150}
-                        locationObject={propertyFilters?.location}
-                        setLocationObject={(l) => {
-                            console.log('in loc', propertyFilters)
-                            // handleFilterChange({ location: l })
-                            handleFilterChange({ location: l })
-                        }}
-                    />
-                    {/* better looking locatoin selector, but needs fixing */}
-                    {/* <Popover> */}
-                    {/*     <PopoverTrigger className='px-3 py-1.5 bg-input/30 text-black/50 dark:text-white hover:bg-input/50 dark:bg-[#241540] rounded flex flex-row items-center'> */}
-                    {/*         {propertyFilters?.location ? (propertyFilters?.location?.city + ", " + propertyFilters?.location?.state) : "Location"} */}
-                    {/*         <ChevronDownIcon className="ml-3 size-4 shrink-0 opacity-50" /> */}
-                    {/*     </PopoverTrigger> */}
-                    {/*     <PopoverContent > */}
-                    {/*         <LocationSelector */}
-                    {/*             width={150} */}
-                    {/*             locationObject={propertyFilters?.location} */}
-                    {/*             setLocationObject={(l) => { */}
-                    {/*                 console.log('in loc', propertyFilters) */}
-                    {/*                 // handleFilterChange({ location: l }) */}
-                    {/*                 handleFilterChange({ location: l }) */}
-                    {/*             }} */}
-                    {/*         /> */}
-                    {/*     </PopoverContent> */}
-                    {/* </Popover> */}
+                    <div className="flex flex-row gap-3 items-start">
+
+                        <PropertyTypeSelector propertyType={searchParams?.propertyType ?? []} handleChangePropertyType={(p) => handleFilterChange({ propertyType: p })} />
+
+                        <Popover>
+                            <PopoverTrigger className='px-3 py-1.5 bg-input/30 text-black/50 dark:text-white hover:bg-input/50 dark:bg-[#241540] rounded flex flex-row items-center relative'>
+                                Budget
+                                {!!(searchParams?.budget?.min || searchParams?.budget?.max) && <span className='animate-pulse text-purple-700 mr-1.5 left-[0.5px] top-0 absolute'>•</span>}
+                                <ChevronDownIcon className="ml-3 size-4 shrink-0 opacity-50" />
+                            </PopoverTrigger>
+                            <PopoverContent>
+                                <label className="block text-sm font-medium mb-2">Budget Range</label>
+                                <div className="flex gap-2">
+                                    <input
+                                        type="number"
+                                        placeholder="Min"
+                                        value={searchParams.budget?.min || ''}
+                                        className="bg-input/50 text-black/50 dark:text-white rounded px-3 py-2 w-24"
+                                        onChange={(e) => {
+                                            const min = e.target.value ? parseInt(e.target.value) : undefined
+                                            setBudget({ ...budget, min })
+                                            debouncedHandleFilterChange({
+                                                budget: { ...searchParams?.budget, min }
+                                            })
+                                        }}
+                                    />
+                                    <input
+                                        type="number"
+                                        placeholder="Max"
+                                        value={searchParams.budget?.max || ''}
+                                        className="bg-input/50 text-black/50 dark:text-white rounded px-3 py-2 w-24"
+                                        onChange={(e) => {
+                                            const max = e.target.value ? parseInt(e.target.value) : undefined
+                                            setBudget({ ...budget, max })
+                                            debouncedHandleFilterChange({
+                                                budget: { ...searchParams?.budget, max }
+                                            })
+                                        }}
+                                    />
+                                </div>
+
+                            </PopoverContent>
+                        </Popover>
 
 
-                    <MultiSelect
-                        values={propertyFilters?.numberOfRooms?.map(i => i.toString())}
-                        onValuesChange={value => handleFilterChange({ numberOfRooms: value.map(i => Number(i)) as any })}
-                    >
-                        <MultiSelectTrigger className=" w-[150px] custor-pointer" >
-                            <MultiSelectValue className='cursor-pointer text-white' placeholder="Number of Rooms" />
-                        </MultiSelectTrigger>
-                        <MultiSelectContent>
-                            {[1, 2, 3, 4, 5, 6, 7, 8].map(num => (
-                                <MultiSelectItem key={num} value={`${num}`}>{num} rooms</MultiSelectItem>
-                            ))}
-                        </MultiSelectContent>
-                    </MultiSelect>
 
-                    <MultiSelect values={propertyFilters?.facilities} onValuesChange={value => handleFilterChange({ facilities: value as (typeof Facilities[number])[] })}>
-                        <MultiSelectTrigger className=" w-[150px] custor-pointer" >
-                            <MultiSelectValue className='cursor-pointer text-white' placeholder="Facilities" />
-                        </MultiSelectTrigger>
-                        <MultiSelectContent>
-                            <MultiSelectItem value="parking">Parking</MultiSelectItem>
-                            <MultiSelectItem value="balcony">Balcony</MultiSelectItem>
-                            <MultiSelectItem value="terrace">Terrace</MultiSelectItem>
-                            <MultiSelectItem value="garden">Garden</MultiSelectItem>
-                            <MultiSelectItem value="elevator">Elevator</MultiSelectItem>
-                            <MultiSelectItem value="air_conditioning">Air conditioning</MultiSelectItem>
-                            <MultiSelectItem value="central_heating">Central heating</MultiSelectItem>
-                            <MultiSelectItem value="furnished">Furnished</MultiSelectItem>
-                            <MultiSelectItem value="internet">Internet</MultiSelectItem>
-                        </MultiSelectContent>
-                    </MultiSelect>
+                        <Popover>
+                            <PopoverTrigger className='px-3 py-1.5 bg-input/30 text-black/50 dark:text-white hover:bg-input/50 dark:bg-[#241540] rounded flex flex-row items-center relative'>
+                                Surface Area
+                                {!!(searchParams?.surfaceArea?.min || searchParams?.surfaceArea?.max) && <span className='animate-pulse text-purple-700 mr-1.5 left-[0.5px] top-0 absolute'>•</span>}
+                                <ChevronDownIcon className="ml-3 size-4 shrink-0 opacity-50" />
+                            </PopoverTrigger>
+                            <PopoverContent>
+                                <label className="block text-sm font-medium mb-2">Surface Area Range</label>
+                                <div className="flex gap-2">
+                                    <input
+                                        type="number"
+                                        placeholder="Min"
+                                        value={searchParams.surfaceArea?.min || ''}
+                                        className="bg-input/50 text-black/50 dark:text-white rounded px-3 py-2 w-24"
+                                        onChange={(e) => {
+                                            const min = e.target.value ? parseInt(e.target.value) : undefined
+                                            debouncedHandleFilterChange({
+                                                surfaceArea: { ...searchParams?.surfaceArea, min }
+                                            })
+                                        }}
+                                    />
+                                    <input
+                                        type="number"
+                                        placeholder="Max"
+                                        value={searchParams.surfaceArea?.max || ''}
+                                        className="bg-input/50 text-black/50 dark:text-white rounded px-3 py-2 w-24"
+                                        onChange={(e) => {
+                                            const max = e.target.value ? parseInt(e.target.value) : undefined
+                                            debouncedHandleFilterChange({
+                                                surfaceArea: { ...searchParams?.surfaceArea, max }
+                                            })
+                                        }}
+                                    />
+                                </div>
+
+                            </PopoverContent>
+                        </Popover>
+
+                        <LocationSelector
+                            width={150}
+                            locationObject={searchParams?.location}
+                            setLocationObject={(l) => {
+                                console.log('in loc', searchParams)
+                                // handleFilterChange({ location: l })
+                                handleFilterChange({ location: l })
+                            }}
+                        />
+                        {/* better looking locatoin selector, but needs fixing */}
+                        {/* <Popover> */}
+                        {/*     <PopoverTrigger className='px-3 py-1.5 bg-input/30 text-black/50 dark:text-white hover:bg-input/50 dark:bg-[#241540] rounded flex flex-row items-center'> */}
+                        {/*         {propertyFilters?.location ? (propertyFilters?.location?.city + ", " + propertyFilters?.location?.state) : "Location"} */}
+                        {/*         <ChevronDownIcon className="ml-3 size-4 shrink-0 opacity-50" /> */}
+                        {/*     </PopoverTrigger> */}
+                        {/*     <PopoverContent > */}
+                        {/*         <LocationSelector */}
+                        {/*             width={150} */}
+                        {/*             locationObject={propertyFilters?.location} */}
+                        {/*             setLocationObject={(l) => { */}
+                        {/*                 console.log('in loc', propertyFilters) */}
+                        {/*                 // handleFilterChange({ location: l }) */}
+                        {/*                 handleFilterChange({ location: l }) */}
+                        {/*             }} */}
+                        {/*         /> */}
+                        {/*     </PopoverContent> */}
+                        {/* </Popover> */}
+
+
+                        <MultiSelect
+                            values={searchParams?.numberOfRooms?.map(i => i.toString())}
+                            onValuesChange={value => handleFilterChange({ numberOfRooms: value.map(i => Number(i)) as any })}
+                        >
+                            <MultiSelectTrigger className=" w-[150px] custor-pointer" >
+                                <MultiSelectValue className='cursor-pointer text-white' placeholder="Number of Rooms" />
+                            </MultiSelectTrigger>
+                            <MultiSelectContent>
+                                {[1, 2, 3, 4, 5, 6, 7, 8].map(num => (
+                                    <MultiSelectItem key={num} value={`${num}`}>{num} rooms</MultiSelectItem>
+                                ))}
+                            </MultiSelectContent>
+                        </MultiSelect>
+
+                        <MultiSelect values={searchParams?.facilities} onValuesChange={value => handleFilterChange({ facilities: value as (typeof Facilities[number])[] })}>
+                            <MultiSelectTrigger className=" w-[150px] custor-pointer" >
+                                <MultiSelectValue className='cursor-pointer text-white' placeholder="Facilities" />
+                            </MultiSelectTrigger>
+                            <MultiSelectContent>
+                                <MultiSelectItem value="parking">Parking</MultiSelectItem>
+                                <MultiSelectItem value="balcony">Balcony</MultiSelectItem>
+                                <MultiSelectItem value="terrace">Terrace</MultiSelectItem>
+                                <MultiSelectItem value="garden">Garden</MultiSelectItem>
+                                <MultiSelectItem value="elevator">Elevator</MultiSelectItem>
+                                <MultiSelectItem value="air-conditioning">Air conditioning</MultiSelectItem>
+                                <MultiSelectItem value="central-heating">Central heating</MultiSelectItem>
+                                <MultiSelectItem value="furnished">Furnished</MultiSelectItem>
+                                <MultiSelectItem value="internet">Internet</MultiSelectItem>
+                            </MultiSelectContent>
+                        </MultiSelect>
+
+
+                    </div>
+                    <button className="py-1.5 px-4 outline-2 outline-gray-600 rounded text-white text-sm cursor-pointer hover:outline-purple-400" onClick={() => {
+                        handleFilterChange({ propertyType: undefined, numberOfRooms: undefined, facilities: undefined, budget: undefined, location: undefined, surfaceArea: undefined, });
+                    }} > Șterge filtrele </button>
                 </div>}
 
                 {/* Mobile Filters Section */}
                 {showFilters && <MobileFiltersOverlay
-                    propertyFilters={propertyFilters}
+                    propertyFilters={searchParams}
+                    debouncedHandleFilterChange={debouncedHandleFilterChange}
+                    budget={budget}
+                    setBudget={setBudget}
                     onFilterChange={handleFilterChange}
                     onClose={() => setShowFilters(false)}
                 />}
 
-                {/* Properties Grid */}
-                {<div className="grid grid-cols-2 lg:grid-cols-3 gap-x-1 md:gap-x-3 gap-y-3 p-4">
-                    {properties?.map((property) => (<PropertyCard match={100} key={property._id} property={property} />))}
-                </div>}
+                {status === 'error' ? (<span>Error: {error.message}</span>) : (
+                    <>
+                        {/* Properties Grid */}
+                        {<div className="grid grid-cols-2 lg:grid-cols-3 gap-x-1 md:gap-x-3 gap-y-3 p-4">
+                            {data.pages?.map(p => p.map((property) => (<PropertyCard match={totalFilteredCount && property.matchScore ? property.matchScore * 100 / totalFilteredCount : 'hide'} key={property._id} property={property} />)))}
+                        </div>}
 
-                {
-                    properties && properties.length === 0 && (
-                        <div className="text-center h-full py-8">
-                            <p className="text-gray-400">No properties found matching your criteria.</p>
+                        {data.pages.flat(1) && data.pages.flat(1).length === 0 && (
+                            <div className="text-center h-full py-8">
+                                <p className="text-gray-400">No properties found matching your criteria.</p>
+                            </div>
+                        )}
+
+
+                        <div>
+                            <button
+                                ref={ref}
+                                onClick={() => fetchNextPage()}
+                                disabled={!hasNextPage || isFetchingNextPage}
+                            >
+                                {isFetchingNextPage
+                                    ? 'Loading more...'
+                                    : hasNextPage
+                                        ? 'Load Newer'
+                                        : 'Nothing more to load'}
+                            </button>
                         </div>
-                    )
-                }
+
+                    </>
+                )}
             </div >
         </div>
     )
@@ -261,22 +351,25 @@ export const PropertyCard = ({ property, match }: { property: PropertyObject, ma
         className="relative bg-[#f7f7f7] dark:bg-[#2B1C37]/50 p-1.5 md:p-3 rounded-[6px] overflow-hidden"
     >
         <div className=" max-h-42 flex items-center justify-center">
-            <img src={property.imageUrls[0]} className="max-h-42 w-full rounded-[6px] h-full object-cover" />
+            <ImageFallback
+                src={property.imageUrls[0] ?? '/icons/homeIcon.svg'}
+                className={`max-h-42 w-full rounded-[6px] h-full object-cover`}
+            />
         </div>
 
         {match && match !== 'hide' && <div className="flex items-center absolute left-3 top-3 md:top-5 md:left-5 justify-between mb-2">
             <span className="bg-[#623398] text-white flex flex-row font-light items-center text-[9px] px-2 py-1 rounded">
                 <img src="/icons/checkIcon.svg" className="w-2 h-2 mr-1" />
-                {match}% Match
+                {match.toFixed(2)}% Match
             </span>
         </div>}
 
 
         <div className="flex items-center gap-1 mt-2 text-[10px] text-[#a3a3a3]">
             {[
-                { icon: <BedIcon className="w-3 h-3" color="#ffffff" />, text: `${property.numberOfRooms}` },
-                { icon: <BathIcon className='w-3 h-3' color="#ffffff" />, text: `${property.numberOfBathrooms}` },
-                { icon: <SurfaceAreaIcon className='w-3 h-3' color="#ffffff" />, text: `${property.surfaceArea}m²` },
+                ...(property.numberOfRooms ? [{ icon: <BedIcon className="w-3 h-3" color="#ffffff" />, text: `${property.numberOfRooms}` }] : []),
+                ...(property.numberOfBathrooms ? [{ icon: <BathIcon className='w-3 h-3' color="#ffffff" />, text: `${property.numberOfBathrooms}` }] : []),
+                ...(property.surfaceArea ? [{ icon: <SurfaceAreaIcon className='w-3 h-3' color="#ffffff" />, text: `${property.surfaceArea}m²` }] : []),
                 // { icon: "/icons/locationIcon.svg", text: `${property.location.city}` },
             ].map(i =>
                 <span className='flex flex-row items-center gap-1 rounded bg-[#32215A] px-2 py-0.5'>{i.text}{i.icon}  </span>
@@ -293,8 +386,8 @@ export const PropertyCard = ({ property, match }: { property: PropertyObject, ma
     </Link>
 }
 
-function PropertyTypeSelector({ propertyFilters, handleFilterChange, className }: { propertyFilters: PropertyFilters | undefined, handleFilterChange: (filters: PropertyFilters) => void, className?: string }) {
-    return <MultiSelect values={propertyFilters?.propertyType} onValuesChange={value => handleFilterChange({ propertyType: value as any })} >
+function PropertyTypeSelector({ propertyType, handleChangePropertyType, className }: { propertyType: PropertyTypeType[], handleChangePropertyType: (type: PropertyTypeType[]) => void, className?: string }) {
+    return <MultiSelect values={propertyType} onValuesChange={handleChangePropertyType as any} >
         <MultiSelectTrigger className={cn(" w-[150px] custor-pointer", className)} >
             <MultiSelectValue className='cursor-pointer text-white' placeholder="Property Type" />
         </MultiSelectTrigger>
@@ -311,20 +404,33 @@ function PropertyTypeSelector({ propertyFilters, handleFilterChange, className }
 function MobileFiltersOverlay({
     propertyFilters,
     onFilterChange,
+    budget,
+    setBudget,
+    debouncedHandleFilterChange,
     onClose
 }: {
     propertyFilters: PropertyFilters | undefined,
     onFilterChange: (filters: Partial<PropertyFilters>) => void,
     onClose: () => void
+    debouncedHandleFilterChange: (value: Partial<PropertyFilters>) => void
+    budget: Partial<PropertyFilters['budget']>
+    setBudget: (budget: Partial<PropertyFilters['budget']>) => void
 }) {
 
 
     const min = 10000
     const max = 2000000
 
+
+    const { aiChatbotOpen, setAiChatbotOpen } = usePopoversOpenStore(useShallow(state => ({
+        aiChatbotOpen: state.aiChatbotOpen,
+        setAiChatbotOpen: state.setAiChatbotOpen,
+    })))
+
     return (
         <div className="md:hidden fixed top-14 bottom-20 left-3 right-3 z-50 bg-[#120826] text-white rounded-lg border overflow-y-auto">
             {/* Header */}
+            {/*JSON.stringify(propertyFilters)*/}
             <div className="flex items-center justify-between border-b rounded-b-lg p-2 pb-3 pt-4 mb-8">
                 <h1 className="text-2xl font-light">Filtrează proprietăți</h1>
                 <button onClick={onClose} className="pl-2 pb-2 pt-1 pr-1"> <X className="w-6 h-6" /> </button>
@@ -332,7 +438,7 @@ function MobileFiltersOverlay({
 
 
             <h2 className="text-lg font-medium mb-4 px-2">Tip Locuița</h2>
-            <PropertyTypeSelector propertyFilters={propertyFilters} handleFilterChange={onFilterChange} className='mx-2 py-4 pl-3' />
+            <PropertyTypeSelector propertyType={propertyFilters?.propertyType ?? []} handleChangePropertyType={(p) => onFilterChange({ propertyType: p })} className='mx-2 py-2 pl-3' />
 
             {/* Price Range */}
             <div className="mb-8 mt-3 p-2">
@@ -351,7 +457,9 @@ function MobileFiltersOverlay({
                         value={[propertyFilters?.budget?.min ?? min, propertyFilters?.budget?.max ?? max]}
                         onValueChange={([min, max]) => {
                             console.log('min', min, 'max', max)
-                            onFilterChange({ ...propertyFilters, budget: { min, max } })
+                            // onFilterChange({ ...propertyFilters, budget: { min, max } })
+                            setBudget({ min, max })
+                            debouncedHandleFilterChange({ budget: { min, max } })
                         }}
                         trackClassName='bg-[#8A4FFF] data-[orientation=horizontal]:h-1'
                         min={min}
@@ -363,8 +471,63 @@ function MobileFiltersOverlay({
 
                 {/* Manual Input */}
                 <div className='grid grid-cols-2 gap-2'>
-                    <Input placeholder="Introdu min" value={propertyFilters?.budget?.min} onChange={(v) => onFilterChange({ ...propertyFilters, budget: { min: parseInt(v.target.value) } })} />
-                    <Input placeholder="Introdu max" value={propertyFilters?.budget?.max} onChange={(v) => onFilterChange({ ...propertyFilters, budget: { max: parseInt(v.target.value) } })} />
+                    <Input
+                        placeholder="Introdu min"
+                        value={propertyFilters?.budget?.min}
+                        onChange={(v) => {
+                            setBudget({ min: parseInt(v.target.value), max: budget?.max })
+                            debouncedHandleFilterChange({ budget: { min: parseInt(v.target.value), max: budget?.max } })
+                        }}
+                    />
+                    <Input
+                        placeholder="Introdu max"
+                        value={propertyFilters?.budget?.max}
+                        onChange={(v) => {
+                            setBudget({ max: parseInt(v.target.value), min: budget?.min })
+                            debouncedHandleFilterChange({ budget: { max: parseInt(v.target.value), min: budget?.min } })
+                        }}
+                    />
+                </div>
+            </div>
+
+            {/* Surface Area */}
+            <div className="mb-8 px-2">
+                <h2 className="text-lg font-medium mb-4">Suprafață</h2>
+                <div className="flex justify-center"> {priceChartSvg} </div>
+
+                {/* Dual Range Slider */}
+                <div className="relative mb-6">
+                    <Slider
+                        value={[propertyFilters?.surfaceArea?.min ?? 15, propertyFilters?.surfaceArea?.max ?? 500]}
+                        onValueChange={([min, max]) => {
+                            console.log('min', min, 'max', max)
+                            // onFilterChange({ ...propertyFilters, budget: { min, max } })
+                            debouncedHandleFilterChange({ surfaceArea: { min, max } })
+                        }}
+                        trackClassName='bg-[#8A4FFF] data-[orientation=horizontal]:h-1'
+                        min={15}
+                        max={500}
+                        step={5}
+                        className="w-full"
+                    />
+                </div>
+
+                {/* Manual Input */}
+                <div className='grid grid-cols-2 gap-2'>
+                    <Input
+                        placeholder="Introdu min"
+                        value={propertyFilters?.surfaceArea?.min}
+                        onChange={(v) => {
+                            debouncedHandleFilterChange({ surfaceArea: { min: parseInt(v.target.value), max: propertyFilters?.surfaceArea?.max } })
+                        }}
+                    />
+                    <Input
+                        placeholder="Introdu max"
+                        value={propertyFilters?.surfaceArea?.max}
+                        onChange={(v) => {
+                            debouncedHandleFilterChange({ surfaceArea: { max: parseInt(v.target.value), min: propertyFilters?.surfaceArea?.min } })
+                        }}
+                    />
                 </div>
             </div>
 
@@ -376,7 +539,7 @@ function MobileFiltersOverlay({
 
             {/* Number of Rooms */}
             <div className="mb-8 px-2">
-                <h2 className="text-lg font-medium mb-4">Tip locuița</h2>
+                <h2 className="text-lg font-medium mb-4">Numar De Camere</h2>
                 <div className="grid grid-cols-5 gap-3">
                     {[1, 2, 3, 4, '5+'].map((num) => (
                         <button
@@ -386,10 +549,11 @@ function MobileFiltersOverlay({
                                 : 'bg-[#241540] text-gray-400'
                                 }`}
                             onClick={() => {
-                                const roomNum = typeof num === 'number' ? [num] : [5]
-                                const newRooms = propertyFilters?.numberOfRooms?.every(r => roomNum.includes(r)) ? propertyFilters?.numberOfRooms?.filter(r => !roomNum.includes(r)) : propertyFilters?.numberOfRooms?.concat(roomNum)
-
-                                onFilterChange({ ...propertyFilters, numberOfRooms: newRooms })
+                                const roomNum = typeof num === 'number' ? [num] : [5, 6, 7, 8, 9];
+                                const newRooms = propertyFilters?.numberOfRooms?.some(i => roomNum.includes(i)) ?
+                                    propertyFilters.numberOfRooms.filter(i => !roomNum.includes(i)) :
+                                    [...new Set((propertyFilters?.numberOfRooms ?? [])?.concat(roomNum))];
+                                onFilterChange({ ...propertyFilters, numberOfRooms: newRooms });
                             }}
                         >
                             {num}
@@ -402,34 +566,51 @@ function MobileFiltersOverlay({
             <div className="mb-8 px-2">
                 <h2 className="text-lg font-medium mb-4">Facilități</h2>
                 <div className="grid grid-cols-2 gap-4">
-                    {(['parking', 'balcony', 'terrace', 'garden', 'elevator', 'air_conditioning', 'central_heating', 'furnished', 'internet'] as const).map((facility) => (
-                        <div key={facility} className="flex items-center space-x-3">
-                            <Checkbox
-                                id={facility}
-                                checked={propertyFilters?.facilities?.includes(facility)}
-                                onCheckedChange={(checked) => {
-                                    const newFacilities = checked
-                                        ? [...(propertyFilters?.facilities ?? []), facility]
-                                        : propertyFilters?.facilities?.filter(f => f !== facility)
-                                    onFilterChange({ ...propertyFilters, facilities: newFacilities })
-                                }}
-                                className="border-[#7B31DC] data-[state=checked]:bg-[#7B31DC]"
-                            />
-                            <label
-                                htmlFor={facility}
-                                className="text-white cursor-pointer"
-                            >
-                                {facility}
-                            </label>
-                        </div>
-                    ))}
+                    {([
+                        { key: 'parking', value: 'parking' },
+                        { key: 'balcony', value: 'balcony' },
+                        { key: 'terrace', value: 'terrace' },
+                        { key: 'garden', value: 'garden' },
+                        { key: 'elevator', value: 'elevator' },
+                        { key: 'air-conditioning', value: 'air-conditioning' },
+                        { key: 'central-heating', value: 'central-heating' },
+                        { key: 'furnished', value: 'furnished' },
+                        { key: 'internet', value: 'internet' },
+                    ] as const)
+                        .map((facility) => (
+                            <div key={facility.key} className="flex items-center space-x-3">
+                                <Checkbox
+                                    id={facility.key}
+                                    checked={propertyFilters?.facilities?.includes(facility.key)}
+                                    onCheckedChange={(checked) => {
+                                        const newFacilities = checked
+                                            ? [...(propertyFilters?.facilities ?? []), facility.key]
+                                            : propertyFilters?.facilities?.filter(f => f !== facility.key)
+                                        onFilterChange({ ...propertyFilters, facilities: newFacilities })
+                                    }}
+                                    className="border-[#7B31DC] data-[state=checked]:bg-[#7B31DC]"
+                                />
+                                <label
+                                    htmlFor={facility.key}
+                                    className="text-white cursor-pointer"
+                                >
+                                    {facility.value}
+                                </label>
+                            </div>
+                        ))}
                 </div>
             </div>
 
             {/* Continue in Chat */}
             <div className="mb-6 px-2">
                 <p className="text-center text-[#E9E1FF] text-sm">Pentru mai multe filtre:</p>
-                <button className="w-full bg-gradient-to-br from-[#4C7CED] to-[#7B31DC] hover:bg-[#6A2BC4] text-white text-sm py-3 rounded-lg flex items-center justify-center gap-2">
+                <button
+                    className="w-full bg-gradient-to-br from-[#4C7CED] to-[#7B31DC] hover:bg-[#6A2BC4] text-white text-sm py-3 rounded-lg flex items-center justify-center gap-2"
+                    onClick={() => {
+                        setAiChatbotOpen(true)
+                        onClose()
+                    }}
+                >
                     <ChatIcon className="w-5 h-5" />
                     Continuă în chat
                 </button>
@@ -437,7 +618,9 @@ function MobileFiltersOverlay({
 
             {/* Bottom Actions */}
             <div className="grid grid-cols-2 gap-2 px-2 pt-3 pb-6 bg-[#1A0F33] text-white sticky bottom-0">
-                <button className="py-3 border border-gray-600 rounded-lg text-white text-sm" onClick={() => { onFilterChange({}); onClose() }} > Șterge filtrele </button>
+                <button className="py-3 border border-gray-600 rounded-lg text-white text-sm" onClick={() => {
+                    onFilterChange({ propertyType: undefined, numberOfRooms: undefined, facilities: undefined, budget: undefined, location: undefined, surfaceArea: undefined, }); onClose()
+                }} > Șterge filtrele </button>
                 <button className="py-3 bg-[#8A4FFF] hover:bg-[#6A2BC4] text-white rounded-lg tex-sm" onClick={() => { onClose() }} > Salvează modificările </button>
             </div>
         </div>

@@ -10,12 +10,21 @@ import { PropertyObject } from "utils/validation/types";
 import { trpcRouter } from "trpc/router";
 import { createServerFn } from "@tanstack/react-start";
 import { PropertyCard } from "./properties";
+import { getHeaders } from "@tanstack/react-start/server";
+import { auth } from "utils/auth";
 
 
 
 
 export const getPropertiesWithFilters = createServerFn().validator((d) => propertyFiltersSchema.parse(d)).handler(async ({ data: filters, }) => {
-    const caller = trpcRouter.createCaller({})
+    const headers = getHeaders()
+
+    const h = new Headers()
+    Object.entries(headers).filter(r => r[1]).map(r => h.append(r[0], r[1]!))
+
+    const sessionData = await auth.api.getSession({ headers: h })
+
+    const caller = trpcRouter.createCaller({ headers: h, user: sessionData?.user })
     const res = await caller.properties.list(filters)
     return res as PropertyObject[]
 })
@@ -43,7 +52,7 @@ function Dashboard() {
 
 
     return (
-        <div className="flex flex-col items-center justify-center ">
+        <div className="flex flex-col items-center justify-center border mx-2 rounded-lg">
             <div className='flex w-full flex-col gap-2 border-b px-6 pt-4 pb-5 dark:border-[#404040] '>
                 <h1 className="text-2xl font-light">Ce vrei să faci astăzi pe DOORS?</h1>
 

@@ -8,6 +8,7 @@ if (!cached) {
 }
 
 
+mongoose.set('debug', true)
 
 async function dbConnect(): Promise<typeof mongoose> {
     if (cached.conn) {
@@ -78,7 +79,7 @@ export function getPropertyObject() {
         "Spațiu de locuit confortabil cu toate facilitățile necesare. Zonă liniștită și sigură pentru întreaga familie."
     ];
 
-    const features = ['balcony', 'terrace', 'garden', 'swimming_pool', 'gym', 'elevator', 'air_conditioning', 'heating', 'fireplace', 'security_system', 'internet', 'cable_tv', 'dishwasher', 'washing_machine', 'dryer', 'microwave', 'refrigerator', 'pet_friendly', 'wheelchair_accessible'];
+    const features = ['balcony', 'terrace', 'garden', 'swimming-pool', 'gym', 'elevator', 'air-conditioning', 'heating', 'fireplace', 'security_system', 'internet', 'cable_tv', 'dishwasher', 'washing_machine', 'dryer', 'microwave', 'refrigerator', 'pet-friendly', 'wheelchair-accessible'];
     const statuses = ['available', 'sold', 'pending', 'rented', 'off-market'];
     const parkingTypes = ['garage', 'driveway', 'street', 'covered', 'underground'];
     const tags = ['nou', 'renovat', 'premium', 'central', 'linistit', 'verde', 'modern', 'traditional', 'investitie', 'familie'];

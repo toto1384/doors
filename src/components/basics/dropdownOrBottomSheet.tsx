@@ -1,12 +1,11 @@
 
-import { DropdownPropsAlternative, DropdownProps, isDropdownAlternative } from "@/app/_components/dropdown";
 import React, { ReactNode, useEffect, useRef, useState } from "react";
 import { ArrowLeft } from "lucide-react";
-import { DropDown } from "./dropdown";
+import { DropDown, DropdownProps, DropdownPropsAlternative, isDropdownAlternative } from "./dropdown";
 import { BottomSheet } from 'react-spring-bottom-sheet'
 import 'react-spring-bottom-sheet/dist/style.css'
-import { useSize } from "@/utils/hooks/useSize";
-import { useDidMount } from "@/utils/hooks/useDidMount";
+import { useSize } from "utils/hooks/useSize";
+import { useDidMount } from "utils/hooks/useDidMount";
 
 //dropdown on desktop, bototm sheet on mobile
 export function DropDownOrBottomSheet(props: DropdownProps | DropdownPropsAlternative) {
@@ -14,11 +13,6 @@ export function DropDownOrBottomSheet(props: DropdownProps | DropdownPropsAltern
 
     const [openState, setOpenState] = useState(false)
     const [toggled, setToggled] = isDropdownAlternative(props) ? [props.open, props.setOpen] : [openState, setOpenState]
-
-    const didMount = useDidMount()
-    // useEffect(() => {
-    //     if (toggled && didMount) window.scrollTo({ top: 0, behavior: 'smooth' });
-    // }, [toggled])
 
     const onClick = (event: any) => {
         event.stopPropagation();
@@ -52,11 +46,6 @@ export function DropDownOrBottomSheetAlt(props: (DropdownProps | DropdownPropsAl
 
     const [openState, setOpenState] = useState(false)
     const [toggled, setToggled] = isDropdownAlternative(props) ? [props.open, props.setOpen] : [openState, setOpenState]
-
-    const didMount = useDidMount()
-    // useEffect(() => {
-    //     if (toggled && didMount) window.scrollTo({ top: 0, behavior: 'smooth' });
-    // }, [toggled])
 
     const onClick = (event: any) => {
         event.stopPropagation();

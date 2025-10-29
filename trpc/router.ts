@@ -8,7 +8,7 @@ import { UTApi } from 'uploadthing/server';
 import dbConnect from "utils/db/mongodb";
 import { getAccountModel, getPropertyModel, getUserModel } from "utils/validation/mongooseModels";
 import { ObjectId } from 'mongodb';
-import { UserType } from "utils/validation/dbSchemas";
+import { UserPreferences, UserType } from "utils/validation/dbSchemas";
 
 extendZod(z as any)
 
@@ -49,8 +49,31 @@ export const trpcRouter = createTRPCRouter({
             const db = await dbConnect();
             const UserModel = getUserModel(db);
 
-            console.log('gh', ctx.user)
-            const user = await UserModel.findOneAndUpdate({ _id: ctx.user.id }, { $set: { userType: input.userType } })
+            const user = await UserModel.updateOne({ _id: ctx.user.id }, { userType: input.userType })
+            console.log('gh', input.userType, user, { userType: input.userType })
+
+            if (!user) {
+                throw new TRPCError({ code: 'UNAUTHORIZED', message: 'User not found' });
+            }
+
+            return { success: true };
+        }),
+
+        updateUserPreferences: authProcedure.input(UserPreferences).mutation(async ({ ctx, input }) => {
+            const db = await dbConnect();
+            const UserModel = getUserModel(db);
+
+            const user = await UserModel.updateOne({ _id: ctx.user.id }, {
+                $set: {
+                    "preferences.propertyType": input.propertyType,
+                    "preferences.budget": input.budget,
+                    "preferences.facilities": input.facilities,
+                    "preferences.location": input.location,
+                    "preferences.numberOfRooms": input.numberOfRooms,
+                }
+            })
+            console.log('gh', input, user)
+
             if (!user) {
                 throw new TRPCError({ code: 'UNAUTHORIZED', message: 'User not found' });
             }

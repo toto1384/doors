@@ -4,7 +4,7 @@ import { auth } from 'utils/auth';
 import dbConnect from 'utils/db/mongodb';
 import { getPropertyModel, getUserModel } from 'utils/validation/mongooseModels';
 import { propertyFiltersSchema } from 'utils/validation/propertyFilters';
-import { PropertyObject } from 'utils/validation/types';
+import { PropertyObject, UserObject } from 'utils/validation/types';
 import { ObjectId } from 'mongodb';
 import z from 'zod/v3';
 import { PropertySchema, ToPostPropertySchema } from 'utils/validation/dbSchemas';
@@ -105,7 +105,7 @@ export const propertiesRouter = {
         }
     }),
     list: publicProcedure
-        .input(propertyFiltersSchema)
+        .input(z.object({ props: propertyFiltersSchema, limit: z.number().optional().default(9), skip: z.number().optional().default(0) }))
         .query(async ({ input }) => {
             await dbConnect();
             const PropertyModel = getPropertyModel(await import('mongoose').then(m => m.default));
@@ -113,72 +113,96 @@ export const propertiesRouter = {
 
             console.log('filters', input)
             // Build MongoDB query based on filters
-            const query: any = {};
+            const query: any[] = [];
 
             // Property type filte
-            if (input.propertyType && input.propertyType.length > 0) {
-                query.propertyType = { $in: input.propertyType };
+            if (input.props.propertyType && input.props.propertyType.length > 0) {
+                query.push({ $cond: [{ $in: ["$propertyType", input.props.propertyType] }, 1, 0] });
             }
 
             // Budget filter
-            if (input.budget) {
-                const priceQuery: any = {};
-                if (input.budget.min !== undefined) {
-                    priceQuery.$gte = input.budget.min;
-                }
-                if (input.budget.max !== undefined) {
-                    priceQuery.$lte = input.budget.max;
-                }
-                if (Object.keys(priceQuery).length > 0) {
-                    query['price.value'] = priceQuery;
-                }
+            if (input.props.budget) {
+                query.push({
+                    $cond: [{
+                        $and: [
+                            ...(input.props.budget.min !== undefined ? [{ $gte: ["$price.value", input.props.budget.min] }] : []),
+                            ...(input.props.budget.max !== undefined ? [{ $lte: ["$price.value", input.props.budget.max] }] : []),
+                        ]
+                    }, 1, 0]
+                });
+            }
+
+            // Surface area filter
+            if (input.props.surfaceArea) {
+                query.push({
+                    $cond: [{
+                        $and: [
+                            ...(input.props.surfaceArea.min !== undefined ? [{ $gte: ["$surfaceArea", input.props.surfaceArea.min] }] : []),
+                            ...(input.props.surfaceArea.max !== undefined ? [{ $lte: ["$surfaceArea", input.props.surfaceArea.max] }] : []),
+                        ]
+                    }, 1, 0]
+                });
             }
 
             // Location filter - geo-spatial search
-            if (input.location) {
-                const locationQuery: any = {};
+            if (input.props.location) {
+                query.push({
+                    $cond: [{
+                        $and: [
+                            ...(input.props.location.city ? [{ $regexMatch: { input: "$location.city", regex: input.props.location.city.replace(/\W+/g, '\\W*') } }] : []),
+                            ...(input.props.location.state ? [{ $regexMatch: { input: "$location.state", regex: input.props.location.state.replace(' County', '').replace(/\W+/g, '\\W*') } }] : []),
+                        ]
+                    }, 1, 0]
+                });
 
-                // City/state text search
-                if (input.location.city) {
-                    locationQuery['location.city'] = {
-                        $regex: input.location.city.replace(/\W+/g, '\\W*'),
-                        $options: 'i'
-                    };
-                }
-                if (input.location.state) {
-                    locationQuery['location.state'] = {
-                        $regex: input.location.state.replace(' County', '').replace(/\W+/g, '\\W*'),
-                        $options: 'i'
-                    };
-                }
-
-
-                Object.assign(query, locationQuery);
+                // const locationQuery: any = {};
+                //
+                // // City/state text search
+                // if (input.location.city) {
+                //     locationQuery['location.city'] = {
+                //         $regex: input.location.city.replace(/\W+/g, '\\W*'),
+                //         $options: 'i'
+                //     };
+                // }
+                // if (input.location.state) {
+                //     locationQuery['location.state'] = {
+                //         $regex: input.location.state.replace(' County', '').replace(/\W+/g, '\\W*'),
+                //         $options: 'i'
+                //     };
+                // }
+                //
+                //
+                // Object.assign(query, locationQuery);
             }
 
             // Number of rooms filter
-            if (input.numberOfRooms && input.numberOfRooms.length > 0) {
-                query.numberOfRooms = { $in: input.numberOfRooms };
+            if (input.props.numberOfRooms && input.props.numberOfRooms.length > 0) {
+                query.push({ $cond: [{ $in: ["$numberOfRooms", input.props.numberOfRooms] }, 1, 0] });
+                // query.numberOfRooms = { $in: input.numberOfRooms };
             }
 
             // Facilities filter - check if property features contain any of the specified facilities
-            if (input.facilities && input.facilities.length > 0) {
-                query.features = { $in: input.facilities };
+            if (input.props.facilities && input.props.facilities.length > 0) {
+                query.push({ $cond: [{ $in: ["$features", input.props.facilities] }, 1, 0] });
+                // query.features = { $in: input.facilities };
             }
 
-            // Only show available properties by default
-            query.status = 'available';
-
-
-            console.log('finalQuery Fetch', query)
-
             try {
-                const properties = await PropertyModel.find(query)
-                    .sort({ postedDate: -1 }) // Most recent first
-                    .limit(9) // Limit results for performance
-                    .lean() as PropertyObject[];
+                const properties = await PropertyModel.aggregate([
 
-                return properties;
+                    { $match: { status: 'available' } },
+                    { $addFields: { matchScore: { $sum: query } } },
+                    { $sort: { matchScore: -1 } },
+                    {
+                        $facet: {
+                            properties: [{ $skip: input.skip }, { $limit: input.limit }],
+                            count: [{ $count: 'count' }],
+                        }
+                    },
+                    // {$project: {_id: 0, status: 1, propertyType: 1, price: 1, location: 1, numberOfRooms: 1, features: 1, postedDate: 1}},
+                ]) as [{ properties: (PropertyObject & { matchScore: number })[], count: [{ count: number }] }];
+
+                return { properties: properties[0].properties, count: properties[0].count[0].count, totalFilterCount: query.length };
             } catch (error) {
                 throw new TRPCError({
                     code: "INTERNAL_SERVER_ERROR",

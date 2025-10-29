@@ -5,6 +5,7 @@ import { LocationSchema } from './location';
 import { zDate } from './zodUtils';
 import { extendZod } from '@zodyac/zod-mongoose';
 import { ObjectId } from 'mongodb';
+import { PropertyType } from 'utils/constants';
 
 
 extendZod(z as any)
@@ -15,24 +16,28 @@ const PropertyStatus = z.enum(['available', 'sold', 'pending', 'rented', 'off-ma
 
 export type PropertyFeaturesType = z.infer<typeof PropertyFeatures>;
 
-export const PropertyType = ['apartment', 'house', 'hotel', 'office'] as const
 
-// export const UserPreferences = 
-// export type UserPreferencesType = z.infer<typeof UserPreferences>;
+export const UserPreferences = z.object({
+    propertyType: z.array(z.string()).optional(), // Property type from PropertySchema
+    budget: z.object({
+        min: z.number().optional(),
+        max: z.number().optional(),
+    }).optional(), // Budget range
+    location: LocationSchema.optional(), // Location using Google Maps data
+    numberOfRooms: z.array(z.number()).optional(), // Number of rooms
+    facilities: z.array(z.string()).optional(), // Facilities/amenities from property features
+    surfaceArea: z.object({
+        min: z.number().optional(),
+        max: z.number().optional(),
+    }).optional(), // Surface area range
+
+    mandatoryPreferences: z.array(z.string()).optional(), // Mandatory preferences
+})
+export type UserPreferencesType = z.infer<typeof UserPreferences>;
 
 export const UserSchema = z.object({
     // _id: z.sting(),
-    preferences: z.object({
-
-        propertyType: z.array(z.string()).optional(), // Property type from PropertySchema
-        budget: z.object({
-            min: z.number().optional(),
-            max: z.number().optional(),
-        }).optional(), // Budget range
-        location: LocationSchema.optional(), // Location using Google Maps data
-        numberOfRooms: z.array(z.number()).optional(), // Number of rooms
-        facilities: z.array(z.string()).optional(), // Facilities/amenities from property features
-    }).optional(),
+    preferences: UserPreferences.optional(),
     notifications: z.object({
         emailNotifications: z.boolean().optional(),
         pushNotifications: z.boolean().optional(),
@@ -45,6 +50,7 @@ export const UserSchema = z.object({
     image: z.string(),
     createdAt: zDate,
     updatedAt: zDate,
+    userType: z.enum(PropertyType),
 })
 
 

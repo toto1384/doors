@@ -17,7 +17,7 @@ import { Toaster } from '@/components/ui/sonner';
 import { getHeaders } from '@tanstack/react-start/server';
 import { auth } from 'utils/auth';
 import { createServerFn } from '@tanstack/react-start';
-
+import { PostHogProvider, PostHogErrorBoundary } from 'posthog-js/react'
 
 export const getRootObjectsServerFn = createServerFn().handler(async ({ data: filters, }) => {
 
@@ -129,8 +129,8 @@ export const usePropertyAddStore = create<{
 type UpdateFiltersFunction = (filters: PropertyFilters) => Promise<string>
 
 export const usePropertyFilterStore = create<{
-    propertyFilters: PropertyFilters | undefined,
-    setPropertyFilters: React.Dispatch<React.SetStateAction<PropertyFilters | undefined>>
+    // propertyFilters: PropertyFilters | undefined,
+    // setPropertyFilters: React.Dispatch<React.SetStateAction<PropertyFilters | undefined>>
 
 
     updatePropertyFilters: UpdateFiltersFunction,
@@ -138,7 +138,7 @@ export const usePropertyFilterStore = create<{
     sendUpdate(str: string): void
     setSendUpdate(fn: (str: string) => void): void
 }>()((set => ({
-    propertyFilters: undefined, setPropertyFilters: () => { },
+    // propertyFilters: undefined, setPropertyFilters: () => { },
 
     updatePropertyFilters: async () => '', setUpdatePropertyFilters: () => { }, sendUpdate: (s) => { }, setSendUpdate: (fn) => { }
 })));
@@ -158,6 +158,7 @@ function RootComponent() {
     );
 }
 
+
 function RootDocument({ children }: { children: React.ReactNode }) {
     const { token: receivedToken } = Route.useLoaderData();
     const { theme } = useTheme();
@@ -175,13 +176,22 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                 <HeadContent />
             </head>
             <body>
-                <GoogleMapsProvider>
-                    <AutumnProvider betterAuthUrl={import.meta.env.VITE_BETTER_AUTH_URL}>
-                        <TRPCWrapper>
-                            {appWrapper ? <AppRouteWrapper token={token}>{children}</AppRouteWrapper> : children}
-                        </TRPCWrapper>
-                    </AutumnProvider>
-                </GoogleMapsProvider>
+                <PostHogProvider apiKey={import.meta.env.VITE_PUBLIC_POSTHOG_KEY} options={{
+                    api_host: import.meta.env.VITE_PUBLIC_POSTHOG_HOST,
+                    defaults: '2025-05-24',
+                }}>
+                    <PostHogErrorBoundary >
+                        <GoogleMapsProvider>
+                            <AutumnProvider betterAuthUrl={import.meta.env.VITE_BETTER_AUTH_URL}>
+                                <TRPCWrapper>
+                                    {appWrapper ? <AppRouteWrapper token={token}>{children}</AppRouteWrapper> : children}
+                                </TRPCWrapper>
+                            </AutumnProvider>
+                        </GoogleMapsProvider>
+
+                    </PostHogErrorBoundary>
+
+                </PostHogProvider>
                 <Toaster />
                 {!import.meta.env.PROD && <TanstackDevtools
                     config={{

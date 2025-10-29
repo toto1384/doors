@@ -11,7 +11,6 @@ import { useClientToolChoice } from "utils/hooks/aiChatbotButtonHook";
 import { searchLocationByString } from "utils/googleMapsUtils";
 
 
-
 export const useSetPropertyFunctions = ({
     setMessages,
     updateGhostProperty,

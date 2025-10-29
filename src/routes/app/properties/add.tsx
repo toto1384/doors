@@ -41,10 +41,6 @@ function PropertyAdd() {
         postedStatus: state.postedStatus,
     })))
 
-
-
-
-
     const router = useRouter()
     const size = useSize(true)
     const cutSize = size.gmd ? 5 : 3
@@ -78,7 +74,7 @@ function PropertyAdd() {
 
 
     useDidMountEffect(() => {
-        if (completedSteps != 0) setProgressBar({ progress: progressPercentage, totalSteps, checkedSteps: completedSteps })
+        if (completedSteps != 0) setProgressBar({ progress: progressPercentage, totalSteps, checkedSteps: completedSteps, })
     }, [completedSteps, totalSteps])
 
 
@@ -98,9 +94,7 @@ function PropertyAdd() {
                 </p>
             </div>
 
-
         </div>
-
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 ">
 
@@ -234,6 +228,7 @@ function PropertyAdd() {
                         )}
                     </>}
 
+
                     <button
                         type="button"
                         onClick={() => { setAiChatbotOpen(true) }}
@@ -250,6 +245,7 @@ function PropertyAdd() {
 
 
             </div>
+
 
             <div className="hidden md:flex flex-row items-center justify-center">
                 {/* Circular Progress Indicator */}

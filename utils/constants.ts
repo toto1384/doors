@@ -33,3 +33,8 @@ export const authAdditionalFields = {
         input: false
     },
 } as const
+
+export const PropertyType = ['apartment', 'house', 'hotel', 'office'] as const
+
+
+export type PropertyTypeType = typeof PropertyType[number]

@@ -1,24 +1,47 @@
 import React from "react";
-import { Message } from "./aiChatbot";
-import { useRouter } from "@tanstack/react-router";
+import { useRouter, useRouterState } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { useClientToolChoice } from "utils/hooks/aiChatbotButtonHook";
 import { nanoid } from "nanoid";
+import { MessageType } from "./aiChatbot";
+import { searchLocationByString } from "utils/googleMapsUtils";
+import { useTRPC } from "trpc/react";
+import { useMutation } from "@tanstack/react-query";
+import { PropertyTypeType } from "utils/constants";
+import { PropertyFilters, UserObject } from "utils/validation/types";
+import { authClient } from "utils/auth-client";
+import { PropertyFeaturesType } from "utils/validation/dbSchemas";
+import { Facilities } from "utils/validation/propertyFilters";
 
-export function useChooseActions({ setMessages, }: { setMessages: React.Dispatch<React.SetStateAction<Message[]>>, }) {
+export function useChooseActions({ setMessages, }: { setMessages: React.Dispatch<React.SetStateAction<MessageType[]>>, }) {
 
     const router = useRouter()
     const { t } = useTranslation('translation', { keyPrefix: 'ai-chatbot' });
+    const trpc = useTRPC()
+    const updateUserTypeMutation = useMutation(trpc.auth.changeUserType.mutationOptions())
+    const updateUserPreferencesMutation = useMutation(trpc.auth.updateUserPreferences.mutationOptions())
+
+    const session = authClient.useSession();
+
 
     const { clientToolFunction: chooseHouseOrApartment } = useClientToolChoice({
         choices: [
             { value: t('propertyTypes.house'), key: 'house' },
             { value: t('propertyTypes.apartment'), key: 'apartment' },
         ],
+        async additionalOnClick(value: 'house' | 'apartment' | any) {
+            router.navigate({ to: '/app/properties', search: (prev) => ({ ...prev, propertyType: [value] }) })
+            await updateUserPreferencesMutation.mutateAsync({ propertyType: [value] })
+        },
         onShowButtons: (buttonsNode) => {
             setMessages(prev => [...prev, { message: buttonsNode, source: 'user', id: nanoid() }]);
         },
     });
+
+    const chooseHouseOrApartmentVoice = ({ propertyType }: { propertyType: PropertyTypeType[] }) => {
+        router.navigate({ to: '/app/properties', search: (prev) => ({ ...prev, propertyType }) })
+        updateUserPreferencesMutation.mutateAsync({ propertyType })
+    }
 
     const { clientToolFunction: chooseBudget } = useClientToolChoice({
         choices: [
@@ -27,10 +50,30 @@ export function useChooseActions({ setMessages, }: { setMessages: React.Dispatch
             { value: t('budgetRanges.over200k'), key: 'over200k' },
         ],
         fullWidth: true,
+        async additionalOnClick(value: 'under100k' | 'between100k200k' | 'over200k' | any) {
+            let budget: Partial<PropertyFilters['budget']> = {}
+            if (value === 'under100k') budget = { max: 100000 }
+            if (value === 'between100k200k') budget = { min: 100000, max: 200000 }
+            if (value === 'over200k') budget = { min: 200000 }
+            router.navigate({ to: '/app/properties', search: (prev) => ({ ...prev, budget }) })
+            await updateUserPreferencesMutation.mutateAsync({ budget })
+        },
         onShowButtons: (buttonsNode) => {
             setMessages(prev => [...prev, { message: buttonsNode, source: 'user', id: nanoid() }]);
         },
     });
+
+
+    function chooseNumberOfRooms({ numberOfRoomsArray }: { numberOfRoomsArray: number[] }) {
+        console.log('chooseNumberOfRooms', numberOfRoomsArray)
+        router.navigate({ to: '/app/properties', search: (prev) => ({ ...prev, numberOfRooms: numberOfRoomsArray }) })
+        updateUserPreferencesMutation.mutateAsync({ numberOfRooms: numberOfRoomsArray })
+    }
+
+    const chooseBudgetVoice = (budget: { min: number, max: number }) => {
+        router.navigate({ to: '/app/properties', search: (prev) => ({ ...prev, budget }) })
+        updateUserPreferencesMutation.mutateAsync({ budget })
+    }
 
     const { clientToolFunction: chooseFacilities } = useClientToolChoice({
         choices: [
@@ -39,19 +82,41 @@ export function useChooseActions({ setMessages, }: { setMessages: React.Dispatch
             { value: t('facilities.terrace'), key: 'terrace' },
             { value: t('facilities.garden'), key: 'garden' },
             { value: t('facilities.elevator'), key: 'elevator' },
-            { value: t('facilities.airConditioning'), key: 'airConditioning' },
-            { value: t('facilities.centralHeating'), key: 'centralHeating' },
+            { value: t('facilities.airConditioning'), key: 'air-conditioning' },
+            { value: t('facilities.centralHeating'), key: 'central-heating' },
             { value: t('facilities.furnished'), key: 'furnished' },
         ],
         multiple: true,
-
+        async additionalOnClick(value) {
+            router.navigate({ to: '/app/properties', search: (prev) => ({ ...prev, facilities: value as any }) })
+            await updateUserPreferencesMutation.mutateAsync({ facilities: value as any })
+        },
         onShowButtons: (buttonsNode) => {
             setMessages(prev => [...prev, { message: buttonsNode, source: 'user', id: nanoid() }]);
         },
     });
 
+    function chooseSurfaceArea({ min, max }: { min: number, max: number }) {
+        router.navigate({ to: '/app/properties', search: (prev) => ({ ...prev, surfaceArea: { min, max } }) })
+        updateUserPreferencesMutation.mutateAsync({ surfaceArea: { min, max } })
+    }
 
-    const { clientToolFunction: setIntentFunction } = useClientToolChoice({
+    const chooseFacilitiesVoice = ({ facilities }: { facilities: typeof Facilities[number][] }) => {
+        router.navigate({ to: '/app/properties', search: (prev) => ({ ...prev, facilities }) })
+        updateUserPreferencesMutation.mutateAsync({ facilities })
+    }
+
+    const setIntentFunction = async ({ intent }: { intent: 'buyer' | 'seller' | 'admin' }) => {
+        console.log('setIntentFunction', intent)
+        await updateUserTypeMutation.mutateAsync({ userType: intent })
+        if (intent == 'seller') router.navigate({ to: '/app/properties/add' })
+        if (intent == 'buyer') {
+            const preferences = (session.data?.user as any as UserObject | undefined)?.preferences as any
+            router.navigate({ to: '/app/properties', search: prev => preferences ? { ...prev, ...preferences } : prev })
+        }
+    }
+
+    const { clientToolFunction: setIntentFunctionOld } = useClientToolChoice({
         choices: [
             {
                 value: 'Cumpara/Inchiriaza', key: 'buyer', icon: <svg width="18" height="16" viewBox="0 0 18 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -73,6 +138,32 @@ export function useChooseActions({ setMessages, }: { setMessages: React.Dispatch
         },
     });
 
-    return { chooseHouseOrApartment, chooseBudget, chooseFacilities, setIntentFunction }
+    return {
+        chooseHouseOrApartment,
+        chooseBudget,
+        chooseFacilities,
+        setIntentFunction,
+        chooseNumberOfRooms,
+        chooseSurfaceArea,
+
+        chooseBudgetVoice,
+        chooseHouseOrApartmentVoice,
+        chooseFacilitiesVoice,
+
+        chooseAndSelectLocation: async ({ location }: { location: string }) => {
+            const locationResult = await searchLocationByString(location);
+            router.navigate({ to: '/app/properties', search: (prev) => ({ ...prev, location: locationResult ?? undefined }) })
+            await updateUserPreferencesMutation.mutateAsync({ location: locationResult ?? undefined })
+        },
+        // applyFiltersWithoutLocation: async (propertyFilters: { filterObject: PropertyFilters }) => {
+        //     console.log('setPropertyFilters', routerState.location.pathname, propertyFilters.filterObject)
+        //     if (routerState.location.pathname !== '/app/properties') {
+        //         router.navigate({ to: '/app/properties' })
+        //     }
+        //
+        //     // setPropertyFilters(propertyFilters.filterObject)
+        //     return await updatePropertyFilters(propertyFilters.filterObject)
+        // },
+    }
 }
 

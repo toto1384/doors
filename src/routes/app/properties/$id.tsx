@@ -19,6 +19,7 @@ import { auth } from 'utils/auth'
 import { BathIcon, BedIcon, PropertyFeatureIcon, SurfaceAreaIcon } from '@/components/icons/propertyIcons'
 import { format } from 'date-fns'
 import { useSize } from 'utils/hooks/useSize'
+import { ImageFallback } from '@/components/basics/imageFallback'
 
 
 const getProperty = createServerFn().validator((params) => z.object({ id: z.string() }).parse(params)).handler(async ({ data: { id } }) => {
@@ -67,7 +68,7 @@ function PropertyDetailRoute() {
 
 
     return (
-        <div className="min-h-screen md:border md:ounded-lg md:mx-3 text-white overflow-y-auto ">
+        <div className="min-h-screen md:border rounded-lg md:mx-3 text-white overflow-y-auto ">
 
             <PropertyHeader
                 isSaved={isSaved}
@@ -155,7 +156,7 @@ function PropertyHeader({ isSaved, onFavoriteToggle, property }: {
         <div className="absolute md:relative flex left-0 right-0 items-center md:border-b mb-4 justify-between p-4 ">
             <button
                 onClick={() => router.history.back()}
-                className=" ml-2 hover:bg-purple-800/30 rounded-lg relative"
+                className=" ml-2 hover:bg-purple-800/30 rounded-lg relative cursor-pointer"
             >
                 <svg width="17" height="16" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ mixBlendMode: 'difference', backdropFilter: 'blur(100px) grayscale(1) contrast(100)', clipPath: 'url(#back-arrow-clip)', backgroundColor: 'white' }}>
                     <defs>
@@ -171,7 +172,7 @@ function PropertyHeader({ isSaved, onFavoriteToggle, property }: {
             <div className="flex items-center gap-3">
                 <button
                     onClick={onFavoriteToggle}
-                    className={`p-1 md:bg-white/5 hover:bg-purple-800/30 rounded-full ${isSaved ? 'text-red-500' : 'text-white'}`}
+                    className={`p-1 md:bg-white/5 hover:bg-purple-800/30 rounded-full cursor-pointer ${isSaved ? 'text-red-500' : 'text-white'}`}
                 >
                     <svg width="20" height="20" fill="none" xmlns="http://www.w3.org/2000/svg" className='scale-125 mt-2' style={{ mixBlendMode: 'difference', backdropFilter: 'blur(100px) grayscale(1) contrast(100)', clipPath: 'url(#heart-clip)', backgroundColor: 'white' }}>
                         <defs>
@@ -190,7 +191,7 @@ function PropertyHeader({ isSaved, onFavoriteToggle, property }: {
                 <button
                     onClick={handleShare}
                     disabled={isSharing}
-                    className="p-1.5 mr-3 md:mr-0 bg-white/5 hover:bg-purple-800/30 rounded-full disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="p-1.5 mr-3 md:mr-0 bg-white/5 hover:bg-purple-800/30 rounded-full disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                     title={t('title')}
                 >
                     {isSharing ? (
@@ -258,13 +259,14 @@ function PropertyImageGallery({
             {/* Main Image */}
 
             <div className='flex flex-row items-center snap-x snap-mandatory overflow-x-scroll md:hidden' >
-                {property.imageUrls.map((i, ind) => <div className="bg-gray-800 snap-center min-w-[100dvw] mr-2 overflow-hidden h-80 flex items-center justify-center" id={`photo-${ind}`}><img src={i} className="w-full h-full object-cover" alt="Property main view" /></div>)}
+                {property.imageUrls.map((i, ind) => <div className={`bg-gray-800 snap-center min-w-[100dvw] ${nonSelected[0] && 'mr-2'} overflow-hidden h-80 flex items-center justify-center`} id={`photo-${ind}`}><ImageFallback src={i} className="w-full h-full object-cover" alt="Property main view" /></div>)}
 
             </div>
-            <div className="hidden md:grid grid-cols-2 md:grid-cols-3 gap-3 mb-2 ">
-                <div className="col-span-2">
+
+            <div className={`hidden md:grid grid-cols-2 md:grid-cols-3 gap-3 mb-2 `}>
+                <div className={` ${nonSelected[0] ? 'col-span-2' : 'col-span-3'}`}>
                     <div className="bg-gray-800 rounded-lg overflow-hidden h-80 flex items-center justify-center">
-                        <img
+                        <ImageFallback
                             src={property.imageUrls[selectedImageIndex] || property.imageUrls[0]}
                             className="w-full h-full object-cover"
                             alt="Property main view"
@@ -273,24 +275,24 @@ function PropertyImageGallery({
                 </div>
 
                 {/* Right side images */}
-                <div className="space-y-4 hidden md:block">
-                    <div className="bg-gray-800 rounded-lg overflow-hidden h-[152px]">
-                        <img
+                {nonSelected[0] && <div className="space-y-4 hidden md:block">
+                    {nonSelected[0] && <div className="bg-gray-800 rounded-lg overflow-hidden h-[152px]">
+                        <ImageFallback
                             src={nonSelected[0]}
                             className="w-full h-full object-cover cursor-pointer hover:opacity-80"
-                            onClick={() => setSelectedImageIndex(0)}
+                            onClick={() => setSelectedImageIndex(property.imageUrls.findIndex(i => i === nonSelected[0]))}
                             alt="Property view 2"
                         />
-                    </div>
-                    <div className="bg-gray-800 rounded-lg overflow-hidden h-[152px]">
-                        <img
-                            src={nonSelected[1] || nonSelected[0]}
+                    </div>}
+                    {nonSelected[1] && <div className="bg-gray-800 rounded-lg overflow-hidden h-[152px]">
+                        <ImageFallback
+                            src={nonSelected[1]}
                             className="w-full h-full object-cover cursor-pointer hover:opacity-80"
-                            onClick={() => setSelectedImageIndex(1)}
+                            onClick={() => setSelectedImageIndex(property.imageUrls.findIndex(i => i === nonSelected[1]))}
                             alt="Property view 3"
                         />
-                    </div>
-                </div>
+                    </div>}
+                </div>}
             </div>
 
             {/* Thumbnail Strip */}
@@ -307,7 +309,7 @@ function PropertyImageGallery({
                             });
                         }}
                     >
-                        <img src={url} className="w-full h-full object-cover" alt={`Thumbnail ${index + 1}`} />
+                        <ImageFallback src={url} className="w-full h-full object-cover" alt={`Thumbnail ${index + 1}`} />
                     </div>
                 ))}
             </div>
@@ -330,10 +332,10 @@ function PropertyInfo({ property }: { property: PropertyObject }) {
                     <BedIcon className="w-8 h-8 bg-white/5 p-2 rounded-full" color="#7B31DC" />
                     <span>{property.numberOfRooms} Beds</span>
                 </div>
-                <div className="flex items-center gap-2">
+                {property.numberOfBathrooms && <div className="flex items-center gap-2">
                     <BathIcon className="w-8 h-8 bg-white/5 p-2 rounded-full" color="#7B31DC" />
-                    <span>{property.numberOfBathrooms || 1} bath</span>
-                </div>
+                    <span>{property.numberOfBathrooms} bath</span>
+                </div>}
                 <div className="flex items-center gap-2">
                     <SurfaceAreaIcon className="w-8 h-8 bg-white/5 p-2 rounded-full" color="#7B31DC" />
                     <span>{property.surfaceArea} sqft</span>
@@ -435,7 +437,7 @@ function LocationSection({ property }: { property: PropertyObject }) {
             <h2 className="text-base font-medium text-white mb-4">Location</h2>
             <div className="flex items-center gap-1 text-[#919EAB] text-xs mb-2">
                 <MapPin className="w-3 h-3 " />
-                <span>Via Alessandro Volta, Italy</span>
+                <span>{property.location.fullLocationName}</span>
             </div>
             <div className="bg-gray-800 rounded-lg h-64 overflow-hidden">
                 <GoogleMapPreview
@@ -457,7 +459,7 @@ function FeaturesSection({ property }: { property: PropertyObject }) {
         <div className="px-4 mb-6">
             <h2 className="text-base font-medium text-white mb-2">Features</h2>
             <div className="flex flex-wrap gap-4">
-                {property.features.map((feature, index) => (
+                {property.features?.map((feature, index) => (
                     <div key={index} className="flex flex-col items-center text-center">
                         <div className="w-[50px] h-[50px] bg-[#120826] rounded-full flex items-center justify-center text-[#7B31DC] mb-2">
                             <PropertyFeatureIcon feature={feature} color={"#919EAB"} />

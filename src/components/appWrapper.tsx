@@ -16,6 +16,7 @@ import { usePopoversOpenStore } from "@/routes/__root";
 import { useShallow } from "zustand/react/shallow";
 import { UserType } from "utils/validation/dbSchemas";
 import { UserObject } from "utils/validation/types";
+import { posthog } from "posthog-js";
 
 
 export default function AppRouteWrapper({
@@ -38,6 +39,9 @@ export default function AppRouteWrapper({
         setUserType: state.setUserType,
     })))
 
+
+
+    posthog.capture('my event', { property: 'value' })
 
 
 
@@ -93,7 +97,7 @@ export default function AppRouteWrapper({
                 </div>
                 <div className="flex flex-row items-stretch grow-1 flex-1 min-h-0 relative" >
                     <div className={` ${!aiChatbotOpen ? 'hidden' : 'flex '} absolute top-0 bottom-20 z-30 mx-3 md:mx-0 md:z-auto w-[calc(100%-24px)] md:relative md:flex flex-col border rounded-lg dark:border-[#1C252E] md:w-[30vw] md:ml-2 mb-2 bg-gray-100 dark:bg-[#120826] `}>
-                        <ElevenLabsChatBotDemo user={session.user} conversationToken={token} />
+                        <ElevenLabsChatBotDemo user={session.user as any as UserObject} conversationToken={token} />
                     </div>
                     <div className='flex flex-col w-full max-h-full overflow-y-auto'>
                         <div className="pb-28 md:pb-0">

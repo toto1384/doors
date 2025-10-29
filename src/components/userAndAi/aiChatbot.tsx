@@ -3,7 +3,7 @@ import i18n from '../i18n';
 import { nanoid } from 'nanoid';
 import { searchLocationByString } from 'utils/googleMapsUtils';
 import { usePropertyAddStore, usePropertyFilterStore } from '@/routes/__root';
-import { PropertyFilters, } from 'utils/validation/types';
+import { PropertyFilters, UserObject, } from 'utils/validation/types';
 import { useRouter, useRouterState } from '@tanstack/react-router';
 import { useTRPC, } from 'trpc/react';
 import { useQuery } from '@tanstack/react-query';
@@ -20,17 +20,12 @@ export type MessageType = { source: 'user' | 'ai', message: string | ReactNode, 
 export const IsConnectedContext = createContext<boolean>(false);
 
 
-export const ElevenLabsChatBotDemo = ({ conversationToken, user }: { conversationToken: string, user: { name: string, userType: string } }) => {
+export const ElevenLabsChatBotDemo = ({ conversationToken, user }: { conversationToken: string, user: UserObject }) => {
 
-    const router = useRouter();
-    const routerState = useRouterState();
     const trpc = useTRPC();
-
     const tokenQuery = useQuery({ ...trpc.auth.getToken.queryOptions(), initialData: { token: conversationToken } });
 
     const [locale, setLocale] = useState(i18n.language as "ro" | "en");
-
-
     const [messages, setMessages] = useState<MessageType[]>([]);
 
 
@@ -39,9 +34,9 @@ export const ElevenLabsChatBotDemo = ({ conversationToken, user }: { conversatio
         setPartialProperty: state.appendPartialProperty,
     })))
 
-    const { propertyFilters, updatePropertyFilters, setSendUpdate } = usePropertyFilterStore(useShallow(state => ({
-        propertyFilters: state.propertyFilters,
-        updatePropertyFilters: state.updatePropertyFilters,
+    const { setSendUpdate } = usePropertyFilterStore(useShallow(state => ({
+        // propertyFilters: state.propertyFilters,
+        // updatePropertyFilters: state.updatePropertyFilters,
         setSendUpdate: state.setSendUpdate,
     })))
 
@@ -62,37 +57,32 @@ export const ElevenLabsChatBotDemo = ({ conversationToken, user }: { conversatio
         };
     }, [])
 
-    const { chooseBudget, chooseHouseOrApartment, chooseFacilities, setIntentFunction } = useChooseActions({ setMessages, })
-    const functions = useSetPropertyFunctions({
+    const setPropertyFiltersFunctions = useChooseActions({ setMessages, })
+    const postPropertyFunctions = useSetPropertyFunctions({
         setMessages, updateGhostProperty: (p) => setPartialProperty(({ ...partialProperty, ...p })),
     })
 
+
+    const dynamicVariables = {
+        'userName': user.name,
+        "userType": user.userType,
+
+        "hasAllPreferencesSet": !!((user.preferences?.propertyType?.length ?? 0) > 0 && (user.preferences?.budget?.min || user.preferences?.budget?.max) && user.preferences?.location?.fullLocationName && (user.preferences?.numberOfRooms?.length ?? 0) > 0 && (user.preferences?.facilities?.length ?? 0) > 0),
+
+        "userPreferences_propertyType": user.preferences?.propertyType?.map(i => i.toString()).join(',') ?? '',
+        "userPreferences_budgetMin": user.preferences?.budget?.min ?? 0,
+        "userPreferences_budgetMax": user.preferences?.budget?.max ?? 0,
+        "userPreferences_location": user.preferences?.location?.fullLocationName ?? '',
+        "userPreferences_numberOfRooms": user.preferences?.numberOfRooms?.map(i => i.toString()).join(',') ?? '',
+        "userPreferences_facilities": user.preferences?.facilities?.map(i => i.toString()).join(',') ?? '',
+        "userPreferences_surfaceArea": user.preferences?.surfaceArea?.map(i => i.toString()).join(',') ?? '',
+    }
+
+
     const conversation = useConversation({
 
-        clientTools: {
-            //apply filters tools
-            chooseHouseOrApartment, chooseBudget, chooseFacilities, setIntentFunction, ...functions,
-            chooseAndSelectLocation: async ({ location }) => {
-                const locationResult = await searchLocationByString(location);
-                updatePropertyFilters({ ...propertyFilters, location: locationResult ?? undefined });
-                // setPropertyFilters({ ...propertyFilters, location: locationResult ?? undefined });
-            },
-            applyFiltersWithoutLocation: async (propertyFilters: { filterObject: PropertyFilters }) => {
-                console.log('setPropertyFilters', routerState.location.pathname, propertyFilters.filterObject)
-                if (routerState.location.pathname !== '/app/properties') {
-                    router.navigate({ to: '/app/properties' })
-                }
-
-                // setPropertyFilters(propertyFilters.filterObject)
-                return await updatePropertyFilters(propertyFilters.filterObject)
-            },
-
-
-        },
-        dynamicVariables: {
-            'userName': user.name,
-            "userType": user.userType,
-        },
+        clientTools: { ...setPropertyFiltersFunctions, ...postPropertyFunctions, },
+        dynamicVariables,
         volume: 0.5,
         onConnect: () => console.log('Connected'),
         onDisconnect: () => console.log('Disconnected'),
@@ -128,6 +118,9 @@ export const ElevenLabsChatBotDemo = ({ conversationToken, user }: { conversatio
                 },
                 onStatusChange(prop) {
                     console.log('Status changed:', prop)
+                },
+                onAgentToolResponse(message: any) {
+                    console.log('Agent tool response:', message)
                 },
                 onDisconnect: () => {
                     console.log('Disconnected')
