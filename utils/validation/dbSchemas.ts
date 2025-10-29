@@ -11,7 +11,7 @@ import { PropertyType } from 'utils/constants';
 extendZod(z as any)
 
 // Enum for property status
-const PropertyStatus = z.enum(['available', 'sold', 'pending', 'rented', 'off-market']);
+export const PropertyStatus = z.enum(['available', 'sold', 'pending', 'rented', 'off-market']);
 
 
 export type PropertyFeaturesType = z.infer<typeof PropertyFeatures>;

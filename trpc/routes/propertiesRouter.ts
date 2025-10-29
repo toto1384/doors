@@ -7,7 +7,7 @@ import { propertyFiltersSchema } from 'utils/validation/propertyFilters';
 import { PropertyObject, UserObject } from 'utils/validation/types';
 import { ObjectId } from 'mongodb';
 import z from 'zod/v3';
-import { PropertySchema, ToPostPropertySchema } from 'utils/validation/dbSchemas';
+import { PropertySchema, PropertyStatus, ToPostPropertySchema } from 'utils/validation/dbSchemas';
 import { nanoid } from 'nanoid';
 
 
@@ -244,4 +244,27 @@ export const propertiesRouter = {
                 });
             }
         }),
+    myProperties: publicProcedure.input(z.object({ skip: z.number().optional().default(0), status: PropertyStatus.optional() })).query(async ({ input }) => {
+        const db = await dbConnect();
+        const PropertyModel = getPropertyModel(db);
+
+        try {
+            const properties = await PropertyModel.aggregate([
+                { $match: { status: input.status } },
+                { $sort: { postedDate: -1 } },
+                {
+                    $facet: {
+                        properties: [{ $skip: input.skip }, { $limit: 9 }],
+                        groupStatus: [{ $group: { _id: '$status', count: { $sum: 1 } } }],
+                    }
+                },
+            ]);
+            return { properties: properties.map(p => p.toJSON()) };
+        } catch (error) {
+            throw new TRPCError({
+                code: "INTERNAL_SERVER_ERROR",
+                message: "Failed to fetch properties"
+            });
+        }
+    }),
 } satisfies TRPCRouterRecord;

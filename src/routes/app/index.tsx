@@ -25,8 +25,8 @@ export const getPropertiesWithFilters = createServerFn().validator((d) => proper
     const sessionData = await auth.api.getSession({ headers: h })
 
     const caller = trpcRouter.createCaller({ headers: h, user: sessionData?.user })
-    const res = await caller.properties.list(filters)
-    return res as PropertyObject[]
+    const res = await caller.properties.list({ props: filters })
+    return res
 })
 
 
@@ -36,7 +36,7 @@ export const Route = createFileRoute('/app/')({
     loader: async () => {
         // Load initial properties without filters
         const data = await getPropertiesWithFilters({ data: {} })
-        console.log('getPropertiesWithFilters', data.length)
+        console.log('getPropertiesWithFilters', data.properties.length)
         return data
     }
 })
@@ -46,7 +46,7 @@ export const Route = createFileRoute('/app/')({
 function Dashboard() {
     const propertiesReceived = Route.useLoaderData()
 
-    const [properties, setProperties] = useState<PropertyObject[]>(propertiesReceived)
+    const [properties, setProperties] = useState<PropertyObject[]>(propertiesReceived.properties)
 
     const [locationObject, setLocationObject] = useState<LocationObject | undefined>()
 
