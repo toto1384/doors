@@ -43,7 +43,7 @@ export const Route = createFileRoute('/app/my-properties')({
     validateSearch: zodValidator
 })
 
-export function MyPropertiesRoute() {
+function MyPropertiesRoute() {
 
     const { t } = useTranslation()
     const propertiesReceived = Route.useLoaderData()

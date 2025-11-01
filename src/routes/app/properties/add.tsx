@@ -28,7 +28,7 @@ const titleAndDescriptionSchema = z.object({
 })
 
 
-export function PropertyAdd() {
+function PropertyAdd() {
     const { t } = useTranslation('translation', { keyPrefix: 'property-add' })
 
     const { partialProperty, setPartialProperty, titlesAndDescriptions, setTitlesAndDescriptions, titleAndDescResolver, setTitleAndDescResolver, postedStatus } = usePropertyAddStore(useShallow(state => ({

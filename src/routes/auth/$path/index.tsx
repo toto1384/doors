@@ -7,7 +7,7 @@ export const Route = createFileRoute('/auth/$path/')({
     component: AuthPage,
 })
 
-export function AuthPage() {
+function AuthPage() {
     const { path } = Route.useParams()
 
     // throw new Error('Not implemented')

@@ -53,7 +53,7 @@ export const Route = createFileRoute('/app/properties/')({
 })
 
 
-export function PropertiesRoute() {
+function PropertiesRoute() {
     const propertiesReceived = Route.useLoaderData()
     const trpcClient = useTRPCClient()
 

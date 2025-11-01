@@ -5,22 +5,12 @@
 import { describe, it, expect, vi, afterEach, } from 'vitest'
 import { render, RenderOptions, screen, waitFor } from '@testing-library/react';
 
-import { PropertyAdd } from './app/properties/add.tsx';
-import { ProfileView } from './app/profile/index';
-import { MyPropertiesRoute } from './app/my-properties';
-import { AuthPage } from './auth/$path/index.tsx';
-import { LandingPage } from './index';
-import { PropertiesRoute } from './app/properties/index';
-import { PropertyDetailRoute } from './app/properties/$id.tsx';
-
-import { Route as ProfileRoute } from './app/profile/index';
 import { createMemoryHistory, createRootRoute, createRoute, createRouter, Outlet, RegisteredRouter, RouterProvider } from '@tanstack/react-router';
 import { cleanup } from '@testing-library/react'
 import { TRPCWrapper } from '@/components/providers/TrpcWrapper.tsx';
 
-// import {Route
-
-
+import { Route as ProfileRoute } from './app/profile/index';
+import { Route as PropertyAddRoute } from "./app/properties/add.tsx";
 
 
 type Routes = RegisteredRouter["routesByPath"];

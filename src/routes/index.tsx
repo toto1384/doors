@@ -16,7 +16,7 @@ export const Route = createFileRoute('/')({
 })
 
 
-export function LandingPage() {
+function LandingPage() {
 
     const blobs = Array.from({ length: 10 }, (_, i) => ({
         id: i,

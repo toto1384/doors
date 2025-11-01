@@ -48,7 +48,7 @@ export const Route = createFileRoute('/app/profile/')({
     }
 })
 
-export function ProfileView() {
+function ProfileView() {
     const { t } = useTranslation('translation', { keyPrefix: 'profile-page.view' });
     const { t: tCommon } = useTranslation('translation', { keyPrefix: 'app-wrapper' });
     const { data: session } = authClient.useSession();
