@@ -9,6 +9,8 @@ import { useClientToolSelectPhotos } from "utils/hooks/aiChatbotSelectImagesHook
 import { nanoid } from "nanoid";
 import { useClientToolChoice } from "utils/hooks/aiChatbotButtonHook";
 import { searchLocationByString } from "utils/googleMapsUtils";
+import { Facilities } from "utils/validation/propertyFilters";
+import { PropertyHeating, PropertyTypeType } from "utils/constants";
 
 
 export const useSetPropertyFunctions = ({
@@ -188,6 +190,23 @@ export const useSetPropertyFunctions = ({
         // this sets the building year of the property after the user tells it to the agent
         setBuildingYear: ({ buildingYear }: { buildingYear: number }) => {
             updateGhostProperty({ buildingYear });
+            ensureIsInAddMode()
+        },
+
+
+        setPropertyFeaturesVoice: ({ features }: { features: typeof Facilities[number][] }) => {
+            updateGhostProperty({ features });
+            ensureIsInAddMode()
+        },
+
+        setPropertyHeatingVoice: ({ heating }: { heating: PropertyHeating }) => {
+            updateGhostProperty({ heating });
+            ensureIsInAddMode()
+        },
+
+
+        setPropertyTypeVoice: ({ propertyType }: { propertyType: PropertyTypeType }) => {
+            updateGhostProperty({ propertyType });
             ensureIsInAddMode()
         },
     }

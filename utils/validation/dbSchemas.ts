@@ -90,7 +90,7 @@ const PropertyFeatures = z.enum([
     'new-construction',
     'city-center',
     'furnished',
-    'central_heating',
+    'central-heating',
     'internet',
 ]);
 
@@ -114,7 +114,7 @@ const ToPostPropertySchemaZod = {
     furnished: z.boolean(),
     features: z.array(PropertyFeatures).default([]).optional(),
     propertyType: z.enum(PropertyType),
-    heating: z.enum(['gas', 'fireplace', 'electric', '3rd_party']).optional(),
+    heating: z.enum().optional(),
     buildingYear: z.number().optional(),
     buildingFloors: z.number().optional(),
 

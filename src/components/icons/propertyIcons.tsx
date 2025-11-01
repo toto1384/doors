@@ -148,6 +148,7 @@ export function PropertyFeatureIcon({ feature, className, color }: { feature: st
             return <Expand className={cn(defaultClassName, className)} style={{ color: color ?? "#ffffff" }} />
         case 'furnished':
             return <Sofa className={cn(defaultClassName, className)} style={{ color: color ?? "#ffffff" }} />
+        case 'central-heating':
         case 'central_heating':
             return <Flame className={cn(defaultClassName, className)} style={{ color: color ?? "#ffffff" }} />
         case 'internet':
