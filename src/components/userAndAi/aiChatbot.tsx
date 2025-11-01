@@ -75,7 +75,7 @@ export const ElevenLabsChatBotDemo = ({ conversationToken, user }: { conversatio
         "userPreferences_location": user.preferences?.location?.fullLocationName ?? '',
         "userPreferences_numberOfRooms": user.preferences?.numberOfRooms?.map(i => i.toString()).join(',') ?? '',
         "userPreferences_facilities": user.preferences?.facilities?.map(i => i.toString()).join(',') ?? '',
-        "userPreferences_surfaceArea": user.preferences?.surfaceArea?.map(i => i.toString()).join(',') ?? '',
+        "userPreferences_surfaceArea": user.preferences?.surfaceArea?.min ?? '',
     }
 
 

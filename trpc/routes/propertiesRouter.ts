@@ -7,8 +7,9 @@ import { propertyFiltersSchema } from 'utils/validation/propertyFilters';
 import { PropertyObject, UserObject } from 'utils/validation/types';
 import { ObjectId } from 'mongodb';
 import z from 'zod/v3';
-import { PropertySchema, PropertyStatus, ToPostPropertySchema } from 'utils/validation/dbSchemas';
+import { PropertySchema, ToPostPropertySchema } from 'utils/validation/dbSchemas';
 import { nanoid } from 'nanoid';
+import { PropertyStatusValues } from 'utils/constants';
 
 
 export const propertiesRouter = {
@@ -244,26 +245,86 @@ export const propertiesRouter = {
                 });
             }
         }),
-    myProperties: publicProcedure.input(z.object({ skip: z.number().optional().default(0), status: PropertyStatus.optional() })).query(async ({ input }) => {
+    myProperties: authProcedure.input(z.object({ skip: z.number().optional().default(0), status: z.enum(PropertyStatusValues).optional() })).query(async ({ input, ctx }) => {
         const db = await dbConnect();
         const PropertyModel = getPropertyModel(db);
 
+
         try {
             const properties = await PropertyModel.aggregate([
-                { $match: { status: input.status } },
-                { $sort: { postedDate: -1 } },
+                { $match: { postedByUserId: ctx.user.id } },
                 {
                     $facet: {
-                        properties: [{ $skip: input.skip }, { $limit: 9 }],
+                        properties: [
+                            { $match: { ...(input.status ? { status: input.status } : {}), } },
+                            { $sort: { postedDate: -1 } },
+                            { $skip: input.skip },
+                            { $limit: 9 },
+                        ],
                         groupStatus: [{ $group: { _id: '$status', count: { $sum: 1 } } }],
                     }
                 },
-            ]);
-            return { properties: properties.map(p => p.toJSON()) };
+            ]) as [{ properties: PropertyObject[], groupStatus: { _id: string, count: number }[] }];
+
+
+            return properties[0]
         } catch (error) {
             throw new TRPCError({
                 code: "INTERNAL_SERVER_ERROR",
                 message: "Failed to fetch properties"
+            });
+        }
+    }),
+
+    deleteProperty: authProcedure.input(z.object({ propertyId: z.string() })).mutation(async ({ input, ctx }) => {
+        const db = await dbConnect();
+        const PropertyModel = getPropertyModel(db);
+
+        try {
+            // Check if user is authenticated and has this property
+            if (ctx.user) {
+                const property = await PropertyModel.findById(input.propertyId);
+                if (!property || property.postedByUserId !== ctx.user.id) {
+                    throw new TRPCError({ code: "NOT_FOUND", message: "Property not found" });
+                }
+            }
+
+            const property = await PropertyModel.deleteOne({ _id: input.propertyId });
+            if (!property) {
+                throw new TRPCError({ code: "NOT_FOUND", message: "Property not found" });
+            }
+
+            return { success: true };
+        } catch (error) {
+            throw new TRPCError({
+                code: "INTERNAL_SERVER_ERROR",
+                message: "Failed to delete property"
+            });
+        }
+    }),
+
+    updateProperty: authProcedure.input(z.object({ property: ToPostPropertySchema.partial(), propertyId: z.string() })).mutation(async ({ input, ctx }) => {
+        const db = await dbConnect();
+        const PropertyModel = getPropertyModel(db);
+
+        try {
+            // Check if user is authenticated and has this property
+            if (ctx.user) {
+                const property = await PropertyModel.findById(input.propertyId);
+                if (!property || property.postedByUserId !== ctx.user.id) {
+                    throw new TRPCError({ code: "NOT_FOUND", message: "Property not found" });
+                }
+            }
+            const property = await PropertyModel.updateOne({ _id: input.propertyId }, input.property,);
+            if (!property) {
+                throw new TRPCError({ code: "NOT_FOUND", message: "Property not found" });
+            }
+
+            return { success: true };
+        } catch (error) {
+            throw new TRPCError({
+                code: "INTERNAL_SERVER_ERROR",
+                message: "Failed to update property"
             });
         }
     }),

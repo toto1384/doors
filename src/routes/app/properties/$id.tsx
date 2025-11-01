@@ -46,7 +46,8 @@ export const Route = createFileRoute('/app/properties/$id')({
     }
 })
 
-function PropertyDetailRoute() {
+
+export function PropertyDetailRoute() {
     const { id } = Route.useParams()
     const loaderData = Route.useLoaderData()
     const property = loaderData.property

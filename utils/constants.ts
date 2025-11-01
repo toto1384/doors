@@ -36,5 +36,6 @@ export const authAdditionalFields = {
 
 export const PropertyType = ['apartment', 'house', 'hotel', 'office'] as const
 
+export const PropertyStatusValues = ['available', 'sold', 'pending', 'rented', 'off-market'] as const
 
 export type PropertyTypeType = typeof PropertyType[number]

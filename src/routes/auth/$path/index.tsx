@@ -7,9 +7,10 @@ export const Route = createFileRoute('/auth/$path/')({
     component: AuthPage,
 })
 
-function AuthPage() {
+export function AuthPage() {
     const { path } = Route.useParams()
 
+    // throw new Error('Not implemented')
     if (path === 'sign-up') {
         return <RegisterPage />
     }

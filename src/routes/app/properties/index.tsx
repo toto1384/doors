@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
-import { useState, useEffect, } from 'react'
+import { useState, useEffect, ReactNode, } from 'react'
 import { useTRPCClient } from '../../../../trpc/react'
 import { PropertyFilters } from 'utils/validation/types'
 import { PropertyObject } from 'utils/validation/types'
@@ -53,9 +53,8 @@ export const Route = createFileRoute('/app/properties/')({
 })
 
 
-function PropertiesRoute() {
+export function PropertiesRoute() {
     const propertiesReceived = Route.useLoaderData()
-    console.log('propertiesReceived', propertiesReceived)
     const trpcClient = useTRPCClient()
 
     const navigate = useNavigate()
@@ -343,13 +342,11 @@ function PropertiesRoute() {
 }
 
 
-export const PropertyCard = ({ property, match }: { property: PropertyObject, match?: number | 'hide' }) => {
-    return <Link
-        to='/app/properties/$id'
-        params={{ id: property._id }}
-        key={property._id}
-        className="relative bg-[#f7f7f7] dark:bg-[#2B1C37]/50 p-1.5 md:p-3 rounded-[6px] overflow-hidden"
-    >
+export const PropertyCard = ({ property, match, matchRight, moreComponent, disableLink }: { property: PropertyObject, match?: number | 'hide' | string, matchRight?: boolean, moreComponent?: ReactNode, disableLink?: boolean }) => {
+
+    const navigate = useNavigate()
+
+    const propertyContent = <>
         <div className=" max-h-42 flex items-center justify-center">
             <ImageFallback
                 src={property.imageUrls[0] ?? '/icons/homeIcon.svg'}
@@ -357,32 +354,54 @@ export const PropertyCard = ({ property, match }: { property: PropertyObject, ma
             />
         </div>
 
-        {match && match !== 'hide' && <div className="flex items-center absolute left-3 top-3 md:top-5 md:left-5 justify-between mb-2">
+        {match && match !== 'hide' && <div className={`flex items-center absolute ${matchRight ? 'right-3 md:right-5' : 'left-3 md:left-5'} top-3 md:top-5  justify-between mb-2`}>
             <span className="bg-[#623398] text-white flex flex-row font-light items-center text-[9px] px-2 py-1 rounded">
-                <img src="/icons/checkIcon.svg" className="w-2 h-2 mr-1" />
-                {match.toFixed(2)}% Match
+                {typeof match === 'string' ? match : <>
+                    <img src="/icons/checkIcon.svg" className="w-2 h-2 mr-1" />
+                    {match.toFixed(2)}% Match
+                </>}
             </span>
         </div>}
 
 
-        <div className="flex items-center gap-1 mt-2 text-[10px] text-[#a3a3a3]">
-            {[
-                ...(property.numberOfRooms ? [{ icon: <BedIcon className="w-3 h-3" color="#ffffff" />, text: `${property.numberOfRooms}` }] : []),
-                ...(property.numberOfBathrooms ? [{ icon: <BathIcon className='w-3 h-3' color="#ffffff" />, text: `${property.numberOfBathrooms}` }] : []),
-                ...(property.surfaceArea ? [{ icon: <SurfaceAreaIcon className='w-3 h-3' color="#ffffff" />, text: `${property.surfaceArea}m²` }] : []),
-                // { icon: "/icons/locationIcon.svg", text: `${property.location.city}` },
-            ].map(i =>
-                <span className='flex flex-row items-center gap-1 rounded bg-[#32215A] px-2 py-0.5'>{i.text}{i.icon}  </span>
-            )}
+        <div className="flex flex-row justify-between" >
+
+            <div className='flex flex-col'>
+                <div className="flex items-center gap-1 mt-2 text-[10px] text-[#a3a3a3]">
+                    {[
+                        ...(property.numberOfRooms ? [{ icon: <BedIcon className="w-3 h-3" color="#ffffff" />, text: `${property.numberOfRooms}` }] : []),
+                        ...(property.numberOfBathrooms ? [{ icon: <BathIcon className='w-3 h-3' color="#ffffff" />, text: `${property.numberOfBathrooms}` }] : []),
+                        ...(property.surfaceArea ? [{ icon: <SurfaceAreaIcon className='w-3 h-3' color="#ffffff" />, text: `${property.surfaceArea}m²` }] : []),
+                        // { icon: "/icons/locationIcon.svg", text: `${property.location.city}` },
+                    ].map(i =>
+                        <span className='flex flex-row items-center gap-1 rounded bg-[#32215A] px-2 py-0.5'>{i.text}{i.icon}  </span>
+                    )}
+                </div>
+
+                <p className="text-xs md:text-[22px] font-light my-2 text-[#8A4FFF]">€{property.price.value.toLocaleString()}</p>
+
+            </div>
+            {moreComponent}
         </div>
 
-        <p className="text-xs md:text-[22px] font-light my-2 text-[#8A4FFF]">€{property.price.value.toLocaleString()}</p>
         <h3 className="text-sm md:text-lg font-normal md:mb-2">{property.title}</h3>
 
         <div className='flex flex-row text-[#637381] text-xs md:text-md items-center gap-1 md:mt-2'>
             <LocationIcon color={'#637381'} className="w-4 h-4 mt-2 mb-2" />
             {property.location.city}, {property.location.state}
         </div>
+    </>
+    return disableLink ? <div
+        className="relative bg-[#f7f7f7] dark:bg-[#2B1C37]/50 p-1.5 md:p-3 rounded-[6px] overflow-hidden"
+        onClick={() => { navigate({ to: `/app/properties/${property._id}` }) }}
+        key={property._id}
+    >{propertyContent}</div> : <Link
+        to='/app/properties/$id'
+        params={{ id: property._id }}
+        key={property._id}
+        className="relative bg-[#f7f7f7] dark:bg-[#2B1C37]/50 p-1.5 md:p-3 rounded-[6px] overflow-hidden"
+    >
+        {propertyContent}
     </Link>
 }
 

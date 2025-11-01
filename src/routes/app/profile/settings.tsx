@@ -42,7 +42,7 @@ const notificationSchema = z.object({
 })
 
 
-function ProfileSettings() {
+export function ProfileSettings() {
     const { t } = useTranslation('translation', { keyPrefix: 'profile-page' });
     const { t: tSettings } = useTranslation('translation', { keyPrefix: 'profile-page.settings' });
     const { data: session } = authClient.useSession();

@@ -354,6 +354,36 @@
       "inProgress": "in progress"
     }
   },
+  "my-properties": {
+    "title": "My Properties",
+    "addProperty": "List a property",
+    "filters": {
+      "all": "All"
+    },
+    "status": {
+      "label": "Status",
+      "available": "Active",
+      "sold": "Sold",
+      "pending": "Pending",
+      "rented": "Rented",
+      "off-market": "Off-market"
+    },
+    "actions": {
+      "delete": "Delete"
+    },
+    "deleteDialog": {
+      "title": "Delete Property",
+      "description": "Are you sure you want to delete this property?",
+      "cancel": "Cancel",
+      "confirm": "Delete"
+    },
+    "emptyState": "No properties found matching your criteria.",
+    "loadMore": {
+      "loading": "Loading more...",
+      "loadNewer": "Load Newer",
+      "noMore": "Nothing more to load"
+    }
+  },
   "auth-ui": {
     "signIn": "Sign In",
     "signUp": "Sign Up",

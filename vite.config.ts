@@ -3,7 +3,7 @@ import { tanstackStart } from '@tanstack/react-start/plugin/vite'
 import viteReact from '@vitejs/plugin-react'
 import viteTsConfigPaths from 'vite-tsconfig-paths'
 import tailwindcss from '@tailwindcss/vite'
-
+import { loadEnv } from 'vite'
 
 const config = defineConfig({
     plugins: [
@@ -12,13 +12,16 @@ const config = defineConfig({
             projects: ['./tsconfig.json'],
         }),
         tailwindcss(),
-        tanstackStart({
-            customViteReactPlugin: true,
-        }),
+        ...(process.env.VITEST ? [] : [tanstackStart({ customViteReactPlugin: true, }),]), // 🧠 disable for tests
         viteReact(),
     ],
     test: {
-        pool: "vmForks",
+        // 👋 add the line below to add jsdom to vite
+        environment: 'jsdom',
+        env: loadEnv('', process.cwd(), ''),
+        // hey! 👋 over here
+        globals: true,
+        setupFiles: './setupTests.ts', // assuming the test folder is in the root of our project
     },
     deps: {
         inline: ['katex', 'streamdown'],

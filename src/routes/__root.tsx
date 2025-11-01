@@ -159,7 +159,7 @@ function RootComponent() {
 }
 
 
-function RootDocument({ children }: { children: React.ReactNode }) {
+export function RootDocument({ children }: { children: React.ReactNode }) {
     const { token: receivedToken } = Route.useLoaderData();
     const { theme } = useTheme();
 

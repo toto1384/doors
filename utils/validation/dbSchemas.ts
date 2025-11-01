@@ -5,14 +5,12 @@ import { LocationSchema } from './location';
 import { zDate } from './zodUtils';
 import { extendZod } from '@zodyac/zod-mongoose';
 import { ObjectId } from 'mongodb';
-import { PropertyType } from 'utils/constants';
+import { PropertyStatusValues, PropertyType } from 'utils/constants';
 
 
 extendZod(z as any)
 
 // Enum for property status
-export const PropertyStatus = z.enum(['available', 'sold', 'pending', 'rented', 'off-market']);
-
 
 export type PropertyFeaturesType = z.infer<typeof PropertyFeatures>;
 
@@ -125,6 +123,8 @@ const ToPostPropertySchemaZod = {
     imageUrls: z.array(z.string()),
 
     tags: z.array(z.string()).default([]).optional(),
+
+    status: z.enum(PropertyStatusValues).default('available'),
 }
 
 export const ToPostPropertySchema = z.object(ToPostPropertySchemaZod)
@@ -139,7 +139,6 @@ export const PropertySchema = z.object({
     postedDate: z.date(),
     postedByUserId: z.string(),
 
-    status: PropertyStatus.default('available')
 });
 
 // Type inference

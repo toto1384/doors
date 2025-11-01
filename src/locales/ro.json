@@ -354,6 +354,36 @@
       "inProgress": "în curs de adăugare"
     }
   },
+  "my-properties": {
+    "title": "Proprietățile mele",
+    "addProperty": "Listeaza o proprietate",
+    "filters": {
+      "all": "Toate"
+    },
+    "status": {
+      "label": "Status",
+      "available": "Activ",
+      "sold": "Vândut",
+      "pending": "În așteptare",
+      "rented": "Închiriat",
+      "off-market": "În afara pieței"
+    },
+    "actions": {
+      "delete": "Șterge"
+    },
+    "deleteDialog": {
+      "title": "Șterge Proprietatea",
+      "description": "Ești sigur că vrei să ștergi această proprietate?",
+      "cancel": "Anulează",
+      "confirm": "Șterge"
+    },
+    "emptyState": "Nu s-au găsit proprietăți care să corespundă criteriilor tale.",
+    "loadMore": {
+      "loading": "Se încarcă mai multe...",
+      "loadNewer": "Încarcă mai noi",
+      "noMore": "Nu mai sunt proprietăți de încărcat"
+    }
+  },
   "auth-ui": {
     "signIn": "Conectează-te",
     "signUp": "Înregistrează-te",

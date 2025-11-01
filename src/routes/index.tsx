@@ -12,11 +12,11 @@ import i18n from '../components/i18n';
 
 
 export const Route = createFileRoute('/')({
-    component: HomePage,
+    component: LandingPage,
 })
 
 
-function HomePage() {
+export function LandingPage() {
 
     const blobs = Array.from({ length: 10 }, (_, i) => ({
         id: i,
