@@ -17,7 +17,7 @@ import { PropertyCard } from "../properties";
 import { UserTypeSwitch } from "@/components/userAndAi/userTypeSwitch";
 
 
-export const getFavouritesProperties = createServerFn().validator((params) => z.object({ skip: z.number().optional() }).parse(params)).handler(async ({ data }) => {
+const getFavouritesProperties = createServerFn().validator((params) => z.object({ skip: z.number().optional() }).parse(params)).handler(async ({ data }) => {
     const headers = getHeaders()
 
     const h = new Headers()

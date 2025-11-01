@@ -53,9 +53,8 @@ export const Route = createRootRoute({
             },
         ],
     }),
+    notFoundComponent: (p) => <div>Not found</div>,
     loader: async () => {
-        // const theme = await getThemeServerFn()
-
 
         return await getRootObjectsServerFn()
     },
@@ -129,17 +128,10 @@ export const usePropertyAddStore = create<{
 type UpdateFiltersFunction = (filters: PropertyFilters) => Promise<string>
 
 export const usePropertyFilterStore = create<{
-    // propertyFilters: PropertyFilters | undefined,
-    // setPropertyFilters: React.Dispatch<React.SetStateAction<PropertyFilters | undefined>>
-
-
     updatePropertyFilters: UpdateFiltersFunction,
     setUpdatePropertyFilters: React.Dispatch<React.SetStateAction<UpdateFiltersFunction>>,
-    sendUpdate(str: string): void
-    setSendUpdate(fn: (str: string) => void): void
+    sendUpdate(str: string): void, setSendUpdate(fn: (str: string) => void): void
 }>()((set => ({
-    // propertyFilters: undefined, setPropertyFilters: () => { },
-
     updatePropertyFilters: async () => '', setUpdatePropertyFilters: () => { }, sendUpdate: (s) => { }, setSendUpdate: (fn) => { }
 })));
 

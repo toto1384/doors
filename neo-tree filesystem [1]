@@ -1,1 +1,90 @@
-
+  ~/Useful/upworkProjects/kraken-ai/kraken-vite
+    .claude
+    .git
+    .nitro                                      
+    .output                                     
+    .tanstack                                   
+    .vscode
+    lib
+    node_modules                                
+    public
+    src
+   │  components
+   │ │  ai-elements
+   │ │  basics
+   │ │  icons
+   │ │  maps
+   │ │  providers
+   │ │  ui
+   │ │  userAndAi
+   │ │ │  aiChatbot.tsx
+   │ │ │  chatComponent.tsx
+   │ │ │  useChooseActionsAiHook.tsx
+   │ │ │  usePostPropertyAiHook.tsx
+   │ │ └  userTypeSwitch.tsx
+   │ │  .DS_Store                               
+   │ │  Header.tsx
+   │ │  appWrapper.tsx
+   │ │  forgot-password.tsx
+   │ │  headerLanding.tsx
+   │ │  i18n.ts
+   │ │  language-toggle.tsx
+   │ │  login-01.tsx
+   │ │  loginSwitchButton.tsx
+   │ │  notifications-dropdown.tsx
+   │ │  profile-dropdown.tsx
+   │ │  register-01.tsx
+   │ │  reset-password.tsx
+   │ └  themeSwitcher.tsx
+   │  lib
+   │  locales
+   │  routes
+   │ │  api
+   │ │  app
+   │ │ │  billing
+   │ │ │  notifications
+   │ │ │  profile
+   │ │ │ │  index.tsx                          󰌶 
+   │ │ │ └  settings.tsx                   󰌶  󰄱 
+   │ │ │  properties
+   │ │ │ │  $id.tsx                            󰌶 
+   │ │ │ │  add.tsx
+   │ │ │ └  index.tsx
+   │ │ │  index.tsx                        󰌶  󰄱 
+   │ │ └  my-properties.tsx
+   │ │  auth
+   │ │ │  $path
+   │ │ │ └  index.tsx
+   │ │ │  forgot-password
+   │ │ └  reset-password
+   │ │  privacy-policy
+   │ │  terms-of-service
+   │ │  .DS_Store                               
+   │ │  __root.tsx                         󰌶  󰄱 
+   │ └  index.tsx
+   │ 󰜡 logo.svg
+   │  routeTree.gen.ts
+   │  router.tsx
+   └  styles.css
+    trpc
+   │  routes
+   │ └  propertiesRouter.ts
+   │  init.ts
+   │  react.ts
+   └  router.ts
+    utils
+    .DS_Store                                   
+    .cta.json
+   * .env.local                                  
+    .gitignore
+    CLAUDE.md
+   󰂺 README.md
+    components.json
+   * neo-tree filesystem [1]                   󰄱 
+    next.config.ts
+    package.json
+    pnpm-lock.yaml
+    todos.json                                  
+    tsconfig.json
+   * vite-profile-0.cpuprofile
+    vite.config.ts                         󰅚  󰄱 

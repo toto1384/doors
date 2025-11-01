@@ -42,8 +42,7 @@ export const Route = createFileRoute('/app/')({
 })
 
 
-
-export function Dashboard() {
+function Dashboard() {
     const propertiesReceived = Route.useLoaderData()
 
     const [properties, setProperties] = useState<PropertyObject[]>(propertiesReceived.properties)

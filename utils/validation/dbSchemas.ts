@@ -5,7 +5,7 @@ import { LocationSchema } from './location';
 import { zDate } from './zodUtils';
 import { extendZod } from '@zodyac/zod-mongoose';
 import { ObjectId } from 'mongodb';
-import { PropertyStatusValues, PropertyType } from 'utils/constants';
+import { PropertyHeatingValues, PropertyStatusValues, PropertyType } from 'utils/constants';
 
 
 extendZod(z as any)
@@ -114,7 +114,7 @@ const ToPostPropertySchemaZod = {
     furnished: z.boolean(),
     features: z.array(PropertyFeatures).default([]).optional(),
     propertyType: z.enum(PropertyType),
-    heating: z.enum().optional(),
+    heating: z.enum(PropertyHeatingValues).optional(),
     buildingYear: z.number().optional(),
     buildingFloors: z.number().optional(),
 
