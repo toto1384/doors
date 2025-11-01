@@ -16,9 +16,11 @@ const ProfileContent = ({ session }: { session: any }) => {
 
     const signOut = useSignOutFunction()
 
-    const { setProfileMenuOpen } = usePopoversOpenStore(useShallow(state => ({
+    const { setProfileMenuOpen, userType } = usePopoversOpenStore(useShallow(state => ({
         setProfileMenuOpen: state.setMenuOpen,
+        userType: state.userType,
     })));
+
     return <>
         {/* User Profile Section */}
         <div className="pb-6 text-center">
@@ -43,7 +45,7 @@ const ProfileContent = ({ session }: { session: any }) => {
 
 
         {[
-            { name: t('viewProfile'), href: '/app/profile' },
+            ...(userType === 'buyer' ? [{ name: t('viewProfile'), href: '/app/profile' },] : [{ name: 'My properties', href: '/app/my-properties' },]),
             { name: t('accountSettings'), href: '/app/profile/settings' },
             { divider: true },
             { name: t('helpCenter'), href: '/app/profile/help' },
