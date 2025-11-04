@@ -239,7 +239,8 @@
     "privacyPolicy": "Politica de confidențialitate",
     "logout": "Deconectare",
     "buyer": "Cumpărător",
-    "seller": "Vânzător"
+    "seller": "Vânzător",
+    "myProperties": "Proprietățile mele"
   },
   "ai-chatbot": {
     "propertyTypes": {

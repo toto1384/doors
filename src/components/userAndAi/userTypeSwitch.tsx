@@ -25,8 +25,8 @@ export function UserTypeSwitch({ extraPadding }: { extraPadding?: boolean }) {
     async function handleChangeUserType(userType: typeof UserType[number]) {
 
         try {
+            setUserType(userType)
             const res = await changeUserTypeMutation.mutateAsync({ userType })
-            if (res.success) setUserType(userType)
         } catch (error) {
             console.log('error', error)
         }

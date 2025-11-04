@@ -16,6 +16,8 @@ import { Button } from '@/components/ui/button'
 import { DropdownMenuCheckboxItemProps } from "@radix-ui/react-dropdown-menu"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger, } from "@/components/ui/alert-dialog"
 import { useTranslation } from 'react-i18next'
+import { usePropertyFilterStore } from '../__root'
+import { useShallow } from 'zustand/react/shallow'
 
 
 
@@ -82,6 +84,10 @@ function MyPropertiesRoute() {
         },
     })
 
+    const { startConversation } = usePropertyFilterStore(useShallow(state => ({
+        startConversation: state.startConversation,
+    })))
+
     async function fetchMyProperties({ skip = 0, status }: { skip?: number, status?: typeof PropertyStatusValues[number] }) {
         const newProps = await trpcClient.properties.myProperties.query({ skip })
         setCount(newProps.groupStatus)
@@ -105,19 +111,22 @@ function MyPropertiesRoute() {
         queryClient.invalidateQueries({ queryKey: ['my-properties'] })
     }
 
+    const actualProperties = data.pages.flat(1).filter(i => searchParams.status === undefined || i.status === searchParams.status)
+
 
     return (
         <div className="flex flex-col items-center justify-center border mx-2 rounded-lg">
             <div className='flex w-full flex-row items-center justify-between gap-2 border-b px-6 pt-6 pb-7 '>
                 <h1 className="text-2xl font-light">{t('my-properties.title')}</h1>
 
-                <Link to='/app/properties/add' className=''>
-                    <button className="py-3.5 px-4 rounded-lg cursor-pointer text-sm font-light text-center border border-[#C1A7FF] text-[#C1A7FF] hover:bg-[#C1A7FF] hover:text-white flex flex-row items-center gap-2">
-                        <Plus className='w-4 h-4' />
-                        {t('my-properties.addProperty')}
-                    </button>
+                <button
+                    onClick={() => { startConversation() }}
+                    className="py-3.5 px-4 rounded-lg cursor-pointer text-sm font-light text-center border border-[#C1A7FF] text-[#C1A7FF] hover:bg-[#C1A7FF] hover:text-white flex flex-row items-center gap-2"
+                >
+                    <Plus className='w-4 h-4' />
+                    {t('my-properties.addProperty')}
+                </button>
 
-                </Link>
             </div>
 
 
@@ -171,7 +180,7 @@ function MyPropertiesRoute() {
 
             {/* Properties Grid */}
             {<div className="grid grid-cols-2 gap-1 md:gap-3 p-4 md:grid-cols-2 lg:grid-cols-3">
-                {data.pages?.map(p => p.map((property) => (<PropertyCard
+                {actualProperties.map((property) => (<PropertyCard
                     match={property.status}
                     matchRight
                     disableLink
@@ -223,10 +232,10 @@ function MyPropertiesRoute() {
                             </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>}
-                />)))}
+                />))}
             </div>}
 
-            {data.pages.flat(1) && data.pages.flat(1).length === 0 && (
+            {actualProperties && actualProperties.length === 0 && (
                 <div className="text-center h-full py-8">
                     <p className="text-gray-400">{t('my-properties.emptyState')}</p>
                 </div>

@@ -45,7 +45,7 @@ const ProfileContent = ({ session }: { session: any }) => {
 
 
         {[
-            ...(userType === 'buyer' ? [{ name: t('viewProfile'), href: '/app/profile' },] : [{ name: 'My properties', href: '/app/my-properties' },]),
+            ...(userType === 'buyer' ? [{ name: t('viewProfile'), href: '/app/profile' },] : [{ name: t('myProperties'), href: '/app/my-properties' },]),
             { name: t('accountSettings'), href: '/app/profile/settings' },
             { divider: true },
             { name: t('helpCenter'), href: '/app/profile/help' },
@@ -98,7 +98,7 @@ export function ProfileDropdown() {
                     <DropdownMenuContent className="w-72 bg-[#1A0F33] text-white flex flex-col" align="end" forceMount>
                         {session && <ProfileContent session={session} />}
                         {isPending && <div className="text-center h-full py-8">
-                            <p className="text-gray-400">Loading...</p>
+                            <p className="text-gray-400">{t('loading')}</p>
                         </div>}
                     </DropdownMenuContent>
                 </DropdownMenu>
@@ -124,7 +124,7 @@ export function ProfileDropdown() {
                         {/* Content */}
                         <div className="flex-1 overflow-y-auto -mt-4 flex flex-col">
                             {isPending && <div className="text-center h-full py-8">
-                                <p className="text-gray-400">Loading...</p>
+                                <p className="text-gray-400">{t('loading')}</p>
                             </div>}
                             {session && <ProfileContent session={session} />}
                         </div>

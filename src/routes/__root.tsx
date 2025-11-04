@@ -131,8 +131,13 @@ export const usePropertyFilterStore = create<{
     updatePropertyFilters: UpdateFiltersFunction,
     setUpdatePropertyFilters: React.Dispatch<React.SetStateAction<UpdateFiltersFunction>>,
     sendUpdate(str: string): void, setSendUpdate(fn: (str: string) => void): void
+    startConversation(): Promise<void>, endConversation(): Promise<void>
+    setStartConversation(fn: () => Promise<void>): void, setEndConversation(fn: () => Promise<void>): void
 }>()((set => ({
-    updatePropertyFilters: async () => '', setUpdatePropertyFilters: () => { }, sendUpdate: (s) => { }, setSendUpdate: (fn) => { }
+    updatePropertyFilters: async () => '', setUpdatePropertyFilters: () => { }, sendUpdate: (s) => { }, setSendUpdate: (fn) => { },
+    startConversation: async () => { }, endConversation: async () => { },
+    setStartConversation: (p) => set({ startConversation: p }),
+    setEndConversation: (p) => set({ endConversation: p })
 })));
 
 

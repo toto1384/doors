@@ -3,7 +3,7 @@ import { MessageType } from "./aiChatbot";
 import { useTranslation } from "react-i18next";
 import { useRouter, useRouterState } from "@tanstack/react-router";
 import { useTRPCClient } from "trpc/react";
-import { usePopoversOpenStore, usePropertyAddStore } from "@/routes/__root";
+import { usePopoversOpenStore, usePropertyAddStore, usePropertyFilterStore } from "@/routes/__root";
 import { useShallow } from "zustand/react/shallow";
 import { useClientToolSelectPhotos } from "utils/hooks/aiChatbotSelectImagesHook";
 import { nanoid } from "nanoid";
@@ -11,6 +11,7 @@ import { useClientToolChoice } from "utils/hooks/aiChatbotButtonHook";
 import { searchLocationByString } from "utils/googleMapsUtils";
 import { Facilities } from "utils/validation/propertyFilters";
 import { PropertyHeating, PropertyTypeType } from "utils/constants";
+import { useQueryClient } from "@tanstack/react-query";
 
 
 export const useSetPropertyFunctions = ({
@@ -41,6 +42,13 @@ export const useSetPropertyFunctions = ({
 
     })))
 
+    const { endConversation } = usePropertyFilterStore(useShallow(state => ({
+        endConversation: state.endConversation,
+    })))
+
+
+    const queryClient = useQueryClient()
+
 
     return {
         publishProperty: async () => {
@@ -50,6 +58,9 @@ export const useSetPropertyFunctions = ({
                 const result = await trpcClient.properties.postProperty.mutate({ property: ghostProperty as any })
                 setPostedStatus({ success: result.success, message: result.message })
                 if (result.success) setProgressBar(undefined)
+                await endConversation()
+                queryClient.invalidateQueries({ queryKey: ['my-properties'] })
+                router.navigate({ to: '/app/my-properties' })
                 return JSON.stringify(result)
             } catch (error) {
                 console.log('error', error)
@@ -141,6 +152,8 @@ export const useSetPropertyFunctions = ({
             const locationResult = await searchLocationByString(location);
             updateGhostProperty({ location: locationResult ?? undefined });
             ensureIsInAddMode()
+
+            return JSON.stringify({ locationName: locationResult?.fullLocationName })
         },
 
         // this displays the buttons in the ai chat to select the type of the property that he wants to post

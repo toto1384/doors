@@ -11,8 +11,7 @@ export function useClientToolChoice<T extends boolean>({ choices, onShowButtons,
 }) {
 
 
-    const clientToolFunction = useCallback(async ({ message }: { message: string }) => {
-        console.log(message);
+    const clientToolFunction = useCallback(async () => {
 
         return new Promise<string>((resolve) => {
 

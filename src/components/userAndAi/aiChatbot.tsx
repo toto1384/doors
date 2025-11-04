@@ -10,8 +10,10 @@ import { useQuery } from '@tanstack/react-query';
 import { useShallow } from 'zustand/react/shallow'
 import { useSetPropertyFunctions } from './usePostPropertyAiHook';
 import { useChooseActions } from './useChooseActionsAiHook';
-import { useConversation } from '@elevenlabs/react';
 import { ChatComponent } from './chatComponent';
+import { useConversation } from '@elevenlabs/react';
+// import { useConversation as uc } from 'utils/hooks/mockElevenlabsHook';
+// const useConversation = uc({ flow: 'seller' })
 
 export type MessageType = { source: 'user' | 'ai', message: string | ReactNode, id: string }
 
@@ -34,28 +36,13 @@ export const ElevenLabsChatBotDemo = ({ conversationToken, user }: { conversatio
         setPartialProperty: state.appendPartialProperty,
     })))
 
-    const { setSendUpdate } = usePropertyFilterStore(useShallow(state => ({
-        // propertyFilters: state.propertyFilters,
-        // updatePropertyFilters: state.updatePropertyFilters,
+    const { setSendUpdate, setStartConversation, setEndConversation } = usePropertyFilterStore(useShallow(state => ({
         setSendUpdate: state.setSendUpdate,
+        setStartConversation: state.setStartConversation,
+        setEndConversation: state.setEndConversation,
     })))
 
 
-    useEffect(() => {
-        const handleLanguageChange = (lng: string) => {
-            setLocale(lng as "ro" | "en");
-        };
-
-        setSendUpdate(str => {
-            conversation.sendContextualUpdate(str)
-        })
-
-        i18n.on('languageChanged', handleLanguageChange);
-
-        return () => {
-            i18n.off('languageChanged', handleLanguageChange);
-        };
-    }, [])
 
     const setPropertyFiltersFunctions = useChooseActions({ setMessages, })
     const postPropertyFunctions = useSetPropertyFunctions({
@@ -83,9 +70,7 @@ export const ElevenLabsChatBotDemo = ({ conversationToken, user }: { conversatio
 
         clientTools: { ...setPropertyFiltersFunctions, ...postPropertyFunctions, },
         dynamicVariables,
-        volume: 0.5,
-        onConnect: () => console.log('Connected'),
-        onDisconnect: () => console.log('Disconnected'),
+        volume: 0.9,
         onDebug: (message) => console.log('Debug:', message),
 
         onStatusChange(prop) {
@@ -149,7 +134,35 @@ export const ElevenLabsChatBotDemo = ({ conversationToken, user }: { conversatio
     }, [conversation]);
 
 
+    useEffect(() => {
+        const handleLanguageChange = (lng: string) => {
+            setLocale(lng as "ro" | "en");
+        };
+
+        setSendUpdate(str => {
+            conversation.sendContextualUpdate(str)
+        })
+
+        setStartConversation(() => {
+            console.log('setStartConversation')
+            return startConversation()
+        })
+
+
+        setEndConversation(async () => {
+            console.log('setEndConversation')
+            return conversation.endSession()
+        })
+
+        i18n.on('languageChanged', handleLanguageChange);
+
+        return () => {
+            i18n.off('languageChanged', handleLanguageChange);
+        };
+    }, [])
+
     const stopConversation = useCallback(async () => {
+        console.log('stopConversation')
         await conversation.endSession();
     }, [conversation]);
 

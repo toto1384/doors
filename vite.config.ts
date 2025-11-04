@@ -12,7 +12,7 @@ const config = defineConfig({
             projects: ['./tsconfig.json'],
         }),
         tailwindcss(),
-        ...(process.env.VITEST ? [] : [tanstackStart({ customViteReactPlugin: true, }),]), // 🧠 disable for tests
+        ...(process.env.VITEST ? [] : [tanstackStart({ customViteReactPlugin: true, tsr: { routeFileIgnorePattern: 'test' } }),]), // 🧠 disable for tests
         viteReact(),
     ],
     test: {
@@ -21,7 +21,7 @@ const config = defineConfig({
         env: loadEnv('', process.cwd(), ''),
         // hey! 👋 over here
         globals: true,
-        setupFiles: './setupTests.ts', // assuming the test folder is in the root of our project
+        setupFiles: './setupTests.tsx', // assuming the test folder is in the root of our project
     },
     deps: {
         inline: ['katex', 'streamdown'],

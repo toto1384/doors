@@ -66,7 +66,6 @@ function PropertiesRoute() {
         status,
         data,
         error,
-        isFetching,
         isFetchingNextPage,
         fetchNextPage,
         hasNextPage,
@@ -74,12 +73,12 @@ function PropertiesRoute() {
         queryKey: ['properties', searchParams],
         queryFn: async ({ pageParam, }) => {
             const res = await fetchProperties({ skip: pageParam * 9 })
-            return res.properties
+            return res
         },
-        initialData: { pages: [propertiesReceived.properties], pageParams: [0] },
+        initialData: { pages: [propertiesReceived], pageParams: [0] },
         initialPageParam: 0,
         getNextPageParam: (lastpage, _allPages, lastPageParam) => {
-            if (lastpage.length === 0) { return undefined; }
+            if (lastpage.properties.length === 0) { return undefined; }
             return lastPageParam + 1;
         },
     })
@@ -92,12 +91,10 @@ function PropertiesRoute() {
     }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage])
 
     const [count, setCount] = useState<number>(propertiesReceived.count)
-    const [totalFilteredCount, setTotalFilteredCount] = useState<number>(propertiesReceived.totalFilterCount)
 
     async function fetchProperties({ skip = 0 }: { skip?: number }) {
         const newProps = await trpcClient.properties.list.query({ props: searchParams, skip })
         setCount(newProps.count)
-        setTotalFilteredCount(newProps.totalFilterCount)
         return newProps
     }
 
@@ -310,7 +307,11 @@ function PropertiesRoute() {
                     <>
                         {/* Properties Grid */}
                         {<div className="grid grid-cols-2 lg:grid-cols-3 gap-x-1 md:gap-x-3 gap-y-3 p-4">
-                            {data.pages?.map(p => p.map((property) => (<PropertyCard match={totalFilteredCount && property.matchScore ? property.matchScore * 100 / totalFilteredCount : 'hide'} key={property._id} property={property} />)))}
+                            {data.pages?.map(p => p.properties.map((property) => (<PropertyCard
+                                match={p.totalFilterCount && property.matchScore ? property.matchScore * 100 / p.totalFilterCount : 'hide'}
+                                key={property._id}
+                                property={property}
+                            />)))}
                         </div>}
 
                         {data.pages.flat(1) && data.pages.flat(1).length === 0 && (

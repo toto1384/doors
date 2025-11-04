@@ -67,27 +67,31 @@ const HeroSection: React.FC = () => {
     return (
         <section className="min-h-[95dvh] bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-end relative md:overflow-hidden h-fit">
             <img src="/landing/chat.png" className="absolute hidden md:block z-40 top-0 bottom-0 my-auto left-10 w-[30vw] opacity-50" />
-            <img src="/landing/hero.png" className="absolute brightness-75 right-0 top-0 md:left-[15%] md:w-[90%] bg-black/50 object-cover h-[70dvh] md:h-auto" />
-            <img src="/landing/heroLayer.png" className="absolute brightness-75 hidden md:block z-20 right-0 top-0 md:left-[15%] md:w-[90%] object-cover h-[70dvh] md:h-auto " />
-            <div className='bg-gradient-to-r hidden md:block from-[#0B0014]/90 from-20% to-black/0 to-50% absolute z-30 inset-0'></div>
+            <img src="/landing/hero.png" className="absolute md:hidden brightness-75 right-0 top-0 md:left-[15%] md:w-[90%] bg-black/50 object-cover h-[70dvh] md:h-auto" />
+            <img src="/landing/heroDesktop.webp" className="absolute brightness-100 hidden md:block z-20 right-0 top-0 md:left-[20%] md:w-[80%] object-cover h-[70dvh] md:h-auto " />
+
+
+
+
+            <div className='bg-gradient-to-r hidden md:block from-[#0B0014]/90 from-20% to-black/0 to-40% absolute z-30 inset-0'></div>
             <div className='bg-gradient-to-t from-[#0B0014] from-20% to-black/0 to-50% absolute z-30 inset-0'></div>
 
 
-            <div className="md:max-w-[75vw] md:px-6 absolute bottom-0 md:mt-0 md:top-[25%] md:right-[10%] mx-auto">
-                <div className="z-10 px-3 text-center">
-                    <span className={`text-4xl md:text-2xl md:block text-center ${language == 'ro' ? "md:pl-5 " : "md:pl-16"} font-light text-white mb-4`}>
+            <div className="md:w-[47vw] absolute bottom-0 md:mt-0 md:top-[35vw] md:right-[12vw] mx-auto">
+                <div className="z-10 px-3 text-center md:hidden">
+                    <span className={`text-4xl md:hidden md:text-2xl text-center ${language == 'ro' ? "md:pl-5 " : "md:pl-16"} font-light text-white mb-4`}>
                         {t('landing-page.hero.title.line1')}
                     </span>
                     <span className="text-4xl md:text-[13rem]/15 font-semibold text-white mb-8 ml-2 md:ml-0">
                         {t('landing-page.hero.title.line2')}
                     </span>
                 </div>
-                <div className='z-40 relative md:absolute px-3'>
-                    <p className="text-xl md:text-[26px] text-center md:-mx-5 mt-4 md:mt-8 mb-8 ">
+                <div className='z-40 relative md:absolute px-3 w-full'>
+                    <p className="text-xl md:text-[26px] md:hidden text-center md:-mx-5 mt-4 md:mt-8 mb-8 ">
                         {t('landing-page.hero.subtitle')}
                     </p>
 
-                    <p className="md:text-sm font-light mt-6 md:mt-16 mb-8 md:mb-4 max-w-3xl mx-auto text-[#C4CDD5]">
+                    <p className="md:text-sm font-light mt-6 md:mt-0 mb-8 md:mb-4 max-w-3xl mx-auto text-[#C4CDD5]">
                         {t('landing-page.hero.description')}
                     </p>
 
@@ -95,12 +99,14 @@ const HeroSection: React.FC = () => {
                         <Link
                             to={data ? "/app" : "/auth/$path"}
                             params={data ? {} : { path: "sign-in" }}
+                            reloadDocument
                             className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-4 py-3 md:py-[9px] rounded-sm text-lg md:text-base hover:from-blue-600 hover:to-purple-700 transition-all transform shadow-2xl text-center"
                         >
                             {t('landing-page.hero.buttons.register')}
                         </Link>
                         <Link
                             to={data ? "/app" : "/auth/$path"}
+                            reloadDocument
                             params={data ? {} : { path: "sign-in" }}
                             className="outline-1 outline-white text-white px-4 py-3 md:py-2 rounded-sm text-lg md:text-base hover:outline-slate-400 hover:bg-slate-800/50 transition-all text-center">
                             {t('landing-page.hero.buttons.login')}
@@ -252,7 +258,7 @@ const PricingSection: React.FC = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 items-stretch w-full gap-4 max-w-4xl mx-auto">
                 <div className="grid grid-cols-1 gap-2 md:gap-4">
-                    {t('landing-page.pricing.features', { returnObjects: true }).map((text, index) => (
+                    {(t('landing-page.pricing.features', { returnObjects: true }) as any).map((text: string, index: number) => (
                         <p key={index} className="text-slate-300 text-center flex flex-row items-center justify-center px-6 py-4 rounded-lg bg-[#120826]">
                             {text}
                         </p>
@@ -360,6 +366,7 @@ const FinalCTASection: React.FC = () => {
 
                 <Link
                     to={data ? "/app" : "/auth/$path"}
+
                     params={data ? {} : { path: "sign-in" }}
                     className="inline-block bg-gradient-to-r from-blue-500 to-purple-600 text-white px-5 py-3 rounded-md font-semibold text-md hover:from-blue-600 hover:to-purple-700 transition-all transform hover:scale-105 shadow-2xl"
                 >
@@ -415,4 +422,3 @@ const Footer: React.FC = () => {
         </footer>
     );
 };
-

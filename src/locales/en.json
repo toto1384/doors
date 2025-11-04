@@ -239,7 +239,8 @@
     "privacyPolicy": "Privacy Policy",
     "logout": "Logout",
     "buyer": "Buyer",
-    "seller": "Seller"
+    "seller": "Seller",
+    "myProperties": "My properties"
   },
   "ai-chatbot": {
     "propertyTypes": {

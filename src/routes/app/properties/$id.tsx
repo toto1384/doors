@@ -84,7 +84,6 @@ function PropertyDetailRoute() {
                 <div className='md:col-spa-2'>
 
                     {/* Property Info */}
-                    <PropertyInfo property={property} />
 
 
                     <OverviewSection property={property} />
