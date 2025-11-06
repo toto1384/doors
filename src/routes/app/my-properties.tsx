@@ -18,6 +18,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { useTranslation } from 'react-i18next'
 import { usePropertyFilterStore } from '../__root'
 import { useShallow } from 'zustand/react/shallow'
+import { useRouter } from '@tanstack/react-router'
 
 
 
@@ -54,6 +55,7 @@ function MyPropertiesRoute() {
     const trpc = useTRPC()
     const navigate = useNavigate()
     const queryClient = useQueryClient()
+    const router = useRouter()
 
     console.log('propertiesReceived', propertiesReceived)
 
@@ -132,7 +134,7 @@ function MyPropertiesRoute() {
 
             <div className="flex flex-row items-center gap-3 px-2 md:px-4 py-2 justify-start w-full">
                 <button
-                    className={`py-3 px-4 rounded-[6px] text-sm font-light text-center ${searchParams?.status !== undefined ? 'bg-[#241540] text-white' : 'bg-[#7B31DC] text-white'}`}
+                    className={`py-3 px-4 rounded-[6px] text-sm font-light text-center cursor-pointer ${searchParams?.status !== undefined ? 'bg-[#241540] text-white' : 'bg-[#7B31DC] text-white'}`}
                     onClick={() => {
                         navigate({ to: '/app/my-properties', search: (prev) => ({ ...prev, status: undefined, skip: 0 }) })
                     }}
@@ -142,7 +144,7 @@ function MyPropertiesRoute() {
                 {PropertyStatusValues.map(status => (
                     <button
                         key={status}
-                        className={`py-3 px-4 rounded-[6px] text-sm font-light text-center ${status === searchParams?.status ? 'bg-[#7B31DC] text-white' : 'bg-[#241540] text-white'}`}
+                        className={`py-3 px-4 rounded-[6px] text-sm font-light text-center cursor-pointer ${status === searchParams?.status ? 'bg-[#7B31DC] text-white' : 'bg-[#241540] text-white'}`}
                         onClick={() => {
                             const newStatus = status === searchParams?.status ? undefined : status
                             const newSkip = newStatus ? 0 : undefined
@@ -220,6 +222,17 @@ function MyPropertiesRoute() {
                                 onClick={(e) => { e.stopPropagation() }}
                             >{t('my-properties.status.off-market')}</DropdownMenuCheckboxItem>
 
+                            <DropdownMenuSeparator className='my-2' />
+                            <DropdownMenuItem
+                                className='flex flex-row items-center gap-2 cursor-pointer'
+                                onClick={async (e) => {
+                                    e.stopPropagation()
+                                    router.navigate({ to: `/app/properties/${property._id}/edit` })
+                                }}
+                            >
+                                <PencilIcon className='w-4 h-4' />
+                                Edit
+                            </DropdownMenuItem>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem>
                                 <div onClick={async (e) => {

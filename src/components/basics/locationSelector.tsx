@@ -39,7 +39,7 @@ export function LocationSelector(
             locationObject: LocationObject | undefined,
             setLocationObject: (l: LocationObject | undefined) => void,
             className?: string
-            width?: number
+            width?: number | string
         }
 ) {
 

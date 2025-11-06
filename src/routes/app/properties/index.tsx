@@ -25,6 +25,7 @@ import { PropertyTypeType } from 'utils/constants'
 import { useDebouncedCallback } from 'use-debounce'
 import { useInView } from 'react-intersection-observer'
 import { useInfiniteQuery } from '@tanstack/react-query'
+import { FacilitiesSelector } from '@/components/facilitiesSelector'
 
 
 export const getPropertiesWithFilters = createServerFn().validator((d) => propertyFiltersSchema.parse(d)).handler(async ({ data: filters, }) => {
@@ -269,23 +270,7 @@ function PropertiesRoute() {
                             </MultiSelectContent>
                         </MultiSelect>
 
-                        <MultiSelect values={searchParams?.facilities} onValuesChange={value => handleFilterChange({ facilities: value as (typeof Facilities[number])[] })}>
-                            <MultiSelectTrigger className=" w-[150px] custor-pointer" >
-                                <MultiSelectValue className='cursor-pointer text-white' placeholder="Facilities" />
-                            </MultiSelectTrigger>
-                            <MultiSelectContent>
-                                <MultiSelectItem value="parking">Parking</MultiSelectItem>
-                                <MultiSelectItem value="balcony">Balcony</MultiSelectItem>
-                                <MultiSelectItem value="terrace">Terrace</MultiSelectItem>
-                                <MultiSelectItem value="garden">Garden</MultiSelectItem>
-                                <MultiSelectItem value="elevator">Elevator</MultiSelectItem>
-                                <MultiSelectItem value="air-conditioning">Air conditioning</MultiSelectItem>
-                                <MultiSelectItem value="central-heating">Central heating</MultiSelectItem>
-                                <MultiSelectItem value="furnished">Furnished</MultiSelectItem>
-                                <MultiSelectItem value="internet">Internet</MultiSelectItem>
-                            </MultiSelectContent>
-                        </MultiSelect>
-
+                        <FacilitiesSelector className="mt-2 w-[150px] " facilities={searchParams?.facilities ?? []} setFacilities={value => handleFilterChange({ facilities: value })} />
 
                     </div>
                     <button className="py-1.5 px-4 outline-2 outline-gray-600 rounded text-white text-sm cursor-pointer hover:outline-purple-400" onClick={() => {

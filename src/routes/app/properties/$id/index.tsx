@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useRouter } from '@tanstack/react-router'
-import { useState, useEffect, useRef } from 'react'
-import { useTRPC } from '../../../../trpc/react'
+import { useState, useEffect, useRef, ReactNode } from 'react'
+import { useTRPC } from '../../../../../trpc/react'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -33,10 +33,10 @@ const getProperty = createServerFn().validator((params) => z.object({ id: z.stri
 
     const caller = trpcRouter.createCaller({ user: sessionData?.user, headers: h })
     const result = await caller.properties.byId({ id })
-    return result as { property: PropertyObject, favorited: boolean, propertyUser: UserObject }
+    return result as { property: PropertyObject, favorited: boolean, propertyUser: UserObject, ownProperty: boolean }
 })
 
-export const Route = createFileRoute('/app/properties/$id')({
+export const Route = createFileRoute('/app/properties/$id/')({
     component: PropertyDetailRoute,
     loader: async ({ params }) => {
         console.log('params', params)
@@ -75,6 +75,7 @@ function PropertyDetailRoute() {
                 isSaved={isSaved}
                 onFavoriteToggle={handleFavoriteToggle}
                 property={property}
+                ownProperty={loaderData.ownProperty}
             />
             {/* Image Gallery */}
             <PropertyImageGallery property={property} />
@@ -83,10 +84,9 @@ function PropertyDetailRoute() {
 
                 <div className='md:col-spa-2'>
 
-                    {/* Property Info */}
+                    <PropertyInfo property={property} />
 
-
-                    <OverviewSection property={property} />
+                    <DescriptionSection property={property} />
 
                     <FeaturesSection property={property} />
 
@@ -108,10 +108,11 @@ function PropertyDetailRoute() {
 
 
 // Component: Property Header
-function PropertyHeader({ isSaved, onFavoriteToggle, property }: {
+function PropertyHeader({ isSaved, onFavoriteToggle, property, ownProperty }: {
     isSaved: boolean
     onFavoriteToggle: () => void
     property: PropertyObject
+    ownProperty: boolean
 }) {
     const router = useRouter()
     const { t } = useTranslation('translation', { keyPrefix: 'property-page.share' })
@@ -170,6 +171,21 @@ function PropertyHeader({ isSaved, onFavoriteToggle, property }: {
             </button>
 
             <div className="flex items-center gap-3">
+
+                {ownProperty && <button
+                    onClick={() => router.navigate({ to: '/app/properties/$id/edit', params: { id: property._id } })}
+                    className={`p-1 md:bg-white/5 hover:bg-purple-800/30 rounded-full cursor-pointer ${isSaved ? 'text-red-500' : 'text-white'}`}
+                >
+                    <svg width="30" height="30" fill="none" xmlns="http://www.w3.org/2000/svg" className='mt-2' style={{ mixBlendMode: 'difference', backdropFilter: 'blur(100px) grayscale(1) contrast(100)', clipPath: 'url(#edit-clip)', backgroundColor: 'white' }}>
+                        <defs>
+                            <clipPath id="edit-clip">
+                                <path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"></path><path d="m15 5 4 4"></path>
+                            </clipPath>
+                        </defs>
+                    </svg>
+
+                </button>}
+
                 <button
                     onClick={onFavoriteToggle}
                     className={`p-1 md:bg-white/5 hover:bg-purple-800/30 rounded-full cursor-pointer ${isSaved ? 'text-red-500' : 'text-white'}`}
@@ -318,27 +334,30 @@ function PropertyImageGallery({
 }
 
 // Component: Property Info
-function PropertyInfo({ property }: { property: PropertyObject }) {
+export function PropertyInfo({ property, additionalComponent }: { property: Partial<PropertyObject>, additionalComponent?: ReactNode }) {
     return (
         <div className="px-4 mb-6">
-            <h1 className="text-xl font-light text-white mb-2">{property.title}</h1>
+            <div className='flex flex-row items-center gap-2 mb-2'>
+                <h1 className="text-xl font-light text-white">{property.title ?? 'No title set'}</h1>
+                {additionalComponent}
+            </div>
             <div className="text-lg text-white mb-4">
-                {formatPrice(property.price)}
+                {property.price ? formatPrice(property.price) : 'No price set'}
             </div>
 
             {/* Property specifications horizontal layout */}
             <div className="flex items-center gap-6 text-white text-xs">
                 <div className="flex items-center gap-2">
                     <BedIcon className="w-8 h-8 bg-white/5 p-2 rounded-full" color="#7B31DC" />
-                    <span>{property.numberOfRooms} Beds</span>
+                    <span>{property.numberOfRooms ? `${property.numberOfRooms} Room(s)` : 'No number of rooms set'}</span>
                 </div>
                 {property.numberOfBathrooms && <div className="flex items-center gap-2">
                     <BathIcon className="w-8 h-8 bg-white/5 p-2 rounded-full" color="#7B31DC" />
-                    <span>{property.numberOfBathrooms} bath</span>
+                    <span>{property.numberOfBathrooms ? `${property.numberOfBathrooms} Bath(s)` : 'No number of bathrooms set'}</span>
                 </div>}
                 <div className="flex items-center gap-2">
                     <SurfaceAreaIcon className="w-8 h-8 bg-white/5 p-2 rounded-full" color="#7B31DC" />
-                    <span>{property.surfaceArea} sqft</span>
+                    <span>{property.surfaceArea ? `${property.surfaceArea} sqft` : 'No surface area set'}</span>
                 </div>
             </div>
         </div>
@@ -380,7 +399,7 @@ function OwnerSection({ owner }: { owner: UserObject }) {
 }
 
 // Component: Overview Section
-function OverviewSection({ property }: { property: PropertyObject }) {
+export function DescriptionSection({ property, additionalComponent }: { property: Partial<PropertyObject>, additionalComponent?: ReactNode }) {
     const [isExpanded, setIsExpanded] = useState(false)
     const textRef = useRef<HTMLParagraphElement>(null)
 
@@ -408,15 +427,18 @@ function OverviewSection({ property }: { property: PropertyObject }) {
 
     return (
         <div className='px-4 mb-6'>
-            <h2 className="text-base font-medium text-white mb-1">Overview</h2>
+            <div className='flex flex-row items-center gap-2 mb-2'>
+                <h2 className="text-base font-medium text-white ">Overview</h2>
+                {additionalComponent}
+            </div>
             <p
                 ref={textRef}
-                className={`text-[#919EAB] text-sm leading-relaxed ${!isExpanded && showReadMore
+                className={`text-[#919EAB] whitespace-pre-line text-sm leading-relaxed ${!isExpanded && showReadMore
                     ? 'line-clamp-2'
                     : ''
                     }`}
             >
-                {property.description}
+                {property.description ?? 'No description set'}
             </p>
             {showReadMore && (
                 <button
@@ -431,33 +453,39 @@ function OverviewSection({ property }: { property: PropertyObject }) {
 }
 
 // Component: Location Section
-function LocationSection({ property }: { property: PropertyObject }) {
+export function LocationSection({ property, additionalComponent }: { property: Partial<PropertyObject>, additionalComponent?: ReactNode }) {
     return (
         <div className='px-4 mb-6'>
-            <h2 className="text-base font-medium text-white mb-4">Location</h2>
+            <div className='flex flex-row items-center gap-2 mb-4'>
+                <h2 className="text-base font-medium text-white">Location</h2>
+                {additionalComponent}
+            </div>
             <div className="flex items-center gap-1 text-[#919EAB] text-xs mb-2">
                 <MapPin className="w-3 h-3 " />
-                <span>{property.location.fullLocationName}</span>
+                <span>{property.location?.fullLocationName ?? 'No location set'}</span>
             </div>
-            <div className="bg-gray-800 rounded-lg h-64 overflow-hidden">
+            {property.location && <div className="bg-gray-800 rounded-lg h-64 overflow-hidden">
                 <GoogleMapPreview
                     location={property.location}
                     height="256px"
                     zoom={16}
                     showMarker={true}
                 />
-            </div>
+            </div>}
         </div>
     )
 }
 
 // Component: Features Section  
-function FeaturesSection({ property }: { property: PropertyObject }) {
+export function FeaturesSection({ property, additionalComponent }: { property: Partial<PropertyObject>, additionalComponent?: ReactNode }) {
     const { t } = useTranslation('translation', { keyPrefix: 'facilities' })
 
     return (
         <div className="px-4 mb-6">
-            <h2 className="text-base font-medium text-white mb-2">Features</h2>
+            <div className='flex flex-row items-center gap-2 mb-2'>
+                <h2 className="text-base font-medium text-white">Features</h2>
+                {additionalComponent}
+            </div>
             <div className="flex flex-wrap gap-4">
                 {property.features?.map((feature, index) => (
                     <div key={index} className="flex flex-col items-center text-center">
@@ -467,6 +495,9 @@ function FeaturesSection({ property }: { property: PropertyObject }) {
                         <span className="text-xs text-white">{t(feature, feature.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase()))}</span>
                     </div>
                 ))}
+                {property.features?.length === 0 && <div className="flex flex-col items-center text-center">
+                    <span className="text-xs text-white">No features set</span>
+                </div>}
             </div>
         </div>
     )

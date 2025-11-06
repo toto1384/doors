@@ -24,8 +24,9 @@ import { Route as AppProfileIndexRouteImport } from './routes/app/profile/index'
 import { Route as AppNotificationsIndexRouteImport } from './routes/app/notifications/index'
 import { Route as AppBillingIndexRouteImport } from './routes/app/billing/index'
 import { Route as AppPropertiesAddRouteImport } from './routes/app/properties/add'
-import { Route as AppPropertiesIdRouteImport } from './routes/app/properties/$id'
 import { Route as AppProfileSettingsRouteImport } from './routes/app/profile/settings'
+import { Route as AppPropertiesIdIndexRouteImport } from './routes/app/properties/$id/index'
+import { Route as AppPropertiesIdEditRouteImport } from './routes/app/properties/$id/edit'
 import { ServerRoute as ApiUploadthingServerRouteImport } from './routes/api/uploadthing'
 import { ServerRoute as ApiTrpcSplatServerRouteImport } from './routes/api/trpc/$'
 import { ServerRoute as ApiAuthSplatServerRouteImport } from './routes/api/auth/$'
@@ -97,14 +98,19 @@ const AppPropertiesAddRoute = AppPropertiesAddRouteImport.update({
   path: '/app/properties/add',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AppPropertiesIdRoute = AppPropertiesIdRouteImport.update({
-  id: '/app/properties/$id',
-  path: '/app/properties/$id',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AppProfileSettingsRoute = AppProfileSettingsRouteImport.update({
   id: '/app/profile/settings',
   path: '/app/profile/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppPropertiesIdIndexRoute = AppPropertiesIdIndexRouteImport.update({
+  id: '/app/properties/$id/',
+  path: '/app/properties/$id/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppPropertiesIdEditRoute = AppPropertiesIdEditRouteImport.update({
+  id: '/app/properties/$id/edit',
+  path: '/app/properties/$id/edit',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiUploadthingServerRoute = ApiUploadthingServerRouteImport.update({
@@ -130,7 +136,6 @@ export interface FileRoutesByFullPath {
   '/privacy-policy': typeof PrivacyPolicyIndexRoute
   '/terms-of-service': typeof TermsOfServiceIndexRoute
   '/app/profile/settings': typeof AppProfileSettingsRoute
-  '/app/properties/$id': typeof AppPropertiesIdRoute
   '/app/properties/add': typeof AppPropertiesAddRoute
   '/app/billing': typeof AppBillingIndexRoute
   '/app/notifications': typeof AppNotificationsIndexRoute
@@ -139,6 +144,8 @@ export interface FileRoutesByFullPath {
   '/auth/$path': typeof AuthPathIndexRoute
   '/auth/forgot-password': typeof AuthForgotPasswordIndexRoute
   '/auth/reset-password': typeof AuthResetPasswordIndexRoute
+  '/app/properties/$id/edit': typeof AppPropertiesIdEditRoute
+  '/app/properties/$id': typeof AppPropertiesIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -147,7 +154,6 @@ export interface FileRoutesByTo {
   '/privacy-policy': typeof PrivacyPolicyIndexRoute
   '/terms-of-service': typeof TermsOfServiceIndexRoute
   '/app/profile/settings': typeof AppProfileSettingsRoute
-  '/app/properties/$id': typeof AppPropertiesIdRoute
   '/app/properties/add': typeof AppPropertiesAddRoute
   '/app/billing': typeof AppBillingIndexRoute
   '/app/notifications': typeof AppNotificationsIndexRoute
@@ -156,6 +162,8 @@ export interface FileRoutesByTo {
   '/auth/$path': typeof AuthPathIndexRoute
   '/auth/forgot-password': typeof AuthForgotPasswordIndexRoute
   '/auth/reset-password': typeof AuthResetPasswordIndexRoute
+  '/app/properties/$id/edit': typeof AppPropertiesIdEditRoute
+  '/app/properties/$id': typeof AppPropertiesIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -165,7 +173,6 @@ export interface FileRoutesById {
   '/privacy-policy/': typeof PrivacyPolicyIndexRoute
   '/terms-of-service/': typeof TermsOfServiceIndexRoute
   '/app/profile/settings': typeof AppProfileSettingsRoute
-  '/app/properties/$id': typeof AppPropertiesIdRoute
   '/app/properties/add': typeof AppPropertiesAddRoute
   '/app/billing/': typeof AppBillingIndexRoute
   '/app/notifications/': typeof AppNotificationsIndexRoute
@@ -174,6 +181,8 @@ export interface FileRoutesById {
   '/auth/$path/': typeof AuthPathIndexRoute
   '/auth/forgot-password/': typeof AuthForgotPasswordIndexRoute
   '/auth/reset-password/': typeof AuthResetPasswordIndexRoute
+  '/app/properties/$id/edit': typeof AppPropertiesIdEditRoute
+  '/app/properties/$id/': typeof AppPropertiesIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -184,7 +193,6 @@ export interface FileRouteTypes {
     | '/privacy-policy'
     | '/terms-of-service'
     | '/app/profile/settings'
-    | '/app/properties/$id'
     | '/app/properties/add'
     | '/app/billing'
     | '/app/notifications'
@@ -193,6 +201,8 @@ export interface FileRouteTypes {
     | '/auth/$path'
     | '/auth/forgot-password'
     | '/auth/reset-password'
+    | '/app/properties/$id/edit'
+    | '/app/properties/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -201,7 +211,6 @@ export interface FileRouteTypes {
     | '/privacy-policy'
     | '/terms-of-service'
     | '/app/profile/settings'
-    | '/app/properties/$id'
     | '/app/properties/add'
     | '/app/billing'
     | '/app/notifications'
@@ -210,6 +219,8 @@ export interface FileRouteTypes {
     | '/auth/$path'
     | '/auth/forgot-password'
     | '/auth/reset-password'
+    | '/app/properties/$id/edit'
+    | '/app/properties/$id'
   id:
     | '__root__'
     | '/'
@@ -218,7 +229,6 @@ export interface FileRouteTypes {
     | '/privacy-policy/'
     | '/terms-of-service/'
     | '/app/profile/settings'
-    | '/app/properties/$id'
     | '/app/properties/add'
     | '/app/billing/'
     | '/app/notifications/'
@@ -227,6 +237,8 @@ export interface FileRouteTypes {
     | '/auth/$path/'
     | '/auth/forgot-password/'
     | '/auth/reset-password/'
+    | '/app/properties/$id/edit'
+    | '/app/properties/$id/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -236,7 +248,6 @@ export interface RootRouteChildren {
   PrivacyPolicyIndexRoute: typeof PrivacyPolicyIndexRoute
   TermsOfServiceIndexRoute: typeof TermsOfServiceIndexRoute
   AppProfileSettingsRoute: typeof AppProfileSettingsRoute
-  AppPropertiesIdRoute: typeof AppPropertiesIdRoute
   AppPropertiesAddRoute: typeof AppPropertiesAddRoute
   AppBillingIndexRoute: typeof AppBillingIndexRoute
   AppNotificationsIndexRoute: typeof AppNotificationsIndexRoute
@@ -245,6 +256,8 @@ export interface RootRouteChildren {
   AuthPathIndexRoute: typeof AuthPathIndexRoute
   AuthForgotPasswordIndexRoute: typeof AuthForgotPasswordIndexRoute
   AuthResetPasswordIndexRoute: typeof AuthResetPasswordIndexRoute
+  AppPropertiesIdEditRoute: typeof AppPropertiesIdEditRoute
+  AppPropertiesIdIndexRoute: typeof AppPropertiesIdIndexRoute
 }
 export interface FileServerRoutesByFullPath {
   '/api/uploadthing': typeof ApiUploadthingServerRoute
@@ -369,18 +382,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppPropertiesAddRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/app/properties/$id': {
-      id: '/app/properties/$id'
-      path: '/app/properties/$id'
-      fullPath: '/app/properties/$id'
-      preLoaderRoute: typeof AppPropertiesIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/app/profile/settings': {
       id: '/app/profile/settings'
       path: '/app/profile/settings'
       fullPath: '/app/profile/settings'
       preLoaderRoute: typeof AppProfileSettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app/properties/$id/': {
+      id: '/app/properties/$id/'
+      path: '/app/properties/$id'
+      fullPath: '/app/properties/$id'
+      preLoaderRoute: typeof AppPropertiesIdIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app/properties/$id/edit': {
+      id: '/app/properties/$id/edit'
+      path: '/app/properties/$id/edit'
+      fullPath: '/app/properties/$id/edit'
+      preLoaderRoute: typeof AppPropertiesIdEditRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -418,7 +438,6 @@ const rootRouteChildren: RootRouteChildren = {
   PrivacyPolicyIndexRoute: PrivacyPolicyIndexRoute,
   TermsOfServiceIndexRoute: TermsOfServiceIndexRoute,
   AppProfileSettingsRoute: AppProfileSettingsRoute,
-  AppPropertiesIdRoute: AppPropertiesIdRoute,
   AppPropertiesAddRoute: AppPropertiesAddRoute,
   AppBillingIndexRoute: AppBillingIndexRoute,
   AppNotificationsIndexRoute: AppNotificationsIndexRoute,
@@ -427,6 +446,8 @@ const rootRouteChildren: RootRouteChildren = {
   AuthPathIndexRoute: AuthPathIndexRoute,
   AuthForgotPasswordIndexRoute: AuthForgotPasswordIndexRoute,
   AuthResetPasswordIndexRoute: AuthResetPasswordIndexRoute,
+  AppPropertiesIdEditRoute: AppPropertiesIdEditRoute,
+  AppPropertiesIdIndexRoute: AppPropertiesIdIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

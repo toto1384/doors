@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { X, File, Loader2Icon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -28,6 +28,17 @@ interface ImagePreviewProps {
     disabled?: boolean;
 }
 
+
+const checkIfImage = async (url: string) => {
+    try {
+        const response = await fetch(url, { method: 'HEAD' });
+        const contentType = response.headers.get('content-type');
+        return contentType?.startsWith('image/');
+    } catch {
+        return false;
+    }
+};
+
 // --- Image Preview Component ---
 export const ImagePreview: React.FC<ImagePreviewProps> = ({
     src,
@@ -39,7 +50,7 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
     isDeleting = false,
     disabled = false,
 }) => {
-    const isImage = fileType.startsWith("image/");
+    const [isImage, setIsImage] = useState(true)
     return (
         <div
             className={cn(
@@ -51,6 +62,7 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
                 <img
                     src={src}
                     alt={alt}
+                    onError={() => { setIsImage(false) }}
                     className="w-full h-full object-cover rounded-md transition-opacity duration-500 ease-in-out"
                     loading="lazy"
                 />

@@ -2,9 +2,7 @@ import { createFileRoute, useRouter } from "@tanstack/react-router"
 import { usePopoversOpenStore, usePropertyAddStore } from "@/routes/__root"
 import { useShallow } from "zustand/react/shallow"
 import { useEffect, useState } from "react"
-import { UploadImageButton } from "@/components/ui/imageUploaders"
 import { useTranslation } from 'react-i18next'
-import TransitionList from "@/components/ui/transitionList"
 import { AnimatePresence, motion } from "framer-motion";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
@@ -15,6 +13,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import z from "zod/v3";
 import useDidMountEffect from "utils/hooks/useDidMountEffect"
 import { useSize } from "utils/hooks/useSize"
+import { EditPropertyComponent } from "@/components/editPropertyComponent"
 
 
 export const Route = createFileRoute("/app/properties/add")({
@@ -31,13 +30,11 @@ const titleAndDescriptionSchema = z.object({
 function PropertyAdd() {
     const { t } = useTranslation('translation', { keyPrefix: 'property-add' })
 
-    const { partialProperty, setPartialProperty, titlesAndDescriptions, setTitlesAndDescriptions, titleAndDescResolver, setTitleAndDescResolver, postedStatus } = usePropertyAddStore(useShallow(state => ({
+    const { partialProperty, titlesAndDescriptions, setPartialProperty, titleAndDescResolver, postedStatus } = usePropertyAddStore(useShallow(state => ({
         partialProperty: state.partialProperty,
         setPartialProperty: state.setPartialProperty,
         titlesAndDescriptions: state.titlesAndDescriptions,
-        setTitlesAndDescriptions: state.setTitlesAndDescriptions,
         titleAndDescResolver: state.titleAndDescResolver,
-        setTitleAndDescResolver: state.setTitleAndDescResolver,
         postedStatus: state.postedStatus,
     })))
 
@@ -46,7 +43,6 @@ function PropertyAdd() {
     const cutSize = size.gmd ? 5 : 3
 
     const [displayMode, setDisplayMode] = useState<'edit' | 'add photos'>('edit')
-
 
     const checkedSteps = [
         { label: `${t('fields.propertyType')}${partialProperty.propertyType ? `: ${partialProperty.propertyType}` : `: ${t('status.waiting')}`}`, isChecked: !!partialProperty?.propertyType },
@@ -77,6 +73,26 @@ function PropertyAdd() {
         if (completedSteps != 0) setProgressBar({ progress: progressPercentage, totalSteps, checkedSteps: completedSteps, })
     }, [completedSteps, totalSteps])
 
+
+    useEffect(() => {
+        setPartialProperty({
+            _id: '',
+            status: 'available',
+            propertyType: 'apartment',
+            location: { fullLocationName: '', city: '', state: '', country: '', countryShort: '', },
+            numberOfRooms: 5,
+            surfaceArea: 35,
+            floor: 0,
+            buildingYear: 0,
+            furnished: false,
+            heating: 'electric',
+            features: [],
+            price: { value: 0, currency: 'EUR' },
+            imageUrls: [],
+            title: '',
+            description: '',
+        })
+    }, [])
 
     const { control, handleSubmit } = useForm({
         defaultValues: {},

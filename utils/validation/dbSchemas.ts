@@ -95,30 +95,37 @@ const PropertyFeatures = z.enum([
 ]);
 
 
-const ToPostPropertySchemaZod = {
 
+export const TPPTitlePriceRoomsSqFeetSchema = {
     title: z.string(),
-
-    description: z.string(),
-
     price: z.object({
         value: z.number(),
         currency: z.enum(['EUR', 'RON', 'USD']).optional(),
     }),
-
-    location: LocationSchema,
-
     numberOfRooms: z.number(),
     numberOfBathrooms: z.number().optional(),
     surfaceArea: z.number(),
+    propertyType: z.enum(PropertyType),
+}
+
+
+
+const ToPostPropertySchemaZod = {
+    ...TPPTitlePriceRoomsSqFeetSchema,
+
+    description: z.string(),
+
+    location: LocationSchema,
+
     furnished: z.boolean(),
     features: z.array(PropertyFeatures).default([]).optional(),
-    propertyType: z.enum(PropertyType),
+
     heating: z.enum(PropertyHeatingValues).optional(),
+
     buildingYear: z.number().optional(),
     buildingFloors: z.number().optional(),
 
-    floor: z.number(),
+    floor: z.number().default(0),
 
     imageUrls: z.array(z.string()),
 

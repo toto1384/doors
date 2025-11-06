@@ -9,7 +9,7 @@ import { ObjectId } from 'mongodb';
 import z from 'zod/v3';
 import { PropertySchema, ToPostPropertySchema } from 'utils/validation/dbSchemas';
 import { nanoid } from 'nanoid';
-import { PropertyStatusValues } from 'utils/constants';
+import { PropertyStatus, PropertyStatusValues } from 'utils/constants';
 
 
 export const propertiesRouter = {
@@ -42,7 +42,7 @@ export const propertiesRouter = {
         const PropertyModel = getPropertyModel(db);
 
         try {
-            const properties = await PropertyModel.updateMany({ numberOfBathrooms: undefined }, { $set: { numberOfBathrooms: 1 } });
+            const properties = await PropertyModel.updateMany({ postedByUserId: '-1' }, { $set: { status: 'off-market' as PropertyStatus } });
 
             console.log('properties', properties)
 
@@ -237,7 +237,7 @@ export const propertiesRouter = {
                     favorited = user?.favoriteProperties?.includes(input.id) || false;
                 }
 
-                return { property, favorited, propertyUser: JSON.parse(JSON.stringify(propertyUser)) as UserObject };
+                return { property, favorited, propertyUser: JSON.parse(JSON.stringify(propertyUser)) as UserObject, ownProperty: property.postedByUserId == ctx.user?.id };
             } catch (error) {
                 throw new TRPCError({
                     code: "INTERNAL_SERVER_ERROR",

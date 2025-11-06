@@ -2,7 +2,7 @@
 import { IsConnectedContext } from '@/components/userAndAi/aiChatbot';
 import { MultiImageUpload } from '@/components/ui/multiImageUpload';
 import { useState, useCallback, useEffect, useContext, ReactNode } from 'react';
-import { useUploadThing } from 'utils/uploadThingClient';
+import { useUploadThingCompressed } from '@/components/ui/imageUploaders';
 
 
 export function useClientToolSelectPhotos({ onShowPhotoSelector, additionalOnClick }: {
@@ -37,7 +37,7 @@ const PhotoSelector = ({ resolve }: { resolve: (photos: string[]) => void }) => 
 
     const isConnected = useContext(IsConnectedContext);
 
-    const { startUpload, isUploading, } = useUploadThing("imageUploader", {
+    const { startUpload, isUploading, } = useUploadThingCompressed("imageUploader", {
         onClientUploadComplete: (e) => {
             setImages(prev => [...prev, ...e.map(i => i.ufsUrl)])
         }

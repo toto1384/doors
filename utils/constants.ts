@@ -38,6 +38,8 @@ export const PropertyType = ['apartment', 'house', 'hotel', 'office'] as const
 
 export const PropertyStatusValues = ['available', 'sold', 'pending', 'rented', 'off-market'] as const
 
+export type PropertyStatus = typeof PropertyStatusValues[number]
+
 export const PropertyHeatingValues = ['gas', 'fireplace', 'electric', '3rd_party'] as const
 
 export type PropertyHeating = typeof PropertyHeatingValues[number]

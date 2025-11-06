@@ -29,6 +29,19 @@ export async function compress(imageFile: File) {
 }
 
 
+export function useUploadThingCompressed(name: Parameters<typeof useUploadThing>[0], options: Parameters<typeof useUploadThing>[1]) {
+    const { startUpload, isUploading, } = useUploadThing(name, options);
+
+    return {
+        startUpload: async (files: File[]) => {
+            const compressed = await Promise.all(Array.from(files).map(i => compress(i)));
+            await startUpload(compressed.filter(i => i) as File[]);
+        },
+        isUploading,
+    }
+}
+
+
 export function UploadImageButton() {
 
     const [images, setImages] = useState<string[]>([])
