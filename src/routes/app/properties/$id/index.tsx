@@ -174,9 +174,9 @@ function PropertyHeader({ isSaved, onFavoriteToggle, property, ownProperty }: {
 
                 {ownProperty && <button
                     onClick={() => router.navigate({ to: '/app/properties/$id/edit', params: { id: property._id } })}
-                    className={`p-1 md:bg-white/5 hover:bg-purple-800/30 rounded-full cursor-pointer ${isSaved ? 'text-red-500' : 'text-white'}`}
+                    className={`p-1 hover:bg-purple-800/30 rounded-full cursor-pointer ${isSaved ? 'text-red-500' : 'text-white'}`}
                 >
-                    <svg width="30" height="30" fill="none" xmlns="http://www.w3.org/2000/svg" className='mt-2' style={{ mixBlendMode: 'difference', backdropFilter: 'blur(100px) grayscale(1) contrast(100)', clipPath: 'url(#edit-clip)', backgroundColor: 'white' }}>
+                    <svg width="30" height="30" fill="none" xmlns="http://www.w3.org/2000/svg" className='scale-90 mt-2' style={{ mixBlendMode: 'difference', backdropFilter: 'blur(100px) grayscale(1) contrast(100)', clipPath: 'url(#edit-clip)', backgroundColor: 'white' }}>
                         <defs>
                             <clipPath id="edit-clip">
                                 <path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"></path><path d="m15 5 4 4"></path>
@@ -188,7 +188,7 @@ function PropertyHeader({ isSaved, onFavoriteToggle, property, ownProperty }: {
 
                 <button
                     onClick={onFavoriteToggle}
-                    className={`p-1 md:bg-white/5 hover:bg-purple-800/30 rounded-full cursor-pointer ${isSaved ? 'text-red-500' : 'text-white'}`}
+                    className={`p-1 hover:bg-purple-800/30 rounded-full cursor-pointer ${isSaved ? 'text-red-500' : 'text-white'}`}
                 >
                     <svg width="20" height="20" fill="none" xmlns="http://www.w3.org/2000/svg" className='scale-125 mt-2' style={{ mixBlendMode: 'difference', backdropFilter: 'blur(100px) grayscale(1) contrast(100)', clipPath: 'url(#heart-clip)', backgroundColor: 'white' }}>
                         <defs>
@@ -207,7 +207,7 @@ function PropertyHeader({ isSaved, onFavoriteToggle, property, ownProperty }: {
                 <button
                     onClick={handleShare}
                     disabled={isSharing}
-                    className="p-1.5 mr-3 md:mr-0 bg-white/5 hover:bg-purple-800/30 rounded-full disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                    className="p-1.5 mr-3 md:mr-0 hover:bg-purple-800/30 rounded-full disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                     title={t('title')}
                 >
                     {isSharing ? (
