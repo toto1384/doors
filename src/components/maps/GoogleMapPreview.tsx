@@ -149,7 +149,7 @@ export function GoogleMapPreview({
     }, [isLoaded, loadError, location, zoom, theme])
 
     const initializeMap = () => {
-        if (!mapRef.current || !window.google) return
+        if (!mapRef.current || !window.google || !location.latitude || !location.longitude) return
 
         try {
             const mapOptions: google.maps.MapOptions = {

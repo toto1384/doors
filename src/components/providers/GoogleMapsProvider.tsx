@@ -1,8 +1,6 @@
 import React, { createContext, useContext } from 'react'
 import { useLoadScript } from '@react-google-maps/api'
 
-const libraries = ['places'] as const
-
 interface GoogleMapsContextType {
     isLoaded: boolean
     loadError: Error | undefined
@@ -16,7 +14,7 @@ const GoogleMapsContext = createContext<GoogleMapsContextType>({
 export function GoogleMapsProvider({ children }: { children: React.ReactNode }) {
     const { isLoaded, loadError } = useLoadScript({
         googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY!,
-        libraries,
+        libraries: ['places'],
     })
 
     return (

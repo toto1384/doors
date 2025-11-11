@@ -8,8 +8,8 @@ import { Button } from "@/components/ui/button";
 import { FloatingInput } from "@/components/ui/floating-input";
 import { FloatingPasswordInput } from "@/components/ui/floating-password-input";
 import { PhoneInput } from "@/components/ui/phone-input";
-import { authClient } from "../../utils/auth-client";
-import { Header } from "./headerLanding";
+import { authClient } from "utils/auth-client";
+import { Header } from "./landing/headerLanding";
 
 type RegisterForm = {
     name: string;

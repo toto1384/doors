@@ -10,7 +10,6 @@ import { Route as ProfileRoute } from './app/profile/index';
 import { Route as AuthPageRoute } from './auth/$path/index.tsx';
 import { Route as LandingPage } from './index';
 import { Route as PropertiesRoute } from './app/properties/index';
-import { Route as PropertyDetailRoute } from './app/properties/$id.tsx';
 import { Route as PropertyAddRoute } from './app/properties/add.tsx';
 import { Route as MyPropertiesRoute } from './app/my-properties';
 
