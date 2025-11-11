@@ -7,6 +7,7 @@ import { reactStartCookies } from "better-auth/react-start";
 import { phoneNumber } from "better-auth/plugins";
 import { autumn } from "autumn-js/better-auth";
 import { authAdditionalFields } from "./constants";
+import { sendPasswordResetEmail } from "./resend";
 
 const client = new MongoClient(process.env.MONGODB_CONNECTION_URI!)
 const db = client.db();
@@ -22,6 +23,7 @@ export const auth = betterAuth({
             //   subject: "Reset your password",
             //   text: `Click the link to reset your password: ${url}`,
             // });
+            sendPasswordResetEmail(user.email, url, 'en', user.name);
         },
         onPasswordReset: async ({ user }, request) => {
             // your logic here

@@ -2,92 +2,221 @@
   "landing-page": {
     "hero": {
       "title": {
-        "line1": "Găsește-ți casa de vis cu ajutorul",
-        "line2": "Doors"
+        "line1": "Fără agenți. Fără comisioane.",
+        "line2": "Fără complicații."
       },
-      "subtitle": "fără agenți, fără comisioane uriașe, fără bătai de cap",
-      "description": "Asistentul tău imobiliar AI te ajută imediat să descoperi, să selectezi și să programezi vizionări - la o fracțiune din costul unei agenții tradiționale.",
+      "subtitle": "DOORS readuce controlul acolo unde îi este locul — în mâinile cumpărătorilor și vânzătorilor.",
+      "description": "Conectăm direct oameni reali, susținuți de un asistent AI puternic și servicii profesionale opționale, atunci când ai nevoie.",
+      "actionSelector": {
+        "buy": "🏠 Cumpăr",
+        "sell": "🏡 Vând"
+      },
+      "microBenefits": [
+        "Conectare directă între oameni",
+        "Transparență totală",
+        "Asistent Doors disponibil 24/7"
+      ],
       "buttons": {
         "register": "Înregistrează-te gratuit",
         "login": "Autentificare"
       }
     },
     "benefits": {
-      "title": "Beneficii",
-      "items": {
-        "personalAssistant": {
-          "title": "Asistentul tău personal AI",
-          "description": "Disponibil 24/7, îti retine preferințele, vorbește limba ta (RO/EN)."
-        },
-        "personalizedSearch": {
-          "title": "Căutare rapidă și personalizată",
-          "description": "Sugestii instant pe baza nevoilor tale - fără căutări nesfarsite."
-        },
-        "correctPrice": {
-          "title": "Preț corect și transparent",
-          "description": "Plătești sub 0.5% din cat ai platii unei agenții imobiliare."
-        },
-        "betterExperience": {
-          "title": "O experiență mai bună",
-          "description": "De la căutare la ofertă, ai parte de un proces intuitiv și simplu - fără agenți."
+      "buyer": {
+        "title": "De câte ori ai simțit că lumea imobiliară e construită să te încurce, nu să te ajute?",
+        "subtitle": "Cumpărarea unei locuințe ar trebui să fie o experiență plăcută — dar adesea se transformă într-un maraton de frustrare și timp pierdut.",
+        "problemList": [
+          "Discuții nesfârșite cu diferiți agenți",
+          "Comunicare slabă și actualizări incoerente",
+          "Contracte pline de \"clauze mici\" și capcane ascunse",
+          "Timp lung de așteptare pentru răspunsuri sau vizionări",
+          "Propuneri irelevante de proprietăți",
+          "Vizionări care nu corespund nevoilor tale",
+          "Lipsă de professionalism",
+          "Și desigur... comisioane uriașe"
+        ],
+        "conclusion": "Într-o piață complicată, DOORS readuce simplitatea.",
+        "solutionTitle": "Asistentul tău imobiliar personal, mereu disponibil și mereu sincer.",
+        "solutionDescription": "DOORS elimină haosul. Asistentul nostru empatic și profesionist ascultă, îți înțelege nevoile și îți găsește instant proprietăți care se potrivesc cu adevărat preferințelor tale — fără intermediari, fără presiune, fără comisioane.",
+        "realBenefits": {
+          "title": "Beneficii reale:",
+          "items": [
+            "Recomandări instant bazate pe criteriile tale",
+            "Programare automată a vizionărilor",
+            "Fără apeluri spam sau agenți insistenți",
+            "0% comision — economisești mii de euro",
+            "Servicii opționale de experți pentru siguranță totală"
+          ]
+        }
+      },
+      "seller": {
+        "title": "Ai mai încercat să vinzi? Atunci știi deja cât de greu e.",
+        "subtitle": "Vânzarea unei locuințe pare simplă — până încerci efectiv. Majoritatea proprietarilor se confruntă cu aceleași obstacole obositoare:",
+        "problemList": [
+          "Discuții nesfârșite cu mai mulți agenți",
+          "Comunicare slabă și lipsă de feedback real",
+          "Agenți necalificați sau fără experiență",
+          "Programări care irosesc timpul",
+          "Contracte restrictive cu clauze ascunse",
+          "Fără răspunsuri clare la \"De ce nu se vinde proprietatea mea?\"",
+          "Cumpărători nepotriviți sau nehotărâți",
+          "Și da... comisioane mari care îți reduc profitul"
+        ],
+        "conclusion": "DOORS schimbă complet această poveste.",
+        "solutionTitle": "Vinde mai repede. Păstrează 100%. Nu plăti nimic.",
+        "solutionDescription": "Pe DOORS, totul începe cu o conversație simplă. Asistentul DOORS te intervievează despre proprietatea ta — sau poți introduce detaliile direct. Apoi, încarci fotografiile, iar în câteva secunde DOORS creează un anunț complet optimizat, gata de publicare, cu text profesional și imagini potrivite — și îl publică instant.",
+        "realBenefits": {
+          "title": "Beneficii reale:",
+          "items": [
+            "100% gratuit pentru vânzători — fără taxe, niciodată",
+            "Anunțuri create automat din voce sau text",
+            "Publicare instant — fără editare suplimentară",
+            "Doar cumpărători serioși și verificați"
+          ]
         }
       }
     },
     "demo": {
-      "title": "Demo"
+      "buyer": {
+        "title": "De la \"Caut\" la \"Am găsit\" — în 4 pași simpli",
+        "steps": [
+          {
+            "number": "1️⃣",
+            "text": "Spune-i asistentului ce cauți — te ghidează prin întrebări clare."
+          },
+          {
+            "number": "2️⃣", 
+            "text": "Primești potriviri instant, adaptate nevoilor tale."
+          },
+          {
+            "number": "3️⃣",
+            "text": "Alegi preferatele și programezi până la 4 vizionări garantate."
+          },
+          {
+            "number": "4️⃣",
+            "text": "Vizitează, compară și decide în liniște — fără presiune, fără grabă."
+          }
+        ],
+        "cta": "🎯 Începe căutarea gratuit",
+        "tryDemo": {
+          "title": "Cunoaște-ți agentul imobiliar DOORS — fără cont, fără card.",
+          "description": "Începe o conversație reală și vezi cum DOORS îți înțelege stilul de viață și preferințele.",
+          "cta": "🚀 Încearcă demo-ul gratuit"
+        }
+      },
+      "seller": {
+        "title": "Analize în timp real care accelerează vânzarea",
+        "subtitle": "Înțelege-ți anunțul. Îmbunătățește rezultatele.",
+        "description": "DOORS îți oferă acces la statistici live, astfel încât știi exact cum performează anunțul tău:",
+        "analytics": [
+          "Vezi câți cumpărători au vizualizat sau salvat anunțul",
+          "Descoperă ce detalii atrag sau descurajează interesul",
+          "Compară prețul cu proprietăți similare din zonă",
+          "Primești sugestii de îmbunătățire de la asistentul DOORS"
+        ],
+        "conclusion": "Uneori, o mică schimbare poate face diferența. Cu DOORS, știi exact ce să îmbunătățești și de ce — pentru a vinde mai repede și la cel mai bun preț.",
+        "tryDemo": {
+          "title": "Creează un anunț complet în 60 de secunde — fără cont, fără costuri.",
+          "description": "Experimentează întregul proces: interviu vocal + încărcare foto → vezi anunțul generat de DOORS, gata de publicare.",
+          "cta": "🚀 Încearcă demo-ul pentru vânzători"
+        }
+      }
     },
     "about": {
-      "title": "Despre noi",
-      "description": {
-        "paragraph1": "La DOORS, credem că achizția sau vânzarea unei locuințe trebuie să fie corectă, transparentă și lipsită de stres. Asistentul nostru AI face procesul imobiliar mai simplu, mai accesibil și mai prietenos decât metodele tradiționale.",
-        "paragraph2": "Suntem hotărâți să aducem această soluție fiecărui cumpărător și vânzător din România, combinând inteligența artificială de ultimă generație cu increderea și claritatea de care industria imobiliară are atât de multă nevoie."
-      },
-      "features": {
-        "protectedData": "Datele tale sunt protejate conform GDPR.",
-        "aiTechnology": "Tehnologie AI de ultimă generație",
-        "localFocus": "Focus local: imobiliare din România, în limba ta",
-        "verifiedListings": "Anunțuri verificate și plăți sigure pentru o experiență fără riscuri."
-      }
+      "title": "Ia decizia corectă cu încredere — susținut de profesioniști.",
+      "subtitle": "Ai văzut ceva ce-ți place — dar nu ești sigur că e \"cea potrivită\"?",
+      "description": "DOORS îți oferă acces la o suită completă de servicii profesionale independente care te ajută să iei decizii mai inteligente și mai sigure:",
+      "services": [
+        {
+                    "comingSoon": true,
+          "icon": "🔧",
+          "title": "Inspecție tehnică",
+          "description": "descoperă starea reală a locuinței"
+        },
+        {
+                    "comingSoon": true,
+          "icon": "⚖️",
+          "title": "Verificare legală",
+          "description": "controlează documentele înainte de a semna"
+        },
+        {
+                    "comingSoon": false,
+          "icon": "💰",
+          "title": "Evaluare proprietate",
+          "description": "află valoarea reală de piață"
+        },
+        {
+        "comingSoon": false,
+          "icon": "📊",
+          "title": "Analiză de piață",
+          "description": "compară oferte similare și tendințe de preț"
+        }
+      ],
+      "conclusion": "Bucură-te de timpul tău liber — DOORS face alegerea casei tale simplă, inteligentă și sigură."
     },
     "pricing": {
-      "title": "Preturi",
-      "subtitle": "Simplu, corect, pe bază de tokeni",
-      "features": [
-        "Incepi gratuit cu un pachet de tokeni inclusi",
-        "Fiecare interacțiune cu AI-ul consumă câțiva tokeni",
-        "Reîncarci doar când ai nevoie"
-      ],
-      "plan": {
-        "name": "Starter",
-        "price": "$49.99",
-        "tokens": "500 tokeni"
+      "buyer": {
+        "title": "Plătești doar pentru ceea ce contează cu adevărat.",
+        "subtitle": "Activează-ți contul DOORS pentru doar 19,99 € și primești 4 vizionări garantate pentru proprietățile alese.",
+        "guarantee": "Nu ai găsit locuința potrivită? Primești ramburs integral pentru vizionările nefolosite — fără întrebări.",
+        "highlights": "💡 Zero comisioane. Zero riscuri. 100% transparență.",
+        "plan": {
+          "name": "Activează contul",
+          "price": "19,99 €",
+          "features": "4 vizionări incluse, garanție de returnare"
+        }
+      },
+      "seller": {
+        "title": "Publici gratuit. Vinzi gratuit.",
+        "subtitle": "Pentru vânzători, DOORS este complet gratuit.",
+        "features": [
+          "Fără taxe de listare, fără abonamente, fără comisioane — niciodată",
+          "Poți publica proprietăți nelimitat și păstrezi 100% din prețul de vânzare"
+        ],
+        "highlights": "💡 Tu vinzi. Noi te ajutăm să vinzi mai inteligent.",
+        "plan": {
+          "name": "Publică-ți proprietatea gratuit",
+          "price": "0 €",
+          "features": "Listare nelimitată, fără comisioane"
+        }
+      },
+      "comparison": {
+        "title": "Comparație rapidă:",
+        "traditional": {
+          "title": "Tradițional",
+          "commission": "Comision: până la 5% (~10.000 €)",
+          "communication": "Comunicare: lentă & repetitivă",
+          "listings": "Anunțuri: limitate / depășite",
+          "process": "Proces: birocrație & presiune"
+        },
+        "doors": {
+          "title": "DOORS",
+          "commission": "0 € pentru vânzători / 19,99 € pentru cumpărători",
+          "communication": "directă & instantanee",
+          "listings": "actualizate în timp real, potrivite de AI",
+          "process": "ghidat, simplu, transparent"
+        }
       }
+    },
+    "security": {
+      "title": "Sigur, verificat și complet transparent — mereu.",
+      "description": "Toate anunțurile sunt verificate, comunicarea este directă, iar datele tale sunt protejate conform celor mai noi standarde GDPR. Cu DOORS, totul este clar — de la prima conversație până la strângerea de mână finală."
     },
     "faq": {
       "title": "Întrebări frecvente",
-      "seeAll": "Vezi toate întrebările",
-      "items": {
-        "tokens": {
-          "question": "Ce sunt tokenii și cum funcționează?",
-          "answer": "Tokenii sunt credite virtuale pentru interacțiunile cu AI-ul. Primești gratuit la început și poți cumpăra mai mulți oricând."
-        },
-        "dataSafety": {
-          "question": "Datele mele sunt în siguranță?",
-          "answer": "Da, toate datele sunt protejate conform standardelor si nu sunt impartasite decat cu tertii mentionati."
-        },
-        "buyerSeller": {
-          "question": "Pot folosi platforma și ca vânzător, și ca cumpărător?",
-          "answer": "Da, platforma este concepută pentru ambele roluri și oferă funcționalități complete pentru vânzarea și cumpărarea proprietăților."
-        },
-        "whyDoors": {
-          "question": "De ce să aleg DOORS și nu o agenție clasică?",
-          "answer": "DOORS oferă transparență completă, costuri reduse și acces imediat la informații, eliminând intermediarii și comisioanele mari."
-        }
-      }
+      "seeAll": "Vezi toate întrebările"
     },
     "finalCta": {
       "title": "Casa ta de vis este la doar o conversație distantă",
       "subtitle": "Încearcă asistentul AI acum:",
+      "buyerSection": {
+        "condition": "Dacă ești cumpărător:",
+        "cta": "Activează contul — 19,99 € (4 vizionări incluse, garanție de returnare)"
+      },
+      "sellerSection": {
+        "condition": "Dacă ești vânzător:",
+        "cta": "Creează cont gratuit și publică acum"
+      },
       "button": "Înregistrează-te gratuit"
     },
     "footer": {

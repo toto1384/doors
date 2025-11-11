@@ -1,19 +1,15 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Home, Menu, X } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import { Link } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
-import { useTRPC } from 'trpc/react';
-import { authClient } from 'utils/auth-client';
-import { LanguageToggle, LanguageToggleVariant } from './language-toggle';
+import { LanguageToggleVariant } from '@/components/language-toggle';
 
 // Header Component
 export const Header: React.FC = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isScrolled, setIsScrolled] = useState(false);
-
-    const trpc = useTRPC()
 
     const { t } = useTranslation('translation', { keyPrefix: 'landing-page' });
 
@@ -25,8 +21,6 @@ export const Header: React.FC = () => {
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
-
-    const { data } = authClient.useSession()
 
     return (
         <header className={`fixed top-0 w-screen z-50 transition-all duration-300 ${isScrolled

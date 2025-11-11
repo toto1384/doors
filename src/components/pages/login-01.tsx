@@ -188,11 +188,11 @@ export default function LoginPage() {
                                 </label>
                             </div>
 
-                            {/* <Link */}
-                            {/*     to="/auth/forgot-password" */}
-                            {/*     className="text-gray-300 hover:text-white"> */}
-                            {/*     {t('form.forgotPassword')} */}
-                            {/* </Link> */}
+                            <Link
+                                to="/auth/forgot-password"
+                                className="text-gray-300 hover:text-white">
+                                {t('form.forgotPassword')}
+                            </Link>
                         </div>
                     </form>
 

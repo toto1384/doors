@@ -2,66 +2,205 @@
   "landing-page": {
     "hero": {
       "title": {
-        "line1": "Find your dream home with the help of",
-        "line2": "Doors"
+        "line1": "No agents. No commissions.",
+        "line2": "No complications."
       },
-      "subtitle": "without agents, without huge commissions, without headaches",
-      "description": "Your AI real estate assistant helps you instantly discover, select and schedule viewings - at a fraction of the cost of a traditional agency.",
+      "subtitle": "DOORS puts control back where it belongs — in the hands of buyers and sellers.",
+      "description": "We directly connect real people, backed by a powerful AI assistant and optional professional services, when you need them.",
+      "actionSelector": {
+        "buy": "🏠 Buying",
+        "sell": "🏡 Selling"
+      },
+      "microBenefits": [
+        "Direct connection between people",
+        "Complete transparency",
+        "Doors assistant available 24/7"
+      ],
       "buttons": {
         "register": "Register for free",
         "login": "Login"
       }
     },
     "benefits": {
-      "title": "Benefits",
-      "items": {
-        "personalAssistant": {
-          "title": "Your personal AI assistant",
-          "description": "Available 24/7, remembers your preferences, speaks your language (RO/EN)."
-        },
-        "personalizedSearch": {
-          "title": "Fast and personalized search",
-          "description": "Instant suggestions based on your needs - no endless searching."
-        },
-        "correctPrice": {
-          "title": "Fair and transparent pricing",
-          "description": "You pay less than 0.5% of what you would pay a real estate agency."
-        },
-        "betterExperience": {
-          "title": "A better experience",
-          "description": "From search to offer, you get an intuitive and simple process - without agents."
+      "buyer": {
+        "title": "How many times have you felt like the real estate world is built to confuse you, not help you?",
+        "subtitle": "Buying a home should be a pleasant experience — but it often turns into a marathon of frustration and wasted time.",
+        "problemList": [
+          "Endless discussions with different agents",
+          "Poor communication and inconsistent updates",
+          "Contracts full of \"fine print\" and hidden traps",
+          "Long waiting times for responses or viewings",
+          "Irrelevant property suggestions",
+          "Viewings that don't match your needs",
+          "Lack of professionalism",
+          "And of course... huge commissions"
+        ],
+        "conclusion": "In a complicated market, DOORS brings back simplicity.",
+        "solutionTitle": "Your personal real estate assistant, always available and always honest.",
+        "solutionDescription": "DOORS eliminates the chaos. Our empathetic and professional assistant listens, understands your needs and instantly finds properties that truly match your preferences — no intermediaries, no pressure, no commissions.",
+        "realBenefits": {
+          "title": "Real benefits:",
+          "items": [
+            "Instant recommendations based on your criteria",
+            "Automatic viewing scheduling",
+            "No spam calls or pushy agents",
+            "0% commission — save thousands of euros",
+            "Optional expert services for complete security"
+          ]
+        }
+      },
+      "seller": {
+        "title": "Have you tried selling before? Then you already know how hard it is.",
+        "subtitle": "Selling a home seems simple — until you actually try. Most property owners face the same exhausting obstacles:",
+        "problemList": [
+          "Endless discussions with multiple agents",
+          "Poor communication and lack of real feedback",
+          "Unqualified or inexperienced agents",
+          "Appointments that waste time",
+          "Restrictive contracts with hidden clauses",
+          "No clear answers to \"Why isn't my property selling?\"",
+          "Unsuitable or undecided buyers",
+          "And yes... high commissions that reduce your profit"
+        ],
+        "conclusion": "DOORS completely changes this story.",
+        "solutionTitle": "Sell faster. Keep 100%. Pay nothing.",
+        "solutionDescription": "On DOORS, everything starts with a simple conversation. The DOORS assistant interviews you about your property — or you can enter the details directly. Then, you upload the photos, and in seconds DOORS creates a complete optimized listing, ready to publish, with professional text and suitable images — and publishes it instantly.",
+        "realBenefits": {
+          "title": "Real benefits:",
+          "items": [
+            "100% free for sellers — no fees, ever",
+            "Listings created automatically from voice or text",
+            "Instant publishing — no additional editing",
+            "Only serious and verified buyers"
+          ]
         }
       }
     },
     "demo": {
-      "title": "Demo"
+      "buyer": {
+        "title": "From \"Looking\" to \"Found\" — in 4 simple steps",
+        "steps": [
+          {
+            "number": "1️⃣",
+            "text": "Tell the assistant what you're looking for — it guides you through clear questions."
+          },
+          {
+            "number": "2️⃣", 
+            "text": "Get instant matches, tailored to your needs."
+          },
+          {
+            "number": "3️⃣",
+            "text": "Choose your favorites and schedule up to 4 guaranteed viewings."
+          },
+          {
+            "number": "4️⃣",
+            "text": "Visit, compare and decide in peace — no pressure, no rush."
+          }
+        ],
+        "cta": "🎯 Start searching for free",
+        "tryDemo": {
+          "title": "Meet your DOORS real estate agent — no account, no card.",
+          "description": "Start a real conversation and see how DOORS understands your lifestyle and preferences.",
+          "cta": "🚀 Try the free demo"
+        }
+      },
+      "seller": {
+        "title": "Real-time analytics that accelerate sales",
+        "subtitle": "Understand your listing. Improve results.",
+        "description": "DOORS gives you access to live statistics, so you know exactly how your listing is performing:",
+        "analytics": [
+          "See how many buyers have viewed or saved your listing",
+          "Discover which details attract or discourage interest",
+          "Compare your price with similar properties in the area",
+          "Get improvement suggestions from the DOORS assistant"
+        ],
+        "conclusion": "Sometimes, a small change can make all the difference. With DOORS, you know exactly what to improve and why — to sell faster and at the best price.",
+        "tryDemo": {
+          "title": "Create a complete listing in 60 seconds — no account, no costs.",
+          "description": "Experience the entire process: voice interview + photo upload → see the listing generated by DOORS, ready for publication.",
+          "cta": "🚀 Try the seller demo"
+        }
+      }
     },
     "about": {
-      "title": "About us",
-      "description": {
-        "paragraph1": "At DOORS, we believe that buying or selling a home should be fair, transparent and stress-free. Our AI assistant makes the real estate process simpler, more accessible and friendlier than traditional methods.",
-        "paragraph2": "We are determined to bring this solution to every buyer and seller in Romania, combining cutting-edge artificial intelligence with the trust and clarity that the real estate industry so desperately needs."
-      },
-      "features": {
-        "protectedData": "Your data is protected according to GDPR.",
-        "aiTechnology": "Cutting-edge AI technology",
-        "localFocus": "Local focus: real estate from Romania, in your language",
-        "verifiedListings": "Verified listings and secure payments for a risk-free experience."
-      }
+      "title": "Make the right decision with confidence — backed by professionals.",
+      "subtitle": "Found something you like — but not sure it's \"the one\"?",
+      "description": "DOORS gives you access to a complete suite of independent professional services that help you make smarter and safer decisions:",
+      "services": [
+        {
+          "comingSoon": true,
+          "icon": "🔧",
+          "title": "Technical inspection",
+          "description": "discover the real condition of the property"
+        },
+        {
+                    "comingSoon": true,
+          "icon": "⚖️",
+          "title": "Legal verification",
+          "description": "check the documents before signing"
+        },
+        {
+                    "comingSoon": false,
+          "icon": "💰",
+          "title": "Property evaluation",
+          "description": "find out the real market value"
+        },
+        {
+                    "comingSoon": false,
+          "icon": "📊",
+          "title": "Market analysis",
+          "description": "compare similar offers and price trends"
+        }
+      ],
+      "conclusion": "Enjoy your free time — DOORS makes choosing your home simple, smart and safe."
     },
     "pricing": {
-      "title": "Pricing",
-      "subtitle": "Simple, fair, token-based",
-      "features": [
-        "You start for free with an included token package",
-        "Each interaction with AI consumes a few tokens",
-        "You recharge only when you need it"
-      ],
-      "plan": {
-        "name": "Starter",
-        "price": "$49.99",
-        "tokens": "500 tokens"
+      "buyer": {
+        "title": "Pay only for what truly matters.",
+        "subtitle": "Activate your DOORS account for just €19.99 and get 4 guaranteed viewings for your chosen properties.",
+        "guarantee": "Didn't find the right home? Get a full refund for unused viewings — no questions asked.",
+        "highlights": "💡 Zero commissions. Zero risks. 100% transparency.",
+        "plan": {
+          "name": "Activate account",
+          "price": "€19.99",
+          "features": "4 viewings included, return guarantee"
+        }
+      },
+      "seller": {
+        "title": "List for free. Sell for free.",
+        "subtitle": "For sellers, DOORS is completely free.",
+        "features": [
+          "No listing fees, no subscriptions, no commissions — ever",
+          "You can list unlimited properties and keep 100% of the sale price"
+        ],
+        "highlights": "💡 You sell. We help you sell smarter.",
+        "plan": {
+          "name": "List your property for free",
+          "price": "€0",
+          "features": "Unlimited listing, no commissions"
+        }
+      },
+      "comparison": {
+        "title": "Quick comparison:",
+        "traditional": {
+          "title": "Traditional",
+          "commission": "Commission: up to 5% (~€10,000)",
+          "communication": "Communication: slow & repetitive",
+          "listings": "Listings: limited / outdated",
+          "process": "Process: bureaucracy & pressure"
+        },
+        "doors": {
+          "title": "DOORS",
+          "commission": "€0 for sellers / €19.99 for buyers",
+          "communication": "direct & instant",
+          "listings": "updated in real-time, AI-matched",
+          "process": "guided, simple, transparent"
+        }
       }
+    },
+    "security": {
+      "title": "Safe, verified and completely transparent — always.",
+      "description": "All listings are verified, communication is direct, and your data is protected according to the latest GDPR standards. With DOORS, everything is clear — from the first conversation to the final handshake."
     },
     "faq": {
       "title": "Frequently asked questions",
@@ -88,6 +227,14 @@
     "finalCta": {
       "title": "Your dream home is just one conversation away",
       "subtitle": "Try the AI assistant now:",
+      "buyerSection": {
+        "condition": "If you're a buyer:",
+        "cta": "Activate account — €19.99 (4 viewings included, return guarantee)"
+      },
+      "sellerSection": {
+        "condition": "If you're a seller:",
+        "cta": "Create free account and list now"
+      },
       "button": "Register for free"
     },
     "footer": {
