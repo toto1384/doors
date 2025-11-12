@@ -295,7 +295,7 @@ const SellerDemoSection = ({ token }: { token: string }) => {
                     <h3 className="text-2xl font-semibold text-white mb-4">
                         {t('landing-page.demo.seller.tryDemo.title')}
                     </h3>
-                    <div className='flex flex-row items-center w-fit mx-auto gap-6 rounded-lg p-2 bg-gradient-to-br from-green-500/20 to-blue-600/20 text-white'>
+                    <div className='flex md:hidden flex-row items-center w-fit mx-auto gap-6 rounded-lg p-2 bg-gradient-to-br from-green-500/20 to-blue-600/20 text-white'>
                         <button onClick={() => setTab('agent')} className={`${tab === 'agent' ? 'bg-white text-green-900' : 'bg-gradient-to-br from-green-500/20 to-blue-600/20'} rounded-lg p-2 text-sm`}>Agent</button>
                         <button onClick={() => setTab('results')} className={`${tab === 'results' ? 'bg-white text-green-900' : 'bg-gradient-to-br from-green-500/20 to-blue-600/20'} rounded-lg p-2 text-sm`}>Result</button>
 

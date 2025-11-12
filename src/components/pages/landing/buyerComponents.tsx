@@ -39,7 +39,7 @@ export const BuyerDemoSection = ({ token }: { token: string }) => {
                         {t('landing-page.demo.buyer.tryDemo.title')}
                     </h3>
 
-                    <div className='flex flex-row items-center w-fit mx-auto gap-6 rounded-lg p-2 bg-gradient-to-br from-green-500/20 to-blue-600/20 text-white'>
+                    <div className='flex md:hidden flex-row items-center w-fit mx-auto gap-6 rounded-lg p-2 bg-gradient-to-br from-green-500/20 to-blue-600/20 text-white'>
                         <button onClick={() => setTab('agent')} className={`${tab === 'agent' ? 'bg-white text-green-900' : 'bg-gradient-to-br from-green-500/20 to-blue-600/20'} rounded-lg p-2 text-sm`}>Agent</button>
                         <button onClick={() => setTab('results')} className={`${tab === 'results' ? 'bg-white text-green-900' : 'bg-gradient-to-br from-green-500/20 to-blue-600/20'} rounded-lg p-2 text-sm`}>Results</button>
                     </div>
@@ -49,7 +49,7 @@ export const BuyerDemoSection = ({ token }: { token: string }) => {
 
                             <ElevenLabsChatBotDemo user={undefined} conversationToken={token} demoVersion userType="buyer" />
                         </div>
-                        <div className={`${tab === 'results' ? 'block' : 'md:block hidden'} md:w-[70%] w-full max-h-full flex flex-col`}>
+                        <div className={`${tab === 'results' ? 'block' : 'md:block hidden'} md:w-[70%] w-full max-h-full flex flex-col overflow-y-scroll`}>
                             {/* {JSON.stringify(demoPropertyFilters)} */}
                             <div className="max-h-full overflow-y-scroll">
                                 <PropertiesView searchParams={demoPropertyFilters ?? {}} demoVersion />
