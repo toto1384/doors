@@ -10,23 +10,25 @@ import { nanoid } from "nanoid";
 import { useClientToolChoice } from "utils/hooks/aiChatbotButtonHook";
 import { searchLocationByString } from "utils/googleMapsUtils";
 import { Facilities } from "utils/validation/propertyFilters";
-import { PropertyHeating, PropertyTypeType } from "utils/constants";
+import { demoPropertyKey, PropertyHeating, PropertyTypeType } from "utils/constants";
 import { useQueryClient } from "@tanstack/react-query";
 
 
 export const useSetPropertyFunctions = ({
     setMessages,
     updateGhostProperty,
+    demoVersion
 }: {
     setMessages: React.Dispatch<React.SetStateAction<MessageType[]>>;
     updateGhostProperty: (property: Partial<PropertyObject>) => void;
+    demoVersion?: boolean;
 }) => {
     const { t } = useTranslation('translation', { keyPrefix: 'ai-chatbot' });
     const router = useRouter()
     const routerState = useRouterState()
     const trpcClient = useTRPCClient()
 
-    const ensureIsInAddMode = () => { if (routerState.location.pathname !== '/app/properties/add') router.navigate({ to: '/app/properties/add' }) }
+    const ensureIsInAddMode = () => { if (routerState.location.pathname !== '/app/properties/add' && !demoVersion) router.navigate({ to: '/app/properties/add' }) }
 
     const { setProgressBar, aiChatbotOpen, setAiChatbotOpen } = usePopoversOpenStore(useShallow(state => ({
         setProgressBar: state.setProgressBar,
@@ -55,12 +57,21 @@ export const useSetPropertyFunctions = ({
             const ghostProperty = getPartialProperty()
             console.log('publishProperty', ghostProperty)
             try {
-                const result = await trpcClient.properties.postProperty.mutate({ property: ghostProperty as any })
-                setPostedStatus({ success: result.success, message: result.message })
-                if (result.success) setProgressBar(undefined)
+                let result
+                if (demoVersion) {
+                    localStorage.setItem(demoPropertyKey, JSON.stringify(ghostProperty))
+                    result = JSON.stringify(ghostProperty)
+                    setPostedStatus({ success: true, message: 'Property saved as demo. Login to post' })
+                    setProgressBar(undefined)
+                    router.navigate({ to: '/auth/$path', params: { path: 'sign-in' } })
+                } else {
+                    result = await trpcClient.properties.postProperty.mutate({ property: ghostProperty as any })
+                    setPostedStatus({ success: result.success, message: result.message })
+                    if (result.success) setProgressBar(undefined)
+                    router.navigate({ to: '/app/my-properties' })
+                }
                 await endConversation()
                 queryClient.invalidateQueries({ queryKey: ['my-properties'] })
-                router.navigate({ to: '/app/my-properties' })
                 return JSON.stringify(result)
             } catch (error) {
                 console.log('error', error)

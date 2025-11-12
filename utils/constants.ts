@@ -10,6 +10,9 @@ export const countyUrlSlugs = [countyRoUrlSlug, countyEnUrlSlug] as const
 
 export const uploadThingGetUrl = (fileId: string) => `https://jrr69agtel.ufs.sh/f/${fileId}`
 
+export const propPreferencesKey = 'prepPreferences'
+export const demoPropertyKey = 'demoProperty'
+
 
 export const authAdditionalFields = {
     _id: {

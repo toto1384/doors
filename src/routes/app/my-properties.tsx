@@ -9,7 +9,6 @@ import { useEffect, useState } from 'react'
 import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useInView } from 'react-intersection-observer'
 import { useTRPC, useTRPCClient } from 'trpc/react'
-import { PropertyCard } from './properties'
 import { MoreVerticalIcon, PencilIcon, Plus, TrashIcon } from 'lucide-react'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuCheckboxItem, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Button } from '@/components/ui/button'
@@ -19,6 +18,7 @@ import { useTranslation } from 'react-i18next'
 import { usePropertyFilterStore } from '../__root'
 import { useShallow } from 'zustand/react/shallow'
 import { useRouter } from '@tanstack/react-router'
+import { PropertyCard } from '@/components/basics/propertyCard'
 
 
 
@@ -65,10 +65,7 @@ function MyPropertiesRoute() {
 
 
     const {
-        status,
         data,
-        error,
-        isFetching,
         isFetchingNextPage,
         fetchNextPage,
         hasNextPage,

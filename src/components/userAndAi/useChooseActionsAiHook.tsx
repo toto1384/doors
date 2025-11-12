@@ -7,7 +7,7 @@ import { MessageType } from "./aiChatbot";
 import { searchLocationByString } from "utils/googleMapsUtils";
 import { useTRPC } from "trpc/react";
 import { useMutation } from "@tanstack/react-query";
-import { PropertyTypeType } from "utils/constants";
+import { PropertyTypeType, propPreferencesKey } from "utils/constants";
 import { PropertyFilters, UserObject } from "utils/validation/types";
 import { authClient } from "utils/auth-client";
 import { PropertyFeaturesType } from "utils/validation/dbSchemas";
@@ -15,7 +15,7 @@ import { Facilities } from "utils/validation/propertyFilters";
 import { usePropertyFilterStore } from "@/routes/__root";
 import { useShallow } from "zustand/react/shallow";
 
-export function useChooseActions({ setMessages, }: { setMessages: React.Dispatch<React.SetStateAction<MessageType[]>>, }) {
+export function useChooseActions({ setMessages, demoVersion }: { setMessages: React.Dispatch<React.SetStateAction<MessageType[]>>, demoVersion?: boolean }) {
 
     const router = useRouter()
     const { t } = useTranslation('translation', { keyPrefix: 'ai-chatbot' });
@@ -23,12 +23,27 @@ export function useChooseActions({ setMessages, }: { setMessages: React.Dispatch
     const updateUserTypeMutation = useMutation(trpc.auth.changeUserType.mutationOptions())
     const updateUserPreferencesMutation = useMutation(trpc.auth.updateUserPreferences.mutationOptions())
 
-    const { startConversation, endConversation } = usePropertyFilterStore(useShallow(state => ({
+    const { startConversation, endConversation, demoPropertyFilters, setDemoPropertyFilters } = usePropertyFilterStore(useShallow(state => ({
         startConversation: state.startConversation,
         endConversation: state.endConversation,
+        demoPropertyFilters: state.demoPropertyFilters,
+        setDemoPropertyFilters: state.setDemoPropertyFilters,
+
     })))
 
     const session = authClient.useSession();
+
+
+    async function updatePropertyFilters(filters: PropertyFilters) {
+        if (demoVersion) {
+            const originalPreferences = localStorage.getItem(propPreferencesKey)
+            const currentPreferences = { ...(originalPreferences ? JSON.parse(originalPreferences) : {}), ...filters };
+            setDemoPropertyFilters(currentPreferences)
+            return localStorage.setItem(propPreferencesKey, JSON.stringify(currentPreferences))
+        }
+        router.navigate({ to: '/app/properties', search: (prev) => ({ ...prev, ...filters }) })
+        await updateUserPreferencesMutation.mutateAsync(filters)
+    }
 
 
     const { clientToolFunction: chooseHouseOrApartment } = useClientToolChoice({
@@ -37,8 +52,7 @@ export function useChooseActions({ setMessages, }: { setMessages: React.Dispatch
             { value: t('propertyTypes.apartment'), key: 'apartment' },
         ],
         async additionalOnClick(value: 'house' | 'apartment' | any) {
-            router.navigate({ to: '/app/properties', search: (prev) => ({ ...prev, propertyType: [value] }) })
-            await updateUserPreferencesMutation.mutateAsync({ propertyType: [value] })
+            updatePropertyFilters({ propertyType: [value] })
         },
         onShowButtons: (buttonsNode) => {
             setMessages(prev => [...prev, { message: buttonsNode, source: 'user', id: nanoid() }]);
@@ -46,8 +60,7 @@ export function useChooseActions({ setMessages, }: { setMessages: React.Dispatch
     });
 
     const chooseHouseOrApartmentVoice = ({ propertyType }: { propertyType: PropertyTypeType[] }) => {
-        router.navigate({ to: '/app/properties', search: (prev) => ({ ...prev, propertyType }) })
-        updateUserPreferencesMutation.mutateAsync({ propertyType })
+        updatePropertyFilters({ propertyType })
     }
 
     const { clientToolFunction: chooseBudget } = useClientToolChoice({
@@ -62,8 +75,8 @@ export function useChooseActions({ setMessages, }: { setMessages: React.Dispatch
             if (value === 'under100k') budget = { max: 100000 }
             if (value === 'between100k200k') budget = { min: 100000, max: 200000 }
             if (value === 'over200k') budget = { min: 200000 }
-            router.navigate({ to: '/app/properties', search: (prev) => ({ ...prev, budget }) })
-            await updateUserPreferencesMutation.mutateAsync({ budget })
+
+            updatePropertyFilters({ budget })
         },
         onShowButtons: (buttonsNode) => {
             setMessages(prev => [...prev, { message: buttonsNode, source: 'user', id: nanoid() }]);
@@ -72,14 +85,11 @@ export function useChooseActions({ setMessages, }: { setMessages: React.Dispatch
 
 
     function chooseNumberOfRooms({ numberOfRoomsArray }: { numberOfRoomsArray: number[] }) {
-        console.log('chooseNumberOfRooms', numberOfRoomsArray)
-        router.navigate({ to: '/app/properties', search: (prev) => ({ ...prev, numberOfRooms: numberOfRoomsArray }) })
-        updateUserPreferencesMutation.mutateAsync({ numberOfRooms: numberOfRoomsArray })
+        updatePropertyFilters({ numberOfRooms: numberOfRoomsArray })
     }
 
     const chooseBudgetVoice = (budget: { min: number, max: number }) => {
-        router.navigate({ to: '/app/properties', search: (prev) => ({ ...prev, budget }) })
-        updateUserPreferencesMutation.mutateAsync({ budget })
+        updatePropertyFilters({ budget })
     }
 
     const { clientToolFunction: chooseFacilities } = useClientToolChoice({
@@ -95,8 +105,7 @@ export function useChooseActions({ setMessages, }: { setMessages: React.Dispatch
         ],
         multiple: true,
         async additionalOnClick(value) {
-            router.navigate({ to: '/app/properties', search: (prev) => ({ ...prev, facilities: value as any }) })
-            await updateUserPreferencesMutation.mutateAsync({ facilities: value as any })
+            updatePropertyFilters({ facilities: value as any })
         },
         onShowButtons: (buttonsNode) => {
             setMessages(prev => [...prev, { message: buttonsNode, source: 'user', id: nanoid() }]);
@@ -104,17 +113,18 @@ export function useChooseActions({ setMessages, }: { setMessages: React.Dispatch
     });
 
     function chooseSurfaceArea({ surfaceArea }: { surfaceArea: number }) {
-        router.navigate({ to: '/app/properties', search: (prev) => ({ ...prev, surfaceArea: { min: surfaceArea, max: undefined } }) })
-        updateUserPreferencesMutation.mutateAsync({ surfaceArea: { min: surfaceArea, max: undefined } })
+        updatePropertyFilters({ surfaceArea: { min: surfaceArea, max: undefined } })
     }
 
     const chooseFacilitiesVoice = ({ facilities }: { facilities: typeof Facilities[number][] }) => {
-        router.navigate({ to: '/app/properties', search: (prev) => ({ ...prev, facilities }) })
-        updateUserPreferencesMutation.mutateAsync({ facilities })
+        updatePropertyFilters({ facilities })
     }
 
     const setIntentFunction = async ({ intent }: { intent: 'buyer' | 'seller' | 'admin' }) => {
         console.log('setIntentFunction', intent)
+        if (demoVersion) {
+            return
+        }
         await updateUserTypeMutation.mutateAsync({ userType: intent })
         if (intent == 'seller') router.navigate({ to: '/app/properties/add' })
         if (intent == 'buyer') {
@@ -145,8 +155,7 @@ export function useChooseActions({ setMessages, }: { setMessages: React.Dispatch
 
         chooseAndSelectLocation: async ({ location }: { location: string }) => {
             const locationResult = await searchLocationByString(location);
-            router.navigate({ to: '/app/properties', search: (prev) => ({ ...prev, location: locationResult ?? undefined }) })
-            await updateUserPreferencesMutation.mutateAsync({ location: locationResult ?? undefined })
+            updatePropertyFilters({ location: locationResult ?? undefined })
             return JSON.stringify({ locationName: locationResult?.fullLocationName })
         },
     }

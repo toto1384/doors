@@ -1,16 +1,14 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
-import { useState, useEffect, ReactNode, } from 'react'
-import { useTRPCClient } from '../../../../trpc/react'
+import { useState, ReactNode, } from 'react'
 import { PropertyFilters } from 'utils/validation/types'
 import { PropertyObject } from 'utils/validation/types'
 import { LocationSelector } from '@/components/basics/locationSelector'
-import { Facilities, propertyFiltersSchema } from 'utils/validation/propertyFilters.ts'
+import { propertyFiltersSchema } from 'utils/validation/propertyFilters.ts'
 import { trpcRouter } from 'trpc/router'
 import { createServerFn } from '@tanstack/react-start'
 import { MultiSelect, MultiSelectContent, MultiSelectItem, MultiSelectTrigger, MultiSelectValue } from '@/components/ui/multi-select'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { ChevronDownIcon, X } from 'lucide-react'
-import { usePopoversOpenStore, usePropertyFilterStore } from '@/routes/__root'
 import { useShallow } from 'zustand/react/shallow'
 import { BathIcon, BedIcon, ChatIcon, FilterIcon, LocationIcon, priceChartSvg, SurfaceAreaIcon } from '@/components/icons/propertyIcons'
 import { Input } from '@/components/ui/input'
@@ -23,9 +21,9 @@ import { useNavigate } from '@tanstack/react-router'
 import { ImageFallback } from '@/components/basics/imageFallback'
 import { PropertyTypeType } from 'utils/constants'
 import { useDebouncedCallback } from 'use-debounce'
-import { useInView } from 'react-intersection-observer'
-import { useInfiniteQuery } from '@tanstack/react-query'
 import { FacilitiesSelector } from '@/components/facilitiesSelector'
+import { PropertiesView } from '@/components/pages/propertiesView'
+import { usePopoversOpenStore } from '@/routes/__root'
 
 
 export const getPropertiesWithFilters = createServerFn().validator((d) => propertyFiltersSchema.parse(d)).handler(async ({ data: filters, }) => {
@@ -56,48 +54,10 @@ export const Route = createFileRoute('/app/properties/')({
 
 function PropertiesRoute() {
     const propertiesReceived = Route.useLoaderData()
-    const trpcClient = useTRPCClient()
 
     const navigate = useNavigate()
     const searchParams = Route.useSearch()
 
-    const { ref, inView } = useInView()
-
-    const {
-        status,
-        data,
-        error,
-        isFetchingNextPage,
-        fetchNextPage,
-        hasNextPage,
-    } = useInfiniteQuery({
-        queryKey: ['properties', searchParams],
-        queryFn: async ({ pageParam, }) => {
-            const res = await fetchProperties({ skip: pageParam * 9 })
-            return res
-        },
-        initialData: { pages: [propertiesReceived], pageParams: [0] },
-        initialPageParam: 0,
-        getNextPageParam: (lastpage, _allPages, lastPageParam) => {
-            if (lastpage.properties.length === 0) { return undefined; }
-            return lastPageParam + 1;
-        },
-    })
-
-
-    useEffect(() => {
-        if (inView && hasNextPage && !isFetchingNextPage) {
-            fetchNextPage()
-        }
-    }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage])
-
-    const [count, setCount] = useState<number>(propertiesReceived.count)
-
-    async function fetchProperties({ skip = 0 }: { skip?: number }) {
-        const newProps = await trpcClient.properties.list.query({ props: searchParams, skip })
-        setCount(newProps.count)
-        return newProps
-    }
 
     function handleFilterChange(newFilters: Partial<PropertyFilters>) {
         navigate({ to: '/app/properties', search: (prev) => ({ ...prev, ...newFilters }) })
@@ -288,108 +248,13 @@ function PropertiesRoute() {
                     onClose={() => setShowFilters(false)}
                 />}
 
-                {status === 'error' ? (<span>Error: {error.message}</span>) : (
-                    <>
-                        {/* Properties Grid */}
-                        {<div className="grid grid-cols-2 lg:grid-cols-3 gap-x-1 md:gap-x-3 gap-y-3 p-4">
-                            {data.pages?.map(p => p.properties.map((property) => (<PropertyCard
-                                match={p.totalFilterCount && property.matchScore ? property.matchScore * 100 / p.totalFilterCount : 'hide'}
-                                key={property._id}
-                                property={property}
-                            />)))}
-                        </div>}
+                <PropertiesView propertiesReceived={propertiesReceived} searchParams={searchParams} />
 
-                        {data.pages.flat(1) && data.pages.flat(1).length === 0 && (
-                            <div className="text-center h-full py-8">
-                                <p className="text-gray-400">No properties found matching your criteria.</p>
-                            </div>
-                        )}
-
-
-                        <div>
-                            <button
-                                ref={ref}
-                                onClick={() => fetchNextPage()}
-                                disabled={!hasNextPage || isFetchingNextPage}
-                            >
-                                {isFetchingNextPage
-                                    ? 'Loading more...'
-                                    : hasNextPage
-                                        ? 'Load Newer'
-                                        : 'Nothing more to load'}
-                            </button>
-                        </div>
-
-                    </>
-                )}
             </div >
         </div>
     )
 }
 
-
-export const PropertyCard = ({ property, match, matchRight, moreComponent, disableLink }: { property: PropertyObject, match?: number | 'hide' | string, matchRight?: boolean, moreComponent?: ReactNode, disableLink?: boolean }) => {
-
-    const navigate = useNavigate()
-
-    const propertyContent = <>
-        <div className=" max-h-42 flex items-center justify-center">
-            <ImageFallback
-                src={property.imageUrls[0] ?? '/icons/homeIcon.svg'}
-                className={`max-h-42 w-full rounded-[6px] h-full object-cover`}
-            />
-        </div>
-
-        {match && match !== 'hide' && <div className={`flex items-center absolute ${matchRight ? 'right-3 md:right-5' : 'left-3 md:left-5'} top-3 md:top-5  justify-between mb-2`}>
-            <span className="bg-[#623398] text-white flex flex-row font-light items-center text-[9px] px-2 py-1 rounded">
-                {typeof match === 'string' ? match : <>
-                    <img src="/icons/checkIcon.svg" className="w-2 h-2 mr-1" />
-                    {match.toFixed(2)}% Match
-                </>}
-            </span>
-        </div>}
-
-
-        <div className="flex flex-row justify-between" >
-
-            <div className='flex flex-col'>
-                <div className="flex items-center gap-1 mt-2 text-[10px] text-[#a3a3a3]">
-                    {[
-                        ...(property.numberOfRooms ? [{ icon: <BedIcon className="w-3 h-3" color="#ffffff" />, text: `${property.numberOfRooms}` }] : []),
-                        ...(property.numberOfBathrooms ? [{ icon: <BathIcon className='w-3 h-3' color="#ffffff" />, text: `${property.numberOfBathrooms}` }] : []),
-                        ...(property.surfaceArea ? [{ icon: <SurfaceAreaIcon className='w-3 h-3' color="#ffffff" />, text: `${property.surfaceArea}m²` }] : []),
-                        // { icon: "/icons/locationIcon.svg", text: `${property.location.city}` },
-                    ].map(i =>
-                        <span className='flex flex-row items-center gap-1 rounded bg-[#32215A] px-2 py-0.5'>{i.text}{i.icon}  </span>
-                    )}
-                </div>
-
-                <p className="text-xs md:text-[22px] font-light my-2 text-[#8A4FFF]">€{property.price.value.toLocaleString()}</p>
-
-            </div>
-            {moreComponent}
-        </div>
-
-        <h3 className="text-sm md:text-lg font-normal md:mb-2">{property.title}</h3>
-
-        <div className='flex flex-row text-[#637381] text-xs md:text-md items-center gap-1 md:mt-2'>
-            <LocationIcon color={'#637381'} className="w-4 h-4 mt-2 mb-2" />
-            {property.location.city}, {property.location.state}
-        </div>
-    </>
-    return disableLink ? <div
-        className="relative bg-[#f7f7f7] dark:bg-[#2B1C37]/50 p-1.5 md:p-3 rounded-[6px] overflow-hidden"
-        onClick={() => { navigate({ to: `/app/properties/${property._id}` }) }}
-        key={property._id}
-    >{propertyContent}</div> : <Link
-        to='/app/properties/$id'
-        params={{ id: property._id }}
-        key={property._id}
-        className="relative bg-[#f7f7f7] dark:bg-[#2B1C37]/50 p-1.5 md:p-3 rounded-[6px] overflow-hidden"
-    >
-        {propertyContent}
-    </Link>
-}
 
 function PropertyTypeSelector({ propertyType, handleChangePropertyType, className }: { propertyType: PropertyTypeType[], handleChangePropertyType: (type: PropertyTypeType[]) => void, className?: string }) {
     return <MultiSelect values={propertyType} onValuesChange={handleChangePropertyType as any} >

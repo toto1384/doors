@@ -1,6 +1,6 @@
 
 import { useQuery } from '@tanstack/react-query';
-import { createFileRoute, Link } from '@tanstack/react-router';
+import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
 import { Search, Bot, Zap, Eye, DollarSign, Home, Star, ArrowRight, Menu, X, Shield, Atom, Focus, CheckCircle, ChevronDown, Check } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -12,15 +12,47 @@ import { TimelineLayout } from '@/components/ui/timeline-layout';
 import { Badge } from '@/components/ui/badge';
 import { BuyerBenefitsSection, BuyerDemoSection, BuyerPricingSection } from '@/components/pages/landing/buyerComponents';
 import { Header } from '@/components/pages/landing/headerLanding';
+import { createServerFn } from '@tanstack/react-start';
+import { PropertiesView } from '@/components/pages/propertiesView';
+import { ElevenLabsChatBotDemo } from '@/components/userAndAi/aiChatbot';
+import { usePropertyFilterStore } from './__root';
+import { useShallow } from 'zustand/react/shallow';
+import { PropertyAddView } from '@/components/pages/propertyAddView';
 
 
 export const Route = createFileRoute('/')({
     component: LandingPage,
+    loader: async () => {
+
+        return await getRootObjectsServerFn()
+    },
+})
+
+export const getRootObjectsServerFn = createServerFn().handler(async ({ data: filters, }) => {
+
+    const response = await fetch(
+        `https://api.elevenlabs.io/v1/convai/conversation/token?agent_id=${process.env.VITE_AGENT_ID}`,
+        { headers: { "xi-api-key": process.env.ELEVENLABS_API_KEY, } as any }
+    );
+    const body = await response.json();
+
+
+    return { token: body.token as string, }
 })
 
 
 function LandingPage() {
     const [selectedAction, setSelectedAction] = useState<'buy' | 'sell'>('buy');
+    const navigate = useNavigate();
+    const { data: session } = authClient.useSession();
+
+    const { token } = Route.useLoaderData();
+
+    useEffect(() => {
+        if (session?.user) {
+            navigate({ to: '/app' });
+        }
+    }, [session]);
 
     const blobs = Array.from({ length: 10 }, (_, i) => ({
         id: i,
@@ -75,12 +107,12 @@ function LandingPage() {
                 </div>
             </div>
 
-            {selectedAction === 'buy' ? <BuyerDemoSection /> : <SellerDemoSection />}
+            {selectedAction === 'buy' ? <BuyerDemoSection token={token} /> : <SellerDemoSection token={token} />}
             {selectedAction === 'buy' ? <BuyerBenefitsSection /> : <SellerBenefitsSection />}
             {selectedAction === 'buy' ? <BuyerPricingSection /> : <SellerPricingSection />}
             <SecuritySection />
             {/* <FAQSection /> */}
-            <FinalCTASection selectedAction={selectedAction} />
+            {/* <FinalCTASection selectedAction={selectedAction} /> */}
             <Footer />
         </div>
     );
@@ -103,8 +135,8 @@ const HeroSection: React.FC<{}> = ({ }) => {
             <div className='bg-gradient-to-r hidden md:block from-[#0B0014]/90 from-20% to-black/0 to-40% absolute z-30 inset-0'></div>
             <div className='bg-gradient-to-t from-[#0B0014] from-20% to-black/0 to-50% absolute z-30 inset-0'></div>
 
-            <div className="md:w-[47vw] absolute bottom-0 md:mt-0 md:top-[32vw] md:right-[11vw] mx-auto">
-                <div className="z-10 px-3 text-center md:hidden pl-5">
+            <div className="md:w-[47vw] absolute bottom-30 w-[95%] left-0 md:left-auto right-0 md:mt-0 md:top-[32vw] md:right-[11vw] mx-auto">
+                <div className="z-10 md:px-3 text-center md:hidden md:pl-5">
                     <h1 className={`text-6xl font-semibold text-cente text-white mb-4`}>
                         Doors
                     </h1>
@@ -115,9 +147,9 @@ const HeroSection: React.FC<{}> = ({ }) => {
                         imobiliară mai inteligentă
                     </span>
                 </div>
-                <div className='z-40 relative md:absolute px-3 w-full'>
+                <div className='z-40 relative md:absolute md:px-3 w-full'>
 
-                    <p className="md:text-sm font-light mt-6 md:mt-0 mb-6 md:mb-4 mx-auto w-full text-[#C4CDD5]">
+                    <p className="md:text-sm text-center md:text-start font-light mt-6 md:mt-0 mb-6 md:mb-4 mx-auto w-full text-[#C4CDD5]">
                         Fără agenți. Fără comisioane. Doar tu, asistentul tău personal Doors și o platformă care face cumpărarea sau vânzarea locuinței mai rapidă, clară și complet fără stres.
                     </p>
 
@@ -135,7 +167,7 @@ const HeroSection: React.FC<{}> = ({ }) => {
                     {/*     })()} */}
                     {/* </div> */}
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-6 justify-center items-center">
+                    {false && <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-6 justify-center items-center">
                         <Link
                             to={data ? "/app" : "/auth/$path"}
                             params={data ? {} : { path: "sign-in" }}
@@ -151,7 +183,7 @@ const HeroSection: React.FC<{}> = ({ }) => {
                             className="outline-1 outline-white text-white px-4 py-3 md:py-2 rounded-sm text-lg md:text-base hover:outline-slate-400 hover:bg-slate-800/50 transition-all text-center">
                             {t('landing-page.hero.buttons.login')}
                         </Link>
-                    </div>
+                    </div>}
 
                 </div>
             </div>
@@ -241,25 +273,55 @@ const SellerBenefitsSection = () => {
 
 
 // Seller Demo Section Component
-const SellerDemoSection: React.FC = () => {
+const SellerDemoSection = ({ token }: { token: string }) => {
     const { t } = useTranslation();
+
+    const { data } = authClient.useSession();
+
+    const { demoPropertyFilters, setDemoPropertyFilters } = usePropertyFilterStore(useShallow(state => ({
+        demoPropertyFilters: state.demoPropertyFilters,
+        setDemoPropertyFilters: state.setDemoPropertyFilters,
+    })))
+
+
+    const [tab, setTab] = useState<'agent' | 'results'>('agent')
 
     return (
         <section id="demo" className="md:py-10 ">
-            <div className="max-w-7xl mx-auto px-6">
+            <div className="max-w-7xl mx-auto px-2 md:px-6 flex flex-col items-center">
 
                 {/* Try Demo Section */}
-                <div className="text-center bg-gradient-to-br from-green-500/20 to-blue-600/20 rounded-lg p-8 max-w-4xl mx-auto">
+                <div className="text-center bg-gradient-to-br from-green-500/20 to-blue-600/20 rounded-lg p-2 md:p-8 max-w-4xl mx-auto">
                     <h3 className="text-2xl font-semibold text-white mb-4">
                         {t('landing-page.demo.seller.tryDemo.title')}
                     </h3>
-                    <p className="text-slate-300 mb-6 max-w-2xl mx-auto">
-                        {t('landing-page.demo.seller.tryDemo.description')}
-                    </p>
-                    <button className="bg-gradient-to-r from-green-500 to-blue-600 text-white px-8 py-3 rounded-md font-semibold text-lg hover:from-green-600 hover:to-blue-700 transition-all transform hover:scale-105 shadow-2xl">
-                        {t('landing-page.demo.seller.tryDemo.cta')}
-                    </button>
+                    <div className='flex flex-row items-center w-fit mx-auto gap-6 rounded-lg p-2 bg-gradient-to-br from-green-500/20 to-blue-600/20 text-white'>
+                        <button onClick={() => setTab('agent')} className={`${tab === 'agent' ? 'bg-white text-green-900' : 'bg-gradient-to-br from-green-500/20 to-blue-600/20'} rounded-lg p-2 text-sm`}>Agent</button>
+                        <button onClick={() => setTab('results')} className={`${tab === 'results' ? 'bg-white text-green-900' : 'bg-gradient-to-br from-green-500/20 to-blue-600/20'} rounded-lg p-2 text-sm`}>Result</button>
+
+                    </div>
+                    <div className="flex flex-row text-start gap-6 items-center h-[500px]">
+                        <div className={`${tab === 'agent' ? 'block' : 'md:block hidden'} md:w-[30%] w-full h-full`}>
+
+                            <ElevenLabsChatBotDemo user={undefined} conversationToken={token} demoVersion userType="seller" />
+                        </div>
+                        <div className={`${tab === 'results' ? 'block' : 'md:block hidden'} md:w-[70%] w-full max-h-full flex flex-col`}>
+                            {/* {JSON.stringify(demoPropertyFilters)} */}
+                            <div className="max-h-full w-full overflow-y-scroll">
+                                <PropertyAddView />
+                            </div>
+
+                        </div>
+                    </div>
                 </div>
+
+                <Link
+                    to={data ? "/app" : "/auth/$path"}
+                    params={data ? {} : { path: "sign-in" }}
+                    className="inline-block bg-gradient-to-r mx-auto mt-5 text-center from-blue-500 to-purple-600 text-white px-8 py-3 rounded-md font-semibold text-lg hover:from-blue-600 hover:to-purple-700 transition-all transform hover:scale-105 shadow-2xl"
+                >
+                    {t('landing-page.finalCta.button')}
+                </Link>
             </div>
         </section>
     );
@@ -271,31 +333,31 @@ export const ComparisonTable = () => {
 
     return <div className="mb-12">
         <div className='grid grid-cols-7 max-w-5xl mx-auto'>
-            <div className=' p-6'>
+            <div className=' md:p-6'>
                 <div className='h-[38px]'></div>
                 {['Comision', 'Comunicare', 'Anunțuri', 'Proces'].map((feature, index) => (
-                    <div key={index} className="flex items-center justify-end h-12">
+                    <div key={index} className="flex items-center justify-end h-7 md:h-12 text-[10px] md:text-base">
                         {feature}
                     </div>
                 ))}
             </div>
 
-            <div className='bg-white/5 rounded-l-2xl shadow-sm p-6 mx-4 col-span-3'>
-                <h3 className='text-xl mb-3'>Traditional</h3>
+            <div className='bg-white/5 rounded-l-2xl shadow-sm p-2 md:p-6 mx-1 md:mx-4 col-span-3'>
+                <h3 className='text-xs md:text-xl mb-1 md:mb-3'>Traditional</h3>
                 {['Pana la 5% (~10.000 €)', 'lentă & repetitivă', 'limitate / depășite', 'birocratie & presiune'].map((feature, index) => (
-                    <div key={index} className="flex items-center justify-start h-12">
-                        <div className="w-2 h-2 bg-green-400 rounded-full mr-3"></div>
+                    <div key={index} className="flex items-center justify-start h-7 md:h-12 text-[11px] md:text-base">
+                        <div className="w-1 h-1 md:w-2 md:h-2 bg-green-400 rounded-full mr-3"></div>
                         {feature}
                     </div>
                 ))}
             </div>
 
-            <div className='bg-gradient-to-br to-[#120826] from-[#26408F]/60 mr-4 rounded-2xl shadow-sm p-6 -m-4 col-span-3'>
+            <div className='bg-gradient-to-br to-[#120826] from-[#26408F]/60 mr-1 md:mr-4 rounded-2xl shadow-sm p-2 md:p-6 -m-4 col-span-3'>
 
-                <h3 className='text-xl mb-3'>Doors</h3>
+                <h3 className='text-xs md:text-xl mb-3 md:mb-3'>Doors</h3>
                 {['0€ pentru vânzători/ 19,99€ pentru cumpărători', 'directă & instantanee', 'actualizate în timp real, potrivite de AI', 'ghidat, simplu, transparent'].map((feature, index) => (
-                    <div key={index} className="flex items-center justify-start h-12">
-                        <div className="w-2 h-2 bg-purple-400 rounded-full mr-3"></div>
+                    <div key={index} className="flex items-center justify-start h-7 md:h-12 text-[11px] md:text-base">
+                        <div className="w-1 h-1 md:w-2 md:h-2 bg-purple-400 rounded-full mr-3"></div>
                         {feature}
                     </div>
                 ))}

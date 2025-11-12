@@ -32,3 +32,6 @@ export const propertyFiltersSchema = z.object({
 });
 
 
+export type PropertyFiltersObject = z.infer<typeof propertyFiltersSchema>;
+
+

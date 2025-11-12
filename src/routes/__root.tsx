@@ -18,6 +18,7 @@ import { getHeaders } from '@tanstack/react-start/server';
 import { auth } from 'utils/auth';
 import { createServerFn } from '@tanstack/react-start';
 import { PostHogProvider, PostHogErrorBoundary } from 'posthog-js/react'
+import { PropertyFiltersObject } from 'utils/validation/propertyFilters';
 
 export const getRootObjectsServerFn = createServerFn().handler(async ({ data: filters, }) => {
 
@@ -128,16 +129,20 @@ export const usePropertyAddStore = create<{
 type UpdateFiltersFunction = (filters: PropertyFilters) => Promise<string>
 
 export const usePropertyFilterStore = create<{
-    updatePropertyFilters: UpdateFiltersFunction,
-    setUpdatePropertyFilters: React.Dispatch<React.SetStateAction<UpdateFiltersFunction>>,
     sendUpdate(str: string): void, setSendUpdate(fn: (str: string) => void): void
     startConversation(): Promise<void>, endConversation(): Promise<void>
     setStartConversation(fn: () => Promise<void>): void, setEndConversation(fn: () => Promise<void>): void
+
+    setDemoPropertyFilters(p: PropertyFiltersObject | undefined): void,
+    demoPropertyFilters: PropertyFiltersObject | undefined,
 }>()((set => ({
-    updatePropertyFilters: async () => '', setUpdatePropertyFilters: () => { }, sendUpdate: (s) => { }, setSendUpdate: (fn) => { },
+    sendUpdate: (s) => { }, setSendUpdate: (fn) => { },
     startConversation: async () => { }, endConversation: async () => { },
     setStartConversation: (p) => set({ startConversation: p }),
-    setEndConversation: (p) => set({ endConversation: p })
+    setEndConversation: (p) => set({ endConversation: p }),
+
+    setDemoPropertyFilters: (p) => set({ demoPropertyFilters: p }),
+    demoPropertyFilters: undefined,
 })));
 
 
@@ -157,11 +162,8 @@ function RootComponent() {
 
 
 export function RootDocument({ children }: { children: React.ReactNode }) {
-    const { token: receivedToken } = Route.useLoaderData();
+    const { token } = Route.useLoaderData();
     const { theme } = useTheme();
-
-
-    const [token, setToken] = useState<string>(receivedToken);
 
     const routerState = useRouterState();
 

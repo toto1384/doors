@@ -12,6 +12,7 @@ import { useSetPropertyFunctions } from './usePostPropertyAiHook';
 import { useChooseActions } from './useChooseActionsAiHook';
 import { ChatComponent } from './chatComponent';
 import { useConversation } from '@elevenlabs/react';
+import { UserType } from 'utils/validation/dbSchemas';
 // import { useConversation as uc } from 'utils/hooks/mockElevenlabsHook';
 // const useConversation = uc({ flow: 'seller' })
 
@@ -22,7 +23,7 @@ export type MessageType = { source: 'user' | 'ai', message: string | ReactNode, 
 export const IsConnectedContext = createContext<boolean>(false);
 
 
-export const ElevenLabsChatBotDemo = ({ conversationToken, user }: { conversationToken: string, user: UserObject }) => {
+export function ElevenLabsChatBotDemo<T extends boolean>({ conversationToken, user, demoVersion, userType }: { conversationToken: string, user: T extends true ? UserObject | undefined : UserObject, demoVersion?: T, userType?: typeof UserType[number] }) {
 
     const trpc = useTRPC();
     const tokenQuery = useQuery({ ...trpc.auth.getToken.queryOptions(), initialData: { token: conversationToken } });
@@ -44,26 +45,32 @@ export const ElevenLabsChatBotDemo = ({ conversationToken, user }: { conversatio
 
 
 
-    const setPropertyFiltersFunctions = useChooseActions({ setMessages, })
+    const setPropertyFiltersFunctions = useChooseActions({ setMessages, demoVersion })
     const postPropertyFunctions = useSetPropertyFunctions({
-        setMessages, updateGhostProperty: (p) => setPartialProperty(({ ...partialProperty, ...p })),
+        setMessages, updateGhostProperty: (p) => setPartialProperty(({ ...partialProperty, ...p })), demoVersion
     })
 
 
+    const userTypeVar = userType ?? user?.userType ?? '';
+    const localeVar = locale ? ((locale.includes('-') ? locale.split('-')[0] : locale) as 'en' | 'ro') : 'ro';
     const dynamicVariables = {
-        'userName': user.name,
-        "userType": user.userType,
+        'userName': user?.name ?? '',
+        "userType": userTypeVar,
+        "userTypeMessage": userTypeVar == undefined ? (localeVar == 'ro' ? 'Doresti sa cumperi sau sa vinzi o proprietate' : 'Are you looking to buy or to sell a property') :
+            userTypeVar === 'buyer' ? (localeVar == 'ro' ? "Doresti sa te ajut sa cumperi o proprietate, nu?" : "Are you looking to buy a property, right?") :
+                (localeVar == "ro" ? "Doresti sa te ajut sa vinzi o proprietate, nu?" : 'Are you looking to sell a property, right?'),
+        'demoVersion': (demoVersion ?? false).toString(),
 
-        "hasAllPreferencesSet": !!((user.preferences?.propertyType?.length ?? 0) > 0 && (user.preferences?.budget?.min || user.preferences?.budget?.max) && user.preferences?.location?.fullLocationName && (user.preferences?.numberOfRooms?.length ?? 0) > 0 && (user.preferences?.facilities?.length ?? 0) > 0),
+        "hasAllPreferencesSet": user ? !!((user.preferences?.propertyType?.length ?? 0) > 0 && (user.preferences?.budget?.min || user.preferences?.budget?.max) && user.preferences?.location?.fullLocationName && (user.preferences?.numberOfRooms?.length ?? 0) > 0 && (user.preferences?.facilities?.length ?? 0) > 0) : false,
 
-        "userPreferences_propertyType": user.preferences?.propertyType?.map(i => i.toString()).join(',') ?? '',
-        "userPreferences_budgetMin": user.preferences?.budget?.min ?? 0,
-        "userPreferences_budgetMax": user.preferences?.budget?.max ?? 0,
-        "userPreferences_location": user.preferences?.location?.fullLocationName ?? '',
-        "userPreferences_numberOfRooms": user.preferences?.numberOfRooms?.map(i => i.toString()).join(',') ?? '',
-        "userPreferences_facilities": user.preferences?.facilities?.map(i => i.toString()).join(',') ?? '',
-        "userPreferences_surfaceArea": user.preferences?.surfaceArea?.min ?? '',
-    }
+        "userPreferences_propertyType": user?.preferences?.propertyType?.map(i => i.toString()).join(',') ?? '',
+        "userPreferences_budgetMin": user?.preferences?.budget?.min ?? 0,
+        "userPreferences_budgetMax": user?.preferences?.budget?.max ?? 0,
+        "userPreferences_location": user?.preferences?.location?.fullLocationName ?? '',
+        "userPreferences_numberOfRooms": user?.preferences?.numberOfRooms?.map(i => i.toString()).join(',') ?? '',
+        "userPreferences_facilities": user?.preferences?.facilities?.map(i => i.toString()).join(',') ?? '',
+        "userPreferences_surfaceArea": user?.preferences?.surfaceArea?.min ?? '',
+    };
 
 
     const conversation = useConversation({
@@ -78,7 +85,7 @@ export const ElevenLabsChatBotDemo = ({ conversationToken, user }: { conversatio
         },
         overrides: {
             agent: {
-                language: locale ? ((locale.includes('-') ? locale.split('-')[0] : locale) as 'en' | 'ro') : 'ro',
+                language: localeVar,
             },
         },
     });

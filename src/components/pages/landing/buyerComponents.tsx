@@ -1,31 +1,72 @@
 import { Badge } from "@/components/ui/badge";
 import { TimelineLayout } from "@/components/ui/timeline-layout";
+import { ElevenLabsChatBotDemo } from "@/components/userAndAi/aiChatbot";
 import { ComparisonTable } from "@/routes";
+import { usePropertyFilterStore } from "@/routes/__root";
+import { useQuery } from "@tanstack/react-query";
 import { CheckCircle } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { useTRPC } from "trpc/react";
+import { useShallow } from "zustand/react/shallow";
+import { PropertiesView } from "../propertiesView";
+import { authClient } from "utils/auth-client";
+import { Link } from "@tanstack/react-router";
+import { useState } from "react";
 
 
 
 // Buyer Demo Section Component
-export const BuyerDemoSection: React.FC = () => {
+export const BuyerDemoSection = ({ token }: { token: string }) => {
+
     const { t } = useTranslation();
+
+    const { data } = authClient.useSession();
+
+    const { demoPropertyFilters, setDemoPropertyFilters } = usePropertyFilterStore(useShallow(state => ({
+        demoPropertyFilters: state.demoPropertyFilters,
+        setDemoPropertyFilters: state.setDemoPropertyFilters,
+    })))
+
+    const [tab, setTab] = useState<'agent' | 'results'>('agent')
 
     return (
         <section id="demo" className="md:py-10 ">
-            <div className="max-w-7xl mx-auto px-6">
+            <div className="max-w-7xl mx-auto px-2 md:px-6 flex flex-col items-center">
 
                 {/* Try Demo Section */}
-                <div className="text-center bg-gradient-to-br from-blue-500/20 to-purple-600/20 rounded-lg p-8 max-w-4xl mx-auto">
+                <div className="text-center bg-gradient-to-br from-blue-500/20 to-purple-600/20 rounded-lg p-2 md:p-8 max-w-4xl mx-auto">
                     <h3 className="text-2xl font-semibold text-white mb-4">
                         {t('landing-page.demo.buyer.tryDemo.title')}
                     </h3>
-                    <p className="text-slate-300 mb-6 max-w-2xl mx-auto">
-                        {t('landing-page.demo.buyer.tryDemo.description')}
-                    </p>
-                    <button className="bg-gradient-to-r from-green-500 to-blue-600 text-white px-8 py-3 rounded-md font-semibold text-lg hover:from-green-600 hover:to-blue-700 transition-all transform hover:scale-105 shadow-2xl">
-                        {t('landing-page.demo.buyer.tryDemo.cta')}
-                    </button>
+
+                    <div className='flex flex-row items-center w-fit mx-auto gap-6 rounded-lg p-2 bg-gradient-to-br from-green-500/20 to-blue-600/20 text-white'>
+                        <button onClick={() => setTab('agent')} className={`${tab === 'agent' ? 'bg-white text-green-900' : 'bg-gradient-to-br from-green-500/20 to-blue-600/20'} rounded-lg p-2 text-sm`}>Agent</button>
+                        <button onClick={() => setTab('results')} className={`${tab === 'results' ? 'bg-white text-green-900' : 'bg-gradient-to-br from-green-500/20 to-blue-600/20'} rounded-lg p-2 text-sm`}>Results</button>
+                    </div>
+
+                    <div className="flex flex-row text-start gap-6 items-center h-[500px]">
+                        <div className={`${tab === 'agent' ? 'block' : 'md:block hidden'} md:w-[30%] w-full h-full`}>
+
+                            <ElevenLabsChatBotDemo user={undefined} conversationToken={token} demoVersion userType="buyer" />
+                        </div>
+                        <div className={`${tab === 'results' ? 'block' : 'md:block hidden'} md:w-[70%] w-full max-h-full flex flex-col`}>
+                            {/* {JSON.stringify(demoPropertyFilters)} */}
+                            <div className="max-h-full overflow-y-scroll">
+                                <PropertiesView searchParams={demoPropertyFilters ?? {}} demoVersion />
+                            </div>
+
+                        </div>
+                    </div>
+
                 </div>
+
+                <Link
+                    to={data ? "/app" : "/auth/$path"}
+                    params={data ? {} : { path: "sign-in" }}
+                    className="inline-block bg-gradient-to-r mx-auto mt-5 text-center from-blue-500 to-purple-600 text-white px-8 py-3 rounded-md font-semibold text-lg hover:from-blue-600 hover:to-purple-700 transition-all transform hover:scale-105 shadow-2xl"
+                >
+                    Înregistrează-te acum
+                </Link>
             </div>
         </section>
     );

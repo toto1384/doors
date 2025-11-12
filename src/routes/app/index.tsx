@@ -9,9 +9,9 @@ import { LocationObject } from "utils/validation/types";
 import { PropertyObject } from "utils/validation/types";
 import { trpcRouter } from "trpc/router";
 import { createServerFn } from "@tanstack/react-start";
-import { PropertyCard } from "./properties";
 import { getHeaders } from "@tanstack/react-start/server";
 import { auth } from "utils/auth";
+import { PropertyCard } from "@/components/basics/propertyCard";
 
 
 

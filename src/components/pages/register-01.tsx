@@ -10,6 +10,9 @@ import { FloatingPasswordInput } from "@/components/ui/floating-password-input";
 import { PhoneInput } from "@/components/ui/phone-input";
 import { authClient } from "utils/auth-client";
 import { Header } from "./landing/headerLanding";
+import { demoPropertyKey, propPreferencesKey } from "utils/constants";
+import { useTRPCClient } from "trpc/react";
+import { toast } from "sonner";
 
 type RegisterForm = {
     name: string;
@@ -25,6 +28,8 @@ export default function RegisterPage() {
     const [error, setError] = useState("");
     const { t } = useTranslation('translation', { keyPrefix: 'register-page' });
 
+    const trpcClient = useTRPCClient()
+
     const {
         register,
         handleSubmit,
@@ -39,18 +44,40 @@ export default function RegisterPage() {
         setIsLoading(true);
         setError("");
 
+        const preferences = JSON.parse(localStorage.getItem(propPreferencesKey) ?? "{}")
+        const demoProperty = JSON.parse(localStorage.getItem(demoPropertyKey) ?? "{}")
+
+
+        console.log('demoProperty', demoProperty)
+        console.log('preferences', preferences)
+
+
         try {
             const result = await authClient.signUp.email({
                 email: data.email,
                 password: data.password,
                 name: data.name,
                 phoneNumber: data.phoneNumber,
-            });
+            } as any);
 
             if (result.error) {
                 setError(result.error.message || "Registration failed");
             } else {
-                router.navigate({ to: "/app" });
+
+                if (preferences.propertyType) {
+                    const res = await trpcClient.auth.updateUserPreferences.mutate(preferences)
+                    console.log('resUpdatePreferences', res)
+                    if (!res.success) toast.error('Failed to update preferences')
+                    localStorage.removeItem(propPreferencesKey)
+                }
+
+                if (demoProperty.propertyType) {
+                    const res = await trpcClient.properties.postProperty.mutate({ property: demoProperty as any })
+                    console.log('resPostDemoProperty', res)
+                    localStorage.removeItem(demoPropertyKey)
+                    if (!res.success) toast.error('Failed to post demo property')
+                    router.navigate({ to: "/app/my-properties" })
+                } else router.navigate({ to: "/app" });
             }
         } catch (err) {
             setError("An unexpected error occurred");

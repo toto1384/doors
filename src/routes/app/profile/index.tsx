@@ -13,8 +13,8 @@ import { getHeaders } from "@tanstack/react-start/server";
 import dbConnect from "utils/db/mongodb";
 import { getPropertyModel } from "utils/validation/mongooseModels";
 import { PropertyObject } from "utils/validation/types";
-import { PropertyCard } from "../properties";
 import { UserTypeSwitch } from "@/components/userAndAi/userTypeSwitch";
+import { PropertyCard } from "@/components/basics/propertyCard";
 
 
 const getFavouritesProperties = createServerFn().validator((params) => z.object({ skip: z.number().optional() }).parse(params)).handler(async ({ data }) => {
