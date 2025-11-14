@@ -36,7 +36,7 @@ function PropertyAdd() {
 
         </div>
 
-        <PropertyAddView partialProperty={partialProperty} setPartialProperty={setPartialProperty} />
+        <PropertyAddView />
     </div>
 }
 

@@ -3,10 +3,14 @@
     "hero": {
       "title": {
         "line1": "No agents. No commissions.",
-        "line2": "No complications."
+        "line2": "No complications.",
+        "main": "Doors",
+        "subtitle1": "Open the door to a smarter",
+        "subtitle2": "real estate experience"
       },
       "subtitle": "DOORS puts control back where it belongs — in the hands of buyers and sellers.",
-      "description": "We directly connect real people, backed by a powerful AI assistant and optional professional services, when you need them.",
+      "description": "No agents. No commissions. Just you, your personal Doors assistant and a platform that makes buying or selling your home faster, clearer and completely stress-free.",
+      "startConversation": "Start Conversation",
       "actionSelector": {
         "buy": "🏠 Buying",
         "sell": "🏡 Selling"
@@ -38,6 +42,8 @@
         "conclusion": "In a complicated market, DOORS brings back simplicity.",
         "solutionTitle": "Your personal real estate assistant, always available and always honest.",
         "solutionDescription": "DOORS eliminates the chaos. Our empathetic and professional assistant listens, understands your needs and instantly finds properties that truly match your preferences — no intermediaries, no pressure, no commissions.",
+        "beforeDoorsTitle": "Before DOORS — Fighting with the real estate market",
+        "whyDoorsTitle": "Why DOORS — Buy smarter",
         "realBenefits": {
           "title": "Real benefits:",
           "items": [
@@ -65,6 +71,7 @@
         "conclusion": "DOORS completely changes this story.",
         "solutionTitle": "Sell faster. Keep 100%. Pay nothing.",
         "solutionDescription": "On DOORS, everything starts with a simple conversation. The DOORS assistant interviews you about your property — or you can enter the details directly. Then, you upload the photos, and in seconds DOORS creates a complete optimized listing, ready to publish, with professional text and suitable images — and publishes it instantly.",
+        "whyDoorsTitle": "Why DOORS?",
         "realBenefits": {
           "title": "Real benefits:",
           "items": [
@@ -77,6 +84,11 @@
       }
     },
     "demo": {
+      "tabs": {
+        "agent": "Agent",
+        "results": "Results",
+        "result": "Result"
+      },
       "buyer": {
         "title": "From \"Looking\" to \"Found\" — in 4 simple steps",
         "steps": [
@@ -150,6 +162,12 @@
           "icon": "📊",
           "title": "Market analysis",
           "description": "compare similar offers and price trends"
+        },
+        {
+          "comingSoon": true,
+          "icon": "📋",
+          "title": "Notarial Appointment",
+          "description": "Schedule notary office instantly"
         }
       ],
       "conclusion": "Enjoy your free time — DOORS makes choosing your home simple, smart and safe."
@@ -182,19 +200,24 @@
       },
       "comparison": {
         "title": "Quick comparison:",
+        "features": ["Commission", "Communication", "Listings", "Process"],
         "traditional": {
           "title": "Traditional",
-          "commission": "Commission: up to 5% (~€10,000)",
-          "communication": "Communication: slow & repetitive",
-          "listings": "Listings: limited / outdated",
-          "process": "Process: bureaucracy & pressure"
+          "values": [
+            "Up to 5% (~€10,000)",
+            "slow & repetitive",
+            "limited / outdated", 
+            "bureaucracy & pressure"
+          ]
         },
         "doors": {
-          "title": "DOORS",
-          "commission": "€0 for sellers / €19.99 for buyers",
-          "communication": "direct & instant",
-          "listings": "updated in real-time, AI-matched",
-          "process": "guided, simple, transparent"
+          "title": "Doors",
+          "values": [
+            "€0 for sellers / €19.99 for buyers",
+            "direct & instant",
+            "updated in real-time, AI-matched",
+            "guided, simple, transparent"
+          ]
         }
       }
     },
@@ -390,6 +413,9 @@
     "myProperties": "My properties"
   },
   "ai-chatbot": {
+    "assistant": "Doors Assistant",
+    "assistantNotStarted": "Doors Assistant Not Started",
+    "startConversation": "Start Conversation",
     "propertyTypes": {
       "house": "House",
       "apartment": "Apartment",

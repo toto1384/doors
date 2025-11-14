@@ -1,23 +1,19 @@
 
-import { useQuery } from '@tanstack/react-query';
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
 import { Search, Bot, Zap, Eye, DollarSign, Home, Star, ArrowRight, Menu, X, Shield, Atom, Focus, CheckCircle, ChevronDown, Check } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useTRPC } from 'trpc/react';
 import { authClient } from 'utils/auth-client';
 import '../components/i18n';
-import i18n from '../components/i18n';
 import { TimelineLayout } from '@/components/ui/timeline-layout';
-import { Badge } from '@/components/ui/badge';
 import { BuyerBenefitsSection, BuyerDemoSection, BuyerPricingSection } from '@/components/pages/landing/buyerComponents';
 import { Header } from '@/components/pages/landing/headerLanding';
 import { createServerFn } from '@tanstack/react-start';
-import { PropertiesView } from '@/components/pages/propertiesView';
 import { ElevenLabsChatBotDemo } from '@/components/userAndAi/aiChatbot';
 import { usePropertyFilterStore } from './__root';
 import { useShallow } from 'zustand/react/shallow';
 import { PropertyAddView } from '@/components/pages/propertyAddView';
+import { Button } from '@/components/ui/button';
 
 
 export const Route = createFileRoute('/')({
@@ -81,31 +77,8 @@ function LandingPage() {
 
 
             <Header />
-            <HeroSection />
+            <HeroSection selectedAction={selectedAction} setSelectedAction={setSelectedAction} />
 
-            {/* Action Selector */}
-            <div className="flex flex-row justify-center mb-6 mt-6">
-                <div className="bg-white/10 backdrop-blur-sm rounded-full p-1 flex">
-                    <button
-                        onClick={() => setSelectedAction('buy')}
-                        className={`px-6 py-2 rounded-full text-sm font-medium transition-all ${selectedAction === 'buy'
-                            ? 'bg-white text-purple-900'
-                            : 'text-white hover:bg-white/10'
-                            }`}
-                    >
-                        {t('landing-page.hero.actionSelector.buy')}
-                    </button>
-                    <button
-                        onClick={() => setSelectedAction('sell')}
-                        className={`px-6 py-2 rounded-full text-sm font-medium transition-all ${selectedAction === 'sell'
-                            ? 'bg-white text-purple-900'
-                            : 'text-white hover:bg-white/10'
-                            }`}
-                    >
-                        {t('landing-page.hero.actionSelector.sell')}
-                    </button>
-                </div>
-            </div>
 
             {selectedAction === 'buy' ? <BuyerDemoSection token={token} /> : <SellerDemoSection token={token} />}
             {selectedAction === 'buy' ? <BuyerBenefitsSection /> : <SellerBenefitsSection />}
@@ -122,9 +95,14 @@ function LandingPage() {
 
 
 // Hero Section Component
-const HeroSection: React.FC<{}> = ({ }) => {
+const HeroSection = ({ setSelectedAction, selectedAction }: { setSelectedAction: (str: 'sell' | 'buy') => void, selectedAction: string }) => {
     const { data } = authClient.useSession();
     const { t } = useTranslation();
+
+    const { startConversation } = usePropertyFilterStore(useShallow(state => ({
+        startConversation: state.startConversation,
+    })))
+
 
     return (
         <section className="min-h-[95dvh] bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-end relative md:overflow-hidden h-fit">
@@ -135,23 +113,62 @@ const HeroSection: React.FC<{}> = ({ }) => {
             <div className='bg-gradient-to-r hidden md:block from-[#0B0014]/90 from-20% to-black/0 to-40% absolute z-30 inset-0'></div>
             <div className='bg-gradient-to-t from-[#0B0014] from-20% to-black/0 to-50% absolute z-30 inset-0'></div>
 
-            <div className="md:w-[47vw] absolute bottom-30 w-[95%] left-0 md:left-auto right-0 md:mt-0 md:top-[32vw] md:right-[11vw] mx-auto">
-                <div className="z-10 md:px-3 text-center md:hidden md:pl-5">
-                    <h1 className={`text-6xl font-semibold text-cente text-white mb-4`}>
-                        Doors
+            <div className="md:w-[47vw] absolute bottom-30 w-[95%] left-0 md:left-auto right-0 md:mt-0 md:top-[28vw] md:right-[11vw] mx-auto">
+                <div className="z-10 md:px-3 text-center md:hidden pr-2 md:pr-0 md:pl-5">
+                    <h1 className={`text-7xl font-extrabold text-cente text-white mb-4`}>
+                        {t('landing-page.hero.title.main')}
                     </h1>
-                    <span className={`text-4xl text-center font-light text-white mb-4`}>
-                        Deschide ușa către o experiență
+                    <span className={`text-3xl text-center font-light text-white mb-4`}>
+                        {t('landing-page.hero.title.subtitle1')}
                     </span>
-                    <span className="text-4xl md:text-[13rem]/15 font-semibold text-white mb-8 ml-2 md:ml-0">
-                        imobiliară mai inteligentă
+                    <span className="text-3xl md:text-[13rem]/15 font-semibold text-white mb-8 ml-2 md:ml-0">
+                        {t('landing-page.hero.title.subtitle2')}
                     </span>
                 </div>
                 <div className='z-40 relative md:absolute md:px-3 w-full'>
 
                     <p className="md:text-sm text-center md:text-start font-light mt-6 md:mt-0 mb-6 md:mb-4 mx-auto w-full text-[#C4CDD5]">
-                        Fără agenți. Fără comisioane. Doar tu, asistentul tău personal Doors și o platformă care face cumpărarea sau vânzarea locuinței mai rapidă, clară și complet fără stres.
+                        {t('landing-page.hero.description')}
                     </p>
+
+
+                    <div className='flex flex-col md:flex-row items-center justify-center gap-2 md:gap-6'>
+                        {/* Action Selector */}
+                        <div className="flex flex-col md:flex-row justify-center mb-6 mt-6">
+                            <div className="bg-white/10 backdrop-blur-sm rounded-full p-1 flex">
+                                <button
+                                    onClick={() => setSelectedAction('buy')}
+                                    className={`px-7 py-3 rounded-full text-sm font-medium transition-all ${selectedAction === 'buy'
+                                        ? 'bg-white text-purple-900'
+                                        : 'text-white hover:bg-white/10'
+                                        }`}
+                                >
+                                    {t('landing-page.hero.actionSelector.buy')}
+                                </button>
+                                <button
+                                    onClick={() => setSelectedAction('sell')}
+                                    className={`px-7 py-3 rounded-full text-sm font-medium transition-all ${selectedAction === 'sell'
+                                        ? 'bg-white text-purple-900'
+                                        : 'text-white hover:bg-white/10'
+                                        }`}
+                                >
+                                    {t('landing-page.hero.actionSelector.sell')}
+                                </button>
+                            </div>
+                        </div>
+
+                        <button
+                            onClick={() => {
+                                startConversation()
+                                return document.getElementById('demo')?.scrollIntoView({ behavior: 'smooth' })
+                            }}
+                            className="bg-gradient-to-br from-[#4C7CED] to-[#7B31DC] text-white text-base rounded-[6px] flex flex-row items-center justify-center gap-2 hover:to-[#6A2BC4]/50 hover:from-[#4C7CED]/50 cursor-pointer px-10 py-3"
+                        >
+                            {t('landing-page.hero.startConversation')}
+                        </button>
+
+                    </div>
+
 
                     {/* Micro Benefits */}
                     {/* <div className="mb-8 space-y-2"> */}
@@ -231,7 +248,7 @@ const SellerBenefitsSection = () => {
                     {/* Left side - Blue card */}
                     <div className="bg-gradient-to-br from-blue-500/50 to-purple-600/50 rounded-lg p-6 text-white">
                         <h2 className="text-3xl text-white mb-3">
-                            De ce <b>DOORS?</b>
+                            {t('landing-page.benefits.seller.whyDoorsTitle')}
 
                         </h2>
                         <h3 className="text-lg text-white mb-6">
@@ -296,8 +313,8 @@ const SellerDemoSection = ({ token }: { token: string }) => {
                         {t('landing-page.demo.seller.tryDemo.title')}
                     </h3>
                     <div className='flex md:hidden flex-row items-center w-fit mx-auto gap-6 rounded-lg p-2 bg-gradient-to-br from-green-500/20 to-blue-600/20 text-white'>
-                        <button onClick={() => setTab('agent')} className={`${tab === 'agent' ? 'bg-white text-green-900' : 'bg-gradient-to-br from-green-500/20 to-blue-600/20'} rounded-lg p-2 text-sm`}>Agent</button>
-                        <button onClick={() => setTab('results')} className={`${tab === 'results' ? 'bg-white text-green-900' : 'bg-gradient-to-br from-green-500/20 to-blue-600/20'} rounded-lg p-2 text-sm`}>Result</button>
+                        <button onClick={() => setTab('agent')} className={`${tab === 'agent' ? 'bg-white text-green-900' : 'bg-gradient-to-br from-green-500/20 to-blue-600/20'} rounded-lg p-2 text-sm`}>{t('landing-page.demo.tabs.agent')}</button>
+                        <button onClick={() => setTab('results')} className={`${tab === 'results' ? 'bg-white text-green-900' : 'bg-gradient-to-br from-green-500/20 to-blue-600/20'} rounded-lg p-2 text-sm`}>{t('landing-page.demo.tabs.result')}</button>
 
                     </div>
                     <div className="flex flex-row text-start gap-6 items-center h-[500px]">
@@ -335,7 +352,7 @@ export const ComparisonTable = () => {
         <div className='grid grid-cols-7 max-w-5xl mx-auto'>
             <div className=' md:p-6'>
                 <div className='h-[38px]'></div>
-                {['Comision', 'Comunicare', 'Anunțuri', 'Proces'].map((feature, index) => (
+                {((t('landing-page.pricing.comparison.features', { returnObjects: true }) as string[]) || []).map((feature, index) => (
                     <div key={index} className="flex items-center justify-end h-7 md:h-12 text-[10px] md:text-base">
                         {feature}
                     </div>
@@ -343,8 +360,8 @@ export const ComparisonTable = () => {
             </div>
 
             <div className='bg-white/5 rounded-l-2xl shadow-sm p-2 md:p-6 mx-1 md:mx-4 col-span-3'>
-                <h3 className='text-xs md:text-xl mb-1 md:mb-3'>Traditional</h3>
-                {['Pana la 5% (~10.000 €)', 'lentă & repetitivă', 'limitate / depășite', 'birocratie & presiune'].map((feature, index) => (
+                <h3 className='text-xs md:text-xl mb-1 md:mb-3'>{t('landing-page.pricing.comparison.traditional.title')}</h3>
+                {((t('landing-page.pricing.comparison.traditional.values', { returnObjects: true }) as string[]) || []).map((feature, index) => (
                     <div key={index} className="flex items-center justify-start h-7 md:h-12 text-[11px] md:text-base">
                         <div className="w-1 h-1 md:w-2 md:h-2 bg-green-400 rounded-full mr-3"></div>
                         {feature}
@@ -354,8 +371,8 @@ export const ComparisonTable = () => {
 
             <div className='bg-gradient-to-br to-[#120826] from-[#26408F]/60 mr-1 md:mr-4 rounded-2xl shadow-sm p-2 md:p-6 -m-4 col-span-3'>
 
-                <h3 className='text-xs md:text-xl mb-3 md:mb-3'>Doors</h3>
-                {['0€ pentru vânzători/ 19,99€ pentru cumpărători', 'directă & instantanee', 'actualizate în timp real, potrivite de AI', 'ghidat, simplu, transparent'].map((feature, index) => (
+                <h3 className='text-xs md:text-xl mb-3 md:mb-3'>{t('landing-page.pricing.comparison.doors.title')}</h3>
+                {((t('landing-page.pricing.comparison.doors.values', { returnObjects: true }) as string[]) || []).map((feature, index) => (
                     <div key={index} className="flex items-center justify-start h-7 md:h-12 text-[11px] md:text-base">
                         <div className="w-1 h-1 md:w-2 md:h-2 bg-purple-400 rounded-full mr-3"></div>
                         {feature}

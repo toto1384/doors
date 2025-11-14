@@ -40,8 +40,8 @@ export const BuyerDemoSection = ({ token }: { token: string }) => {
                     </h3>
 
                     <div className='flex md:hidden flex-row items-center w-fit mx-auto gap-6 rounded-lg p-2 bg-gradient-to-br from-green-500/20 to-blue-600/20 text-white'>
-                        <button onClick={() => setTab('agent')} className={`${tab === 'agent' ? 'bg-white text-green-900' : 'bg-gradient-to-br from-green-500/20 to-blue-600/20'} rounded-lg p-2 text-sm`}>Agent</button>
-                        <button onClick={() => setTab('results')} className={`${tab === 'results' ? 'bg-white text-green-900' : 'bg-gradient-to-br from-green-500/20 to-blue-600/20'} rounded-lg p-2 text-sm`}>Results</button>
+                        <button onClick={() => setTab('agent')} className={`${tab === 'agent' ? 'bg-white text-green-900' : 'bg-gradient-to-br from-green-500/20 to-blue-600/20'} rounded-lg p-2 text-sm`}>{t('landing-page.demo.tabs.agent')}</button>
+                        <button onClick={() => setTab('results')} className={`${tab === 'results' ? 'bg-white text-green-900' : 'bg-gradient-to-br from-green-500/20 to-blue-600/20'} rounded-lg p-2 text-sm`}>{t('landing-page.demo.tabs.results')}</button>
                     </div>
 
                     <div className="flex flex-row text-start gap-6 items-center h-[500px]">
@@ -65,7 +65,7 @@ export const BuyerDemoSection = ({ token }: { token: string }) => {
                     params={data ? {} : { path: "sign-in" }}
                     className="inline-block bg-gradient-to-r mx-auto mt-5 text-center from-blue-500 to-purple-600 text-white px-8 py-3 rounded-md font-semibold text-lg hover:from-blue-600 hover:to-purple-700 transition-all transform hover:scale-105 shadow-2xl"
                 >
-                    Înregistrează-te acum
+                    Înregistrează-te Gratuit
                 </Link>
             </div>
         </section>
@@ -84,7 +84,7 @@ export const ProblemSolutionBuyer = () => {
         {/* Problem Statement */}
         <div className="text-center mb-24">
             <h2 className='text-3xl font-semibold text-white mb-6'>
-                Înainte de DOORS — Lupta cu piața imobiliară
+                {t('landing-page.benefits.buyer.beforeDoorsTitle')}
             </h2>
             <h3 className="text-lg text-white mb-6">
                 {t('landing-page.benefits.buyer.title')}
@@ -121,7 +121,7 @@ export const ProblemSolutionBuyer = () => {
                     {/* Left side - Blue card */}
                     <div className="bg-gradient-to-br from-blue-500/50 to-purple-600/50 rounded-lg p-6 text-white">
                         <h2 className="text-3xl text-white mb-3">
-                            De ce DOORS — Cumpără mai inteligent
+                            {t('landing-page.benefits.buyer.whyDoorsTitle')}
                         </h2>
                         <h3 className="text-lg text-white mb-6">
                             {t('landing-page.benefits.buyer.solutionTitle')}
@@ -159,7 +159,7 @@ export const FoundSomethingYouLikeSection: React.FC = () => {
     const services = Array.isArray(servicesData) ? servicesData as Array<{ icon: string, title: string, description: string, comingSoon?: boolean }> : [];
 
     return (
-        <section id="about" className="mt-20 max-w-5xl mx-auto">
+        <section id="about" className="mt-20 max-w-6xl mx-auto">
             <div className="mx-4 text-center">
                 {/* Subtitle Question */}
                 <p className="text-xl text-slate-300 mb-6">
@@ -177,7 +177,7 @@ export const FoundSomethingYouLikeSection: React.FC = () => {
                 </p>
 
                 {/* Services Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-12">
                     {services.map((service, index) => (
                         <div key={index} className="bg-[#120826] rounded-lg p-6 text-center relative">
                             {service.comingSoon && <Badge variant="destructive" className="absolute top-1.5 right-1.5">Coming Soon</Badge>}
@@ -259,9 +259,6 @@ export const BuyerPricingSection: React.FC = () => {
                 <p className="text-lg text-slate-300 max-w-4xl mx-auto mb-4">
                     {t('landing-page.pricing.buyer.subtitle')}
                 </p>
-                <p className="text-md text-slate-400 max-w-3xl mx-auto mb-6">
-                    {t('landing-page.pricing.buyer.guarantee')}
-                </p>
                 <p className="text-xl font-semibold text-blue-400">
                     {t('landing-page.pricing.buyer.highlights')}
                 </p>
@@ -289,7 +286,7 @@ export const BuyerPricingSection: React.FC = () => {
 export const BuyerBenefitsSection: React.FC = () => {
     return (
         <section id="benefits" className="py-16">
-            <div className="max-w-5xl mx-auto px-6">
+            <div className="max-w-6xl mx-auto px-6">
                 <ProblemSolutionBuyer />
                 <FromLookingToFound />
                 <FoundSomethingYouLikeSection />

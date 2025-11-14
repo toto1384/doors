@@ -3,10 +3,14 @@
     "hero": {
       "title": {
         "line1": "Fără agenți. Fără comisioane.",
-        "line2": "Fără complicații."
+        "line2": "Fără complicații.",
+        "main": "Doors",
+        "subtitle1": "Deschide ușa către o experiență",
+        "subtitle2": "imobiliară mai inteligentă"
       },
       "subtitle": "DOORS readuce controlul acolo unde îi este locul — în mâinile cumpărătorilor și vânzătorilor.",
-      "description": "Conectăm direct oameni reali, susținuți de un asistent AI puternic și servicii profesionale opționale, atunci când ai nevoie.",
+      "description": "Fără agenți. Fără comisioane. Doar tu, asistentul tău personal Doors și o platformă care face cumpărarea sau vânzarea locuinței mai rapidă, clară și complet fără stres.",
+      "startConversation": "Incepe Conversatia",
       "actionSelector": {
         "buy": "🏠 Cumpăr",
         "sell": "🏡 Vând"
@@ -38,6 +42,8 @@
         "conclusion": "Într-o piață complicată, DOORS readuce simplitatea.",
         "solutionTitle": "Asistentul tău imobiliar personal, mereu disponibil și mereu sincer.",
         "solutionDescription": "DOORS elimină haosul. Asistentul nostru empatic și profesionist ascultă, îți înțelege nevoile și îți găsește instant proprietăți care se potrivesc cu adevărat preferințelor tale — fără intermediari, fără presiune, fără comisioane.",
+        "beforeDoorsTitle": "Înainte de DOORS — Lupta cu piața imobiliară",
+        "whyDoorsTitle": "De ce DOORS — Cumpără mai inteligent",
         "realBenefits": {
           "title": "Beneficii reale:",
           "items": [
@@ -65,6 +71,7 @@
         "conclusion": "DOORS schimbă complet această poveste.",
         "solutionTitle": "Vinde mai repede. Păstrează 100%. Nu plăti nimic.",
         "solutionDescription": "Pe DOORS, totul începe cu o conversație simplă. Asistentul DOORS te intervievează despre proprietatea ta — sau poți introduce detaliile direct. Apoi, încarci fotografiile, iar în câteva secunde DOORS creează un anunț complet optimizat, gata de publicare, cu text profesional și imagini potrivite — și îl publică instant.",
+        "whyDoorsTitle": "De ce DOORS?",
         "realBenefits": {
           "title": "Beneficii reale:",
           "items": [
@@ -77,6 +84,11 @@
       }
     },
     "demo": {
+      "tabs": {
+        "agent": "Agent",
+        "results": "Results",
+        "result": "Result"
+      },
       "buyer": {
         "title": "De la \"Caut\" la \"Am găsit\" — în 4 pași simpli",
         "steps": [
@@ -150,6 +162,12 @@
           "icon": "📊",
           "title": "Analiză de piață",
           "description": "compară oferte similare și tendințe de preț"
+        },
+        {
+          "comingSoon": true,
+          "icon": "📋",
+          "title": "Programare Notariala",
+          "description": "Programeaza instant biroul notarial"
         }
       ],
       "conclusion": "Bucură-te de timpul tău liber — DOORS face alegerea casei tale simplă, inteligentă și sigură."
@@ -182,19 +200,24 @@
       },
       "comparison": {
         "title": "Comparație rapidă:",
+        "features": ["Comision", "Comunicare", "Anunțuri", "Proces"],
         "traditional": {
-          "title": "Tradițional",
-          "commission": "Comision: până la 5% (~10.000 €)",
-          "communication": "Comunicare: lentă & repetitivă",
-          "listings": "Anunțuri: limitate / depășite",
-          "process": "Proces: birocrație & presiune"
+          "title": "Traditional",
+          "values": [
+            "Pana la 5% (~10.000 €)",
+            "lentă & repetitivă", 
+            "limitate / depășite",
+            "birocratie & presiune"
+          ]
         },
         "doors": {
-          "title": "DOORS",
-          "commission": "0 € pentru vânzători / 19,99 € pentru cumpărători",
-          "communication": "directă & instantanee",
-          "listings": "actualizate în timp real, potrivite de AI",
-          "process": "ghidat, simplu, transparent"
+          "title": "Doors",
+          "values": [
+            "0€ pentru vânzători/ 19,99€ pentru cumpărători",
+            "directă & instantanee",
+            "actualizate în timp real, potrivite de AI", 
+            "ghidat, simplu, transparent"
+          ]
         }
       }
     },
@@ -372,6 +395,9 @@
     "myProperties": "Proprietățile mele"
   },
   "ai-chatbot": {
+    "assistant": "Asistent Doors",
+    "assistantNotStarted": "Asistent Doors nu a fost pornit",
+    "startConversation": "Pornește conversația",
     "propertyTypes": {
       "house": "Casa",
       "apartment": "Apartament",
