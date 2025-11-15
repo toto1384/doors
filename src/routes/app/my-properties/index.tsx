@@ -15,10 +15,10 @@ import { Button } from '@/components/ui/button'
 import { DropdownMenuCheckboxItemProps } from "@radix-ui/react-dropdown-menu"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger, } from "@/components/ui/alert-dialog"
 import { useTranslation } from 'react-i18next'
-import { usePropertyFilterStore } from '../__root'
 import { useShallow } from 'zustand/react/shallow'
 import { useRouter } from '@tanstack/react-router'
 import { PropertyCard } from '@/components/basics/propertyCard'
+import { usePropertyFilterStore } from '@/routes/__root'
 
 
 
@@ -34,7 +34,7 @@ const fetchMyPropertiesServerFn = createServerFn().validator(d => zodValidator.p
     return res
 })
 
-export const Route = createFileRoute('/app/my-properties')({
+export const Route = createFileRoute('/app/my-properties/')({
     component: MyPropertiesRoute,
     loaderDeps: ({ search }) => ({ search }),
     loader: async ({ deps: { search } }) => {

@@ -15,16 +15,18 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as TermsOfServiceIndexRouteImport } from './routes/terms-of-service/index'
 import { Route as PrivacyPolicyIndexRouteImport } from './routes/privacy-policy/index'
 import { Route as AppIndexRouteImport } from './routes/app/index'
-import { Route as AppMyPropertiesRouteImport } from './routes/app/my-properties'
+import { Route as AppAppointmentsRouteImport } from './routes/app/appointments'
 import { Route as AuthResetPasswordIndexRouteImport } from './routes/auth/reset-password/index'
 import { Route as AuthForgotPasswordIndexRouteImport } from './routes/auth/forgot-password/index'
 import { Route as AuthPathIndexRouteImport } from './routes/auth/$path/index'
 import { Route as AppPropertiesIndexRouteImport } from './routes/app/properties/index'
 import { Route as AppProfileIndexRouteImport } from './routes/app/profile/index'
 import { Route as AppNotificationsIndexRouteImport } from './routes/app/notifications/index'
+import { Route as AppMyPropertiesIndexRouteImport } from './routes/app/my-properties/index'
 import { Route as AppBillingIndexRouteImport } from './routes/app/billing/index'
 import { Route as AppPropertiesAddRouteImport } from './routes/app/properties/add'
 import { Route as AppProfileSettingsRouteImport } from './routes/app/profile/settings'
+import { Route as AppMyPropertiesBookingsRouteImport } from './routes/app/my-properties/bookings'
 import { Route as AppPropertiesIdIndexRouteImport } from './routes/app/properties/$id/index'
 import { Route as AppPropertiesIdEditRouteImport } from './routes/app/properties/$id/edit'
 import { ServerRoute as ApiUploadthingServerRouteImport } from './routes/api/uploadthing'
@@ -53,9 +55,9 @@ const AppIndexRoute = AppIndexRouteImport.update({
   path: '/app/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AppMyPropertiesRoute = AppMyPropertiesRouteImport.update({
-  id: '/app/my-properties',
-  path: '/app/my-properties',
+const AppAppointmentsRoute = AppAppointmentsRouteImport.update({
+  id: '/app/appointments',
+  path: '/app/appointments',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthResetPasswordIndexRoute = AuthResetPasswordIndexRouteImport.update({
@@ -88,6 +90,11 @@ const AppNotificationsIndexRoute = AppNotificationsIndexRouteImport.update({
   path: '/app/notifications/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppMyPropertiesIndexRoute = AppMyPropertiesIndexRouteImport.update({
+  id: '/app/my-properties/',
+  path: '/app/my-properties/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AppBillingIndexRoute = AppBillingIndexRouteImport.update({
   id: '/app/billing/',
   path: '/app/billing/',
@@ -101,6 +108,11 @@ const AppPropertiesAddRoute = AppPropertiesAddRouteImport.update({
 const AppProfileSettingsRoute = AppProfileSettingsRouteImport.update({
   id: '/app/profile/settings',
   path: '/app/profile/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppMyPropertiesBookingsRoute = AppMyPropertiesBookingsRouteImport.update({
+  id: '/app/my-properties/bookings',
+  path: '/app/my-properties/bookings',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppPropertiesIdIndexRoute = AppPropertiesIdIndexRouteImport.update({
@@ -131,13 +143,15 @@ const ApiAuthSplatServerRoute = ApiAuthSplatServerRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/app/my-properties': typeof AppMyPropertiesRoute
+  '/app/appointments': typeof AppAppointmentsRoute
   '/app': typeof AppIndexRoute
   '/privacy-policy': typeof PrivacyPolicyIndexRoute
   '/terms-of-service': typeof TermsOfServiceIndexRoute
+  '/app/my-properties/bookings': typeof AppMyPropertiesBookingsRoute
   '/app/profile/settings': typeof AppProfileSettingsRoute
   '/app/properties/add': typeof AppPropertiesAddRoute
   '/app/billing': typeof AppBillingIndexRoute
+  '/app/my-properties': typeof AppMyPropertiesIndexRoute
   '/app/notifications': typeof AppNotificationsIndexRoute
   '/app/profile': typeof AppProfileIndexRoute
   '/app/properties': typeof AppPropertiesIndexRoute
@@ -149,13 +163,15 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/app/my-properties': typeof AppMyPropertiesRoute
+  '/app/appointments': typeof AppAppointmentsRoute
   '/app': typeof AppIndexRoute
   '/privacy-policy': typeof PrivacyPolicyIndexRoute
   '/terms-of-service': typeof TermsOfServiceIndexRoute
+  '/app/my-properties/bookings': typeof AppMyPropertiesBookingsRoute
   '/app/profile/settings': typeof AppProfileSettingsRoute
   '/app/properties/add': typeof AppPropertiesAddRoute
   '/app/billing': typeof AppBillingIndexRoute
+  '/app/my-properties': typeof AppMyPropertiesIndexRoute
   '/app/notifications': typeof AppNotificationsIndexRoute
   '/app/profile': typeof AppProfileIndexRoute
   '/app/properties': typeof AppPropertiesIndexRoute
@@ -168,13 +184,15 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/app/my-properties': typeof AppMyPropertiesRoute
+  '/app/appointments': typeof AppAppointmentsRoute
   '/app/': typeof AppIndexRoute
   '/privacy-policy/': typeof PrivacyPolicyIndexRoute
   '/terms-of-service/': typeof TermsOfServiceIndexRoute
+  '/app/my-properties/bookings': typeof AppMyPropertiesBookingsRoute
   '/app/profile/settings': typeof AppProfileSettingsRoute
   '/app/properties/add': typeof AppPropertiesAddRoute
   '/app/billing/': typeof AppBillingIndexRoute
+  '/app/my-properties/': typeof AppMyPropertiesIndexRoute
   '/app/notifications/': typeof AppNotificationsIndexRoute
   '/app/profile/': typeof AppProfileIndexRoute
   '/app/properties/': typeof AppPropertiesIndexRoute
@@ -188,13 +206,15 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/app/my-properties'
+    | '/app/appointments'
     | '/app'
     | '/privacy-policy'
     | '/terms-of-service'
+    | '/app/my-properties/bookings'
     | '/app/profile/settings'
     | '/app/properties/add'
     | '/app/billing'
+    | '/app/my-properties'
     | '/app/notifications'
     | '/app/profile'
     | '/app/properties'
@@ -206,13 +226,15 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/app/my-properties'
+    | '/app/appointments'
     | '/app'
     | '/privacy-policy'
     | '/terms-of-service'
+    | '/app/my-properties/bookings'
     | '/app/profile/settings'
     | '/app/properties/add'
     | '/app/billing'
+    | '/app/my-properties'
     | '/app/notifications'
     | '/app/profile'
     | '/app/properties'
@@ -224,13 +246,15 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
-    | '/app/my-properties'
+    | '/app/appointments'
     | '/app/'
     | '/privacy-policy/'
     | '/terms-of-service/'
+    | '/app/my-properties/bookings'
     | '/app/profile/settings'
     | '/app/properties/add'
     | '/app/billing/'
+    | '/app/my-properties/'
     | '/app/notifications/'
     | '/app/profile/'
     | '/app/properties/'
@@ -243,13 +267,15 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AppMyPropertiesRoute: typeof AppMyPropertiesRoute
+  AppAppointmentsRoute: typeof AppAppointmentsRoute
   AppIndexRoute: typeof AppIndexRoute
   PrivacyPolicyIndexRoute: typeof PrivacyPolicyIndexRoute
   TermsOfServiceIndexRoute: typeof TermsOfServiceIndexRoute
+  AppMyPropertiesBookingsRoute: typeof AppMyPropertiesBookingsRoute
   AppProfileSettingsRoute: typeof AppProfileSettingsRoute
   AppPropertiesAddRoute: typeof AppPropertiesAddRoute
   AppBillingIndexRoute: typeof AppBillingIndexRoute
+  AppMyPropertiesIndexRoute: typeof AppMyPropertiesIndexRoute
   AppNotificationsIndexRoute: typeof AppNotificationsIndexRoute
   AppProfileIndexRoute: typeof AppProfileIndexRoute
   AppPropertiesIndexRoute: typeof AppPropertiesIndexRoute
@@ -319,11 +345,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/app/my-properties': {
-      id: '/app/my-properties'
-      path: '/app/my-properties'
-      fullPath: '/app/my-properties'
-      preLoaderRoute: typeof AppMyPropertiesRouteImport
+    '/app/appointments': {
+      id: '/app/appointments'
+      path: '/app/appointments'
+      fullPath: '/app/appointments'
+      preLoaderRoute: typeof AppAppointmentsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth/reset-password/': {
@@ -368,6 +394,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppNotificationsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/app/my-properties/': {
+      id: '/app/my-properties/'
+      path: '/app/my-properties'
+      fullPath: '/app/my-properties'
+      preLoaderRoute: typeof AppMyPropertiesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/app/billing/': {
       id: '/app/billing/'
       path: '/app/billing'
@@ -387,6 +420,13 @@ declare module '@tanstack/react-router' {
       path: '/app/profile/settings'
       fullPath: '/app/profile/settings'
       preLoaderRoute: typeof AppProfileSettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app/my-properties/bookings': {
+      id: '/app/my-properties/bookings'
+      path: '/app/my-properties/bookings'
+      fullPath: '/app/my-properties/bookings'
+      preLoaderRoute: typeof AppMyPropertiesBookingsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/app/properties/$id/': {
@@ -433,13 +473,15 @@ declare module '@tanstack/react-start/server' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AppMyPropertiesRoute: AppMyPropertiesRoute,
+  AppAppointmentsRoute: AppAppointmentsRoute,
   AppIndexRoute: AppIndexRoute,
   PrivacyPolicyIndexRoute: PrivacyPolicyIndexRoute,
   TermsOfServiceIndexRoute: TermsOfServiceIndexRoute,
+  AppMyPropertiesBookingsRoute: AppMyPropertiesBookingsRoute,
   AppProfileSettingsRoute: AppProfileSettingsRoute,
   AppPropertiesAddRoute: AppPropertiesAddRoute,
   AppBillingIndexRoute: AppBillingIndexRoute,
+  AppMyPropertiesIndexRoute: AppMyPropertiesIndexRoute,
   AppNotificationsIndexRoute: AppNotificationsIndexRoute,
   AppProfileIndexRoute: AppProfileIndexRoute,
   AppPropertiesIndexRoute: AppPropertiesIndexRoute,

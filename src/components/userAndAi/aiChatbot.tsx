@@ -5,7 +5,7 @@ import { searchLocationByString } from 'utils/googleMapsUtils';
 import { usePropertyAddStore, usePropertyFilterStore } from '@/routes/__root';
 import { PropertyFilters, UserObject, } from 'utils/validation/types';
 import { useRouter, useRouterState } from '@tanstack/react-router';
-import { useTRPC, } from 'trpc/react';
+import { useTRPC, useTRPCClient, } from 'trpc/react';
 import { useQuery } from '@tanstack/react-query';
 import { useShallow } from 'zustand/react/shallow'
 import { useSetPropertyFunctions } from './usePostPropertyAiHook';
@@ -23,10 +23,19 @@ export type MessageType = { source: 'user' | 'ai', message: string | ReactNode, 
 export const IsConnectedContext = createContext<boolean>(false);
 
 
-export function ElevenLabsChatBotDemo<T extends boolean>({ conversationToken, user, demoVersion, userType }: { conversationToken: string, user: T extends true ? UserObject | undefined : UserObject, demoVersion?: T, userType?: typeof UserType[number] }) {
+export function ElevenLabsChatBotDemo<T extends boolean>({ conversationToken, user, demoVersion, userType }: {
+    conversationToken: string,
+    user: T extends true ? UserObject | undefined : UserObject,
+    demoVersion?: T,
+    userType?: typeof UserType[number];
+}) {
 
-    const trpc = useTRPC();
-    const tokenQuery = useQuery({ ...trpc.auth.getToken.queryOptions(), initialData: { token: conversationToken } });
+    const trpc = useTRPCClient();
+    const tokenQuery = useQuery({
+        queryKey: ['auth.getToken'],
+        initialData: { token: conversationToken },
+        queryFn: () => trpc.auth.getToken.query()
+    });
 
     const [locale, setLocale] = useState(i18n.language as "ro" | "en");
     const [messages, setMessages] = useState<MessageType[]>([]);
@@ -57,8 +66,8 @@ export function ElevenLabsChatBotDemo<T extends boolean>({ conversationToken, us
         'userName': user?.name ?? '',
         "userType": userTypeVar,
         "userTypeMessage": userTypeVar == undefined ? (localeVar == 'ro' ? 'Doresti sa cumperi sau sa vinzi o proprietate' : 'Are you looking to buy or to sell a property') :
-            userTypeVar === 'buyer' ? (localeVar == 'ro' ? "Doresti sa te ajut sa cumperi o proprietate, nu?" : "Are you looking to buy a property, right?") :
-                (localeVar == "ro" ? "Doresti sa te ajut sa vinzi o proprietate, nu?" : 'Are you looking to sell a property, right?'),
+            userTypeVar === 'buyer' ? (localeVar == 'ro' ? "sunt aici sa te ajut sa iti gasesti noua proprietatea. Cauti un apartament sau o casa?" : "I\'m here to help you buy a property. Are you looking for an apartment or a house?") :
+                (localeVar == "ro" ? "sunt aici sa te ajut sa iti vinzi proprietatea. Este vorba de apartament sau casa?" : 'I\'m here to help you sell your property. Are we talking about an apartment or a house?'),
         'demoVersion': (demoVersion ?? false).toString(),
 
         "hasAllPreferencesSet": user ? !!((user.preferences?.propertyType?.length ?? 0) > 0 && (user.preferences?.budget?.min || user.preferences?.budget?.max) && user.preferences?.location?.fullLocationName && (user.preferences?.numberOfRooms?.length ?? 0) > 0 && (user.preferences?.facilities?.length ?? 0) > 0) : false,

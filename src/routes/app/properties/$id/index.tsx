@@ -14,10 +14,11 @@ import { GoogleMapPreview } from '@/components/maps/GoogleMapPreview'
 import { formatPrice } from 'utils/mainUtils'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
+import { ViewingScheduleModal } from '@/components/scheduling/ViewingScheduleModal'
 import { getHeaders } from '@tanstack/react-start/server'
 import { auth } from 'utils/auth'
 import { BathIcon, BedIcon, PropertyFeatureIcon, SurfaceAreaIcon } from '@/components/icons/propertyIcons'
-import { format } from 'date-fns'
+import { format, addDays, isAfter, isBefore, startOfDay, endOfDay, parse, isWithinInterval } from 'date-fns'
 import { useSize } from 'utils/hooks/useSize'
 import { ImageFallback } from '@/components/basics/imageFallback'
 
@@ -47,12 +48,77 @@ export const Route = createFileRoute('/app/properties/$id/')({
 })
 
 
+export const ScheduleViewComponent = ({ id, property }: { id: string, property: Partial<PropertyObject> }) => {
+
+    const { t } = useTranslation()
+
+    const trpc = useTRPC()
+
+    const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false)
+    const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1)
+    const [selectedYear, setSelectedYear] = useState(new Date().getFullYear())
+
+    // Scheduling queries and mutations
+    const { data: sellerAvailability } = useQuery(
+        trpc.appointments.getSellerAvailability.queryOptions({ 
+            propertyId: id,
+            month: selectedMonth,
+            year: selectedYear
+        })
+    )
+
+    const { data: existingBookings } = useQuery(
+        trpc.appointments.getExistingBookings.queryOptions({ propertyId: id })
+    )
+
+    const scheduleViewingMutation = useMutation(trpc.appointments.scheduleViewing.mutationOptions({
+        onSuccess: () => {
+            toast.success('Viewing scheduled successfully!')
+            setIsScheduleModalOpen(false)
+        },
+        onError: (error) => {
+            toast.error(error.message || 'Failed to schedule viewing')
+        }
+    }))
+
+    const handleScheduleViewing = (date: Date, time: string) => {
+        const endTime = new Date(date);
+        const [hours, minutes] = time.split(':').map(Number);
+        endTime.setHours(hours, minutes + 60, 0, 0); // 60 minute slots
+
+        const endTimeString = `${endTime.getHours().toString().padStart(2, '0')}:${endTime.getMinutes().toString().padStart(2, '0')}`;
+
+        return scheduleViewingMutation.mutateAsync({
+            propertyId: id,
+            date: date,
+            startTime: time,
+            endTime: endTimeString,
+        });
+    }
+
+    return <>
+        <Button className='bg-gradient-to-br from-[#4C7CED] to-[#7B31DC] text-white text-xs px-4 py-2 rounded-[6px]' onClick={() => setIsScheduleModalOpen(true)}>
+            {t('property-page.scheduleViewing')}
+        </Button>
+
+        {/* Viewing Schedule Modal */}
+        <ViewingScheduleModal
+            isOpen={isScheduleModalOpen}
+            onClose={() => setIsScheduleModalOpen(false)}
+            property={property}
+            sellerAvailability={sellerAvailability || { availableSlots: [] }}
+            existingBookings={existingBookings?.existingBookings || []}
+            onScheduleViewing={handleScheduleViewing}
+        />
+    </>
+}
+
+
 function PropertyDetailRoute() {
     const { id } = Route.useParams()
     const loaderData = Route.useLoaderData()
     const property = loaderData.property
     const [selectedImageIndex, setSelectedImageIndex] = useState(0)
-    const [notes, setNotes] = useState('')
     const [isSaved, setIsSaved] = useState(loaderData.favorited)
 
     const trpc = useTRPC()
@@ -62,10 +128,11 @@ function PropertyDetailRoute() {
         }
     }))
 
+
     const handleFavoriteToggle = () => {
         setFavoriteMutation.mutate({ propertyId: id, favorite: !isSaved })
     }
-    const imageUrl = "https://s3-us-west-2.amazonaws.com/s.cdpn.io/2017/17_04_cat_bg_03.jpg";
+
 
 
     return (
@@ -84,7 +151,7 @@ function PropertyDetailRoute() {
 
                 <div className='md:col-spa-2'>
 
-                    <PropertyInfo property={property} />
+                    <PropertyInfo property={property} additionalSpacing additionalComponent={<ScheduleViewComponent id={id} property={property} />} />
 
                     <DescriptionSection property={property} />
 
@@ -102,6 +169,7 @@ function PropertyDetailRoute() {
 
                 </div>
             </div>
+
         </div>
     )
 }
@@ -334,10 +402,10 @@ function PropertyImageGallery({
 }
 
 // Component: Property Info
-export function PropertyInfo({ property, additionalComponent }: { property: Partial<PropertyObject>, additionalComponent?: ReactNode }) {
+export function PropertyInfo({ property, additionalComponent, additionalSpacing }: { property: Partial<PropertyObject>, additionalComponent?: ReactNode, additionalSpacing?: boolean }) {
     return (
         <div className="px-4 mb-6">
-            <div className='flex flex-row items-center gap-2 mb-2'>
+            <div className={`flex flex-row items-center gap-2 mb-2 ${additionalSpacing && 'justify-between'}`}>
                 <h1 className="text-xl font-light text-white">{property.title ?? 'No title set'}</h1>
                 {additionalComponent}
             </div>

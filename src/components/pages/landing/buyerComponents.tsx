@@ -34,7 +34,7 @@ export const BuyerDemoSection = ({ token }: { token: string }) => {
             <div className="max-w-7xl mx-auto px-2 md:px-6 flex flex-col items-center">
 
                 {/* Try Demo Section */}
-                <div className="text-center bg-gradient-to-br from-blue-500/20 to-purple-600/20 rounded-lg p-2 md:p-8 max-w-4xl mx-auto">
+                <div className="text-center bg-gradient-to-br from-blue-500/20 to-purple-600/20 rounded-lg p-2 md:p-8 max-w-5xl w-full mx-auto">
                     <h3 className="text-2xl font-semibold text-white mb-4">
                         {t('landing-page.demo.buyer.tryDemo.title')}
                     </h3>

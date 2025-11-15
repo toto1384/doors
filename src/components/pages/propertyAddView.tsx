@@ -18,7 +18,7 @@ const titleAndDescriptionSchema = z.object({
     description: z.string().min(2),
 })
 
-export const PropertyAddView = () => {
+export const PropertyAddView = ({ demoVersion }: { demoVersion?: boolean }) => {
     const { t } = useTranslation('translation', { keyPrefix: 'property-add' })
 
     const [displayMode, setDisplayMode] = useState<'edit' | 'add photos'>('edit')
@@ -96,10 +96,12 @@ export const PropertyAddView = () => {
     })
 
 
-    return <>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 ">
+    const width = demoVersion ? 200 : 200
 
-            <div>
+    return <>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 ">
+
+            <div className="md:col-span-2">
                 {/* Progress Section */}
                 <div className="px-6 py-4">
                     <div className="flex justify-between items-start">
@@ -250,15 +252,15 @@ export const PropertyAddView = () => {
 
             <div className="hidden md:flex flex-row items-center justify-center">
                 {/* Circular Progress Indicator */}
-                <div className="relative w-[300px] h-[300px]">
-                    <svg width="300" height="300" className="transform -rotate-90">
+                <div className={`relative  `} style={{ width: `${width}px`, height: `${width}px` }}>
+                    <svg width={`${width}`} height={`${width}`} className="transform -rotate-90">
                         {/* Background circle with blur effect */}
-                        <circle cx="150" cy="150" r="120" stroke="rgba(139, 92, 246, 0.2)" strokeWidth="8" fill="none" className="blur-sm" />
+                        <circle cx={`${width / 2}`} cy={`${width / 2}`} r={`${width / 2 - width / 10}`} stroke="rgba(139, 92, 246, 0.2)" strokeWidth="8" fill="none" className="blur-sm" />
                         {/* Progress circle */}
                         <circle
-                            cx="150" cy="150" r="120" stroke="url(#progressGradient)" strokeWidth="6" fill="none" strokeLinecap="round"
-                            strokeDasharray={`${2 * Math.PI * 120}`}
-                            strokeDashoffset={`${2 * Math.PI * 120 * (1 - progressPercentage / 100)}`}
+                            cx={`${width / 2}`} cy={`${width / 2}`} r={`${width / 2 - width / 10}`} stroke="url(#progressGradient)" strokeWidth="6" fill="none" strokeLinecap="round"
+                            strokeDasharray={`${2 * Math.PI * (width / 2 - width / 10)}`}
+                            strokeDashoffset={`${2 * Math.PI * (width / 2 - width / 10) * (1 - progressPercentage / 100)}`}
                             className="transition-all duration-500 ease-out drop-shadow-lg"
                             style={{
                                 filter: 'drop-shadow(0 0 8px rgba(139, 92, 246, 0.6))'

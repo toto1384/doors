@@ -52,7 +52,7 @@ export const ChatComponent = ({ messages, sendMessage, sendUserActivity, status,
 
                 <div className='flex flex-row items-start justify-between border-b border-[#404040 rounded-b-lg'>
                     <div className='flex flex-row items-center px-3 pb-5 gap-2 '>
-                        <img src={'/doors-logo.png'} className="w-[35px] h-[35px] object-contain bg-[#525252]/10 rounded-full p-0 object-center" />
+                        <img src={'/android-chrome-512x512.png'} className="w-[35px] h-[35px] object-contain bg-[#525252]/10 rounded-full p-2 object-center" />
                         <div className="flex flex-col mr-3">
                             <p >{t('ai-chatbot.assistant')}</p>
                             <p className="text-xs text-[#a3a3a3]">Online</p>
@@ -78,7 +78,9 @@ export const ChatComponent = ({ messages, sendMessage, sendUserActivity, status,
                 <Conversation className="h-full no-scrollbar">
                     <ConversationContent className='bg-transparent p-0 min-h-full flex flex-col'>
                         {messages.length === 0 && <div className='flex flex-col min-h-full grow-1 flex-1 items-center justify-center'>
-                            <img src={'/doors-logo.png'} className="w-[100px] h-[100px] object-contain bg-[#525252]/10 text-white rounded-full p-0 object-center" />
+                            <div className='flex flex-col items-center justify-center bg-[#525252]/10 rounded-full p-4 object-center'>
+                                <img src={'/android-chrome-512x512.png'} className="w-[100px] h-[100px] object-contain text-white object-center " />
+                            </div>
                             <p className='text-gray-400 text-center mt-3'>{t('ai-chatbot.assistantNotStarted')}</p>
                         </div>}
                         {messages.length > 0 && messages.map((message, i) => (

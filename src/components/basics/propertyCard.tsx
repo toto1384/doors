@@ -54,7 +54,7 @@ export const PropertyCard = ({ property, match, matchRight, moreComponent, disab
                     )}
                 </div>
 
-                <p className={` ${demoVersion ? 'text-[12px] mt-0.5' : 'text-xs md:text-[22px] my-2'}  font-light text-[#8A4FFF] text-start`}>€{property.price.value.toLocaleString()}</p>
+                <p className={` ${demoVersion ? 'text-[12px] mt-0.5' : 'text-xs md:text-[22px] my-2'}  font-light text-white text-start`}>€{property.price.value.toLocaleString()}</p>
 
             </div>
             {moreComponent}

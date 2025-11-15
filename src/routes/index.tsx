@@ -14,6 +14,7 @@ import { usePropertyFilterStore } from './__root';
 import { useShallow } from 'zustand/react/shallow';
 import { PropertyAddView } from '@/components/pages/propertyAddView';
 import { Button } from '@/components/ui/button';
+import { QueryClient, useQueryClient } from '@tanstack/react-query';
 
 
 export const Route = createFileRoute('/')({
@@ -41,6 +42,7 @@ function LandingPage() {
     const [selectedAction, setSelectedAction] = useState<'buy' | 'sell'>('buy');
     const navigate = useNavigate();
     const { data: session } = authClient.useSession();
+    const queryClient = useQueryClient();
 
     const { token } = Route.useLoaderData();
 
@@ -77,7 +79,10 @@ function LandingPage() {
 
 
             <Header />
-            <HeroSection selectedAction={selectedAction} setSelectedAction={setSelectedAction} />
+            <HeroSection selectedAction={selectedAction} setSelectedAction={(e) => {
+                queryClient.invalidateQueries({ queryKey: ['auth.getToken'] })
+                return setSelectedAction(e)
+            }} />
 
 
             {selectedAction === 'buy' ? <BuyerDemoSection token={token} /> : <SellerDemoSection token={token} />}
@@ -305,10 +310,10 @@ const SellerDemoSection = ({ token }: { token: string }) => {
 
     return (
         <section id="demo" className="md:py-10 ">
-            <div className="max-w-7xl mx-auto px-2 md:px-6 flex flex-col items-center">
+            <div className="max-w-7xl mx-auto px-2 w-full md:px-6 flex flex-col items-center">
 
                 {/* Try Demo Section */}
-                <div className="text-center bg-gradient-to-br from-green-500/20 to-blue-600/20 rounded-lg p-2 md:p-8 max-w-4xl mx-auto">
+                <div className="text-center bg-gradient-to-br from-green-500/20 to-blue-600/20 rounded-lg p-2 md:p-8 max-w-5xl w-full mx-auto">
                     <h3 className="text-2xl font-semibold text-white mb-4">
                         {t('landing-page.demo.seller.tryDemo.title')}
                     </h3>
@@ -322,10 +327,10 @@ const SellerDemoSection = ({ token }: { token: string }) => {
 
                             <ElevenLabsChatBotDemo user={undefined} conversationToken={token} demoVersion userType="seller" />
                         </div>
-                        <div className={`${tab === 'results' ? 'block' : 'md:block hidden'} md:w-[70%] w-full max-h-full flex flex-col`}>
+                        <div className={`${tab === 'results' ? 'block' : 'md:block hidden'} md:w-[70%] w-full max-h-full flex flex-col overflow-y-scroll`}>
                             {/* {JSON.stringify(demoPropertyFilters)} */}
-                            <div className="max-h-full w-full overflow-y-scroll">
-                                <PropertyAddView />
+                            <div className="max-h-full w-full h-full overflow-y-scroll overflow-x-clip">
+                                <PropertyAddView demoVersion />
                             </div>
 
                         </div>

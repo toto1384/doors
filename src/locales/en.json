@@ -410,7 +410,9 @@
     "logout": "Logout",
     "buyer": "Buyer",
     "seller": "Seller",
-    "myProperties": "My properties"
+    "myProperties": "My properties",
+    "myAppointments": "My Appointments",
+    "manageBookings": "Manage Bookings"
   },
   "ai-chatbot": {
     "assistant": "Doors Assistant",
@@ -460,12 +462,58 @@
     "introduction": "These Terms of Service govern your use of our platform and services."
   },
   "property-page": {
+    "scheduleViewing": "Schedule a Viewing",
     "share": {
       "title": "Share Property",
       "linkCopied": "Link copied to clipboard!",
       "shareError": "Unable to share property",
       "copyError": "Unable to copy link"
     }
+  },
+  "bookings": {
+    "title": "Manage Your Viewings",
+    "subtitle": "View and manage all property viewing appointments",
+    "todayButton": "Today",
+    "appointmentsFor": "Appointments for",
+    "upcomingViewings": "Upcoming Viewings",
+    "appointmentsCount": "appointments",
+    "appointmentCount": "appointment",
+    "noAppointments": "No appointments",
+    "noAppointmentsDate": "No viewings scheduled for this date.",
+    "noAppointmentsGeneral": "No upcoming viewings scheduled.",
+    "daysWithAppointments": "Days with appointments",
+    "selectedDate": "Selected date",
+    "statusPending": "Pending",
+    "statusConfirmed": "Confirmed",
+    "statusCancelled": "Cancelled",
+    "statusCompleted": "Completed",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "contact": "Contact",
+    "reschedule": "Reschedule"
+  },
+  "buyer-appointments": {
+    "title": "My Appointments",
+    "subtitle": "View and manage your scheduled property viewings",
+    "todayButton": "Today",
+    "appointmentsFor": "Appointments for",
+    "upcomingViewings": "Upcoming Viewings",
+    "appointmentsCount": "appointments",
+    "appointmentCount": "appointment",
+    "noAppointments": "No appointments",
+    "noAppointmentsDate": "No viewings scheduled for this date.",
+    "noAppointmentsGeneral": "No upcoming viewings scheduled.",
+    "daysWithAppointments": "Days with appointments",
+    "selectedDate": "Selected date",
+    "statusPending": "Pending",
+    "statusConfirmed": "Confirmed",
+    "statusCancelled": "Cancelled",
+    "statusCompleted": "Completed",
+    "cancel": "Cancel",
+    "contact": "Contact",
+    "reschedule": "Reschedule",
+    "viewProperty": "View Property",
+    "markCompleted": "Mark Completed"
   },
   "facilities": {
     "pet-friendly": "Pet Friendly",

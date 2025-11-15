@@ -392,7 +392,9 @@
     "logout": "Deconectare",
     "buyer": "Cumpărător",
     "seller": "Vânzător",
-    "myProperties": "Proprietățile mele"
+    "myProperties": "Proprietățile mele",
+    "myAppointments": "Programările mele",
+    "manageBookings": "Gestionare rezervări"
   },
   "ai-chatbot": {
     "assistant": "Asistent Doors",
@@ -442,12 +444,58 @@
     "introduction": "Acești Termeni de Serviciu guvernează utilizarea platformei și serviciilor noastre."
   },
   "property-page": {
+    "scheduleViewing": "Programeaza o vizionare",
     "share": {
       "title": "Distribuie proprietatea",
       "linkCopied": "Link copiat în clipboard!",
       "shareError": "Nu se poate distribui proprietatea",
       "copyError": "Nu se poate copia linkul"
     }
+  },
+  "bookings": {
+    "title": "Gestionează vizionările",
+    "subtitle": "Vezi și gestionează toate programările de vizionare",
+    "todayButton": "Astăzi",
+    "appointmentsFor": "Programări pentru",
+    "upcomingViewings": "Vizionări viitoare",
+    "appointmentsCount": "programări",
+    "appointmentCount": "programare",
+    "noAppointments": "Nu există programări",
+    "noAppointmentsDate": "Nicio vizionare programată pentru această dată.",
+    "noAppointmentsGeneral": "Nicio vizionare programată.",
+    "daysWithAppointments": "Zile cu programări",
+    "selectedDate": "Data selectată",
+    "statusPending": "În așteptare",
+    "statusConfirmed": "Confirmat",
+    "statusCancelled": "Anulat",
+    "statusCompleted": "Finalizat",
+    "confirm": "Confirmă",
+    "cancel": "Anulează",
+    "contact": "Contact",
+    "reschedule": "Reprogramează"
+  },
+  "buyer-appointments": {
+    "title": "Programările mele",
+    "subtitle": "Vezi și gestionează programările tale pentru vizionări",
+    "todayButton": "Astăzi",
+    "appointmentsFor": "Programări pentru",
+    "upcomingViewings": "Vizionări viitoare",
+    "appointmentsCount": "programări",
+    "appointmentCount": "programare",
+    "noAppointments": "Nu există programări",
+    "noAppointmentsDate": "Nicio vizionare programată pentru această dată.",
+    "noAppointmentsGeneral": "Nicio vizionare programată.",
+    "daysWithAppointments": "Zile cu programări",
+    "selectedDate": "Data selectată",
+    "statusPending": "În așteptare",
+    "statusConfirmed": "Confirmat",
+    "statusCancelled": "Anulat",
+    "statusCompleted": "Finalizat",
+    "cancel": "Anulează",
+    "contact": "Contact",
+    "reschedule": "Reprogramează",
+    "viewProperty": "Vezi proprietatea",
+    "markCompleted": "Marchează finalizat"
   },
   "facilities": {
     "pet-friendly": "Prietenos cu animalele",

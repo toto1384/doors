@@ -45,7 +45,13 @@ const ProfileContent = ({ session }: { session: any }) => {
 
 
         {[
-            ...(userType === 'buyer' ? [{ name: t('viewProfile'), href: '/app/profile' },] : [{ name: t('myProperties'), href: '/app/my-properties' },]),
+            ...(userType === 'buyer' ? [
+                { name: t('viewProfile'), href: '/app/profile' },
+                // { name: t('myAppointments'), href: '/app/appointments' },
+            ] : [
+                { name: t('myProperties'), href: '/app/my-properties' },
+                // { name: t('manageBookings'), href: '/app/my-properties/bookings' },
+            ]),
             { name: t('accountSettings'), href: '/app/profile/settings' },
             { divider: true },
             { name: t('helpCenter'), href: '/app/profile/help' },

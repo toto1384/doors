@@ -2,8 +2,9 @@ import { TRPCError, type TRPCRouterRecord } from "@trpc/server";
 import { z } from "zod/v3";
 
 import { extendZod } from "@zodyac/zod-mongoose";
-import { authProcedure, createTRPCRouter, } from "./init";
+import { authProcedure, createTRPCRouter, publicProcedure, } from "./init";
 import { propertiesRouter } from "./routes/propertiesRouter";
+import { appointmentsRouter } from "./routes/appointmentsRouter";
 import { UTApi } from 'uploadthing/server';
 import dbConnect from "utils/db/mongodb";
 import { getAccountModel, getPropertyModel, getUserModel } from "utils/validation/mongooseModels";
@@ -16,8 +17,9 @@ extendZod(z as any)
 
 export const trpcRouter = createTRPCRouter({
     properties: propertiesRouter,
+    appointments: appointmentsRouter,
     auth: {
-        getToken: authProcedure.query(async ({ ctx }) => {
+        getToken: publicProcedure.query(async ({ ctx }) => {
             console.log(process.env.VITE_AGENT_ID, process.env.ELEVENLABS_API_KEY)
             const response = await fetch(
                 `https://api.elevenlabs.io/v1/convai/conversation/token?agent_id=${process.env.VITE_AGENT_ID}`,

@@ -10,7 +10,22 @@ import { PropertyHeatingValues, PropertyStatusValues, PropertyType } from 'utils
 
 extendZod(z as any)
 
-// Enum for property status
+
+export const AppointmentSchema = z.object({
+    _id: z.string().optional(),
+    date: zDate,
+    startTime: z.string(), // "09:00" format
+    endTime: z.string(), // "09:30" format
+    buyerUserId: z.string(), // buyer
+    sellerUserId: z.string(), // seller
+    propertyId: z.string(),
+    status: z.enum(['pending', 'confirmed', 'cancelled', 'completed']).default('pending'),
+    notes: z.string().optional(),
+    createdAt: zDate.optional(),
+    updatedAt: zDate.optional(),
+})
+
+
 
 export type PropertyFeaturesType = z.infer<typeof PropertyFeatures>;
 
@@ -30,6 +45,13 @@ export const UserPreferences = z.object({
     }).optional(), // Surface area range
 
     mandatoryPreferences: z.array(z.string()).optional(), // Mandatory preferences
+
+    sellerAvailability: z.array(z.object({
+        startDate: z.enum(["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]),
+        endDate: z.enum(["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]),
+        startTime: z.string(),
+        endTime: z.string(),
+    })).optional()
 })
 export type UserPreferencesType = z.infer<typeof UserPreferences>;
 

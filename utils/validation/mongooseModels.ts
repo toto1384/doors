@@ -1,6 +1,6 @@
 import mongoose, { Document, Model, } from 'mongoose'
-import { PropertyObject, UserObject } from "./types";
-import { AccountObject, AccountSchema, PropertySchema, UserSchema } from "./dbSchemas";
+import { PropertyObject, UserObject, AppointmentObject } from "./types";
+import { AccountObject, AccountSchema, PropertySchema, UserSchema, AppointmentSchema, } from "./dbSchemas";
 
 
 import { zodSchema } from "@zodyac/zod-mongoose";
@@ -33,6 +33,14 @@ export const getPropertyModel = (mong: typeof mongoose) => {
     // const propertySchema = convertToModel(PropertySchema)
     return mgse.model<PropertyObject & Document>('Property', zodSchema(PropertySchema as any), 'properties')
 
+}
+
+export const getAppointmentModel = (mong: typeof mongoose) => {
+    const mgse = mong ?? mongoose;
+
+    if (mgse.models.Appointment) return mgse.models.Appointment as Model<AppointmentObject & Document>
+
+    return mgse.model<AppointmentObject & Document>('Appointment', zodSchema(AppointmentSchema as any), 'appointments')
 }
 
 
