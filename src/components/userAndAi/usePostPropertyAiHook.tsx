@@ -14,6 +14,55 @@ import { demoPropertyKey, PropertyHeating, PropertyTypeType } from "utils/consta
 import { useQueryClient } from "@tanstack/react-query";
 
 
+export const usePublishPropertyHook = ({ demoVersion }: { demoVersion?: boolean }) => {
+    const router = useRouter()
+    const trpcClient = useTRPCClient()
+    const queryClient = useQueryClient()
+
+    const { endConversation } = usePropertyFilterStore(useShallow(state => ({
+        endConversation: state.endConversation,
+    })))
+
+    const { setTitlesAndDescriptions, setTitleAndDescResolver, getPartialProperty, setPostedStatus } = usePropertyAddStore(useShallow(state => ({
+        setTitlesAndDescriptions: state.setTitlesAndDescriptions,
+        setTitleAndDescResolver: state.setTitleAndDescResolver,
+        getPartialProperty: state.getPartialProperty,
+        setPostedStatus: state.setPostedStatus,
+
+    })))
+
+    const { setProgressBar, aiChatbotOpen, setAiChatbotOpen } = usePopoversOpenStore(useShallow(state => ({
+        setProgressBar: state.setProgressBar,
+        aiChatbotOpen: state.aiChatbotOpen,
+        setAiChatbotOpen: state.setAiChatbotOpen,
+    })))
+
+    return async () => {
+        const ghostProperty = getPartialProperty()
+        console.log('publishProperty', ghostProperty)
+        try {
+            let result
+            if (demoVersion) {
+                localStorage.setItem(demoPropertyKey, JSON.stringify(ghostProperty))
+                result = JSON.stringify(ghostProperty)
+                setPostedStatus({ success: true, message: 'Property saved as demo. Login to post' })
+                setProgressBar(undefined)
+            } else {
+                result = await trpcClient.properties.postProperty.mutate({ property: ghostProperty as any })
+                setPostedStatus({ success: result.success, message: result.message })
+                if (result.success) setProgressBar(undefined)
+                router.navigate({ to: '/app/my-properties' })
+            }
+            await endConversation()
+            queryClient.invalidateQueries({ queryKey: ['my-properties'] })
+            return JSON.stringify(result)
+        } catch (error) {
+            console.log('error', error)
+            return JSON.stringify({ success: false, message: error })
+        }
+    }
+}
+
 export const useSetPropertyFunctions = ({
     setMessages,
     updateGhostProperty,
@@ -26,58 +75,31 @@ export const useSetPropertyFunctions = ({
     const { t } = useTranslation('translation', { keyPrefix: 'ai-chatbot' });
     const router = useRouter()
     const routerState = useRouterState()
-    const trpcClient = useTRPCClient()
 
     const ensureIsInAddMode = () => { if (routerState.location.pathname !== '/app/properties/add' && !demoVersion) router.navigate({ to: '/app/properties/add' }) }
 
-    const { setProgressBar, aiChatbotOpen, setAiChatbotOpen } = usePopoversOpenStore(useShallow(state => ({
-        setProgressBar: state.setProgressBar,
+    const { aiChatbotOpen, setAiChatbotOpen } = usePopoversOpenStore(useShallow(state => ({
         aiChatbotOpen: state.aiChatbotOpen,
         setAiChatbotOpen: state.setAiChatbotOpen,
     })))
 
-    const { setTitlesAndDescriptions, setTitleAndDescResolver, getPartialProperty, setPostedStatus } = usePropertyAddStore(useShallow(state => ({
+    const { setTitlesAndDescriptions, setTitleAndDescResolver, setPropertyType, propertyType } = usePropertyAddStore(useShallow(state => ({
         setTitlesAndDescriptions: state.setTitlesAndDescriptions,
         setTitleAndDescResolver: state.setTitleAndDescResolver,
-        getPartialProperty: state.getPartialProperty,
-        setPostedStatus: state.setPostedStatus,
-
-    })))
-
-    const { endConversation } = usePropertyFilterStore(useShallow(state => ({
-        endConversation: state.endConversation,
+        setPropertyType: state.setPropertyType,
+        propertyType: state.propertyType,
     })))
 
 
-    const queryClient = useQueryClient()
+    const publishProperty = usePublishPropertyHook({ demoVersion })
 
 
     return {
-        publishProperty: async () => {
-            const ghostProperty = getPartialProperty()
-            console.log('publishProperty', ghostProperty)
-            try {
-                let result
-                if (demoVersion) {
-                    localStorage.setItem(demoPropertyKey, JSON.stringify(ghostProperty))
-                    result = JSON.stringify(ghostProperty)
-                    setPostedStatus({ success: true, message: 'Property saved as demo. Login to post' })
-                    setProgressBar(undefined)
-                    router.navigate({ to: '/auth/$path', params: { path: 'sign-in' } })
-                } else {
-                    result = await trpcClient.properties.postProperty.mutate({ property: ghostProperty as any })
-                    setPostedStatus({ success: result.success, message: result.message })
-                    if (result.success) setProgressBar(undefined)
-                    router.navigate({ to: '/app/my-properties' })
-                }
-                await endConversation()
-                queryClient.invalidateQueries({ queryKey: ['my-properties'] })
-                return JSON.stringify(result)
-            } catch (error) {
-                console.log('error', error)
-                return JSON.stringify({ success: false, message: error })
-            }
+        setFinalEditFunction: async () => {
+            console.log('setFinalEditFunction', 'final-edit')
+            setPropertyType('final-edit')
         },
+        publishProperty,
         //add posting tools
         // this tool displays a photo select interface for the user to add their photos
         selectPropertyPhotos: useClientToolSelectPhotos({

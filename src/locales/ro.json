@@ -240,7 +240,9 @@
         "condition": "Dacă ești vânzător:",
         "cta": "Creează cont gratuit și publică acum"
       },
-      "button": "Înregistrează-te gratuit"
+      "button": "Înregistrează-te gratuit",
+      "sellerButton": "Înregistrează-te gratuit pentru a publica proprietatea",
+      "buyerButton": "Înregistrează-te gratuit pentru a accesa proprietățile"
     },
     "footer": {
       "brand": "DOORS",
@@ -431,6 +433,31 @@
       "stop": "Oprește",
       "copy": "Copiază",
       "regenerate": "Regenerează"
+    },
+    "demo": {
+      "buyer": {
+        "message": "Preferințele tale au fost salvate, conectează-te pentru a vedea proprietățile",
+        "loginButton": "Conectează-te"
+      },
+      "seller": {
+        "message": "Proprietatea ta a fost creată, conectează-te pentru a o publica",
+        "loginButton": "Conectează-te"
+      },
+      "undefined": {
+        "message": "Interviul tău s-a încheiat. Conectează-te pentru a vedea detaliile",
+        "loginButton": "Conectează-te"
+      }
+    },
+    "production": {
+      "buyer": {
+        "message": "Interviul tău s-a încheiat, simte-te liber să începi din nou conversația dacă dorești să îți modifici preferințele"
+      },
+      "seller": {
+        "message": "Proprietatea ta a fost creată. Asigură-te că faci editările finale înainte de publicare"
+      },
+      "undefined": {
+        "message": "Interviul tău s-a încheiat, îl poți reporni din nou oricând"
+      }
     }
   },
   "privacy-policy": {

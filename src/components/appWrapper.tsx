@@ -14,9 +14,9 @@ import { NotificationsDropdown } from "./notifications-dropdown";
 import { HeartIcon, HomeIcon, NotificationsOutlineIcon, TokensOutlineIcon } from "./icons/homeIcons";
 import { usePopoversOpenStore } from "@/routes/__root";
 import { useShallow } from "zustand/react/shallow";
-import { UserType } from "utils/validation/dbSchemas";
 import { UserObject } from "utils/validation/types";
 import { posthog } from "posthog-js";
+import { UserType } from "utils/constants";
 
 
 export default function AppRouteWrapper({

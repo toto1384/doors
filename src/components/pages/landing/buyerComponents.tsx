@@ -65,7 +65,7 @@ export const BuyerDemoSection = ({ token }: { token: string }) => {
                     params={data ? {} : { path: "sign-in" }}
                     className="inline-block bg-gradient-to-r mx-auto mt-5 text-center from-blue-500 to-purple-600 text-white px-8 py-3 rounded-md font-semibold text-lg hover:from-blue-600 hover:to-purple-700 transition-all transform hover:scale-105 shadow-2xl"
                 >
-                    Înregistrează-te Gratuit
+                    {t('landing-page.finalCta.buyerButton')}
                 </Link>
             </div>
         </section>
@@ -236,7 +236,7 @@ export const FromLookingToFound = () => {
         {/* CTA Button */}
         <div className="text-center ">
             <button className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-8 py-3 rounded-md font-semibold text-lg hover:from-blue-600 hover:to-purple-700 transition-all transform hover:scale-105 shadow-2xl">
-                Înregistrează-te acum
+                {t('landing-page.finalCta.buyerButton')}
             </button>
         </div>
 

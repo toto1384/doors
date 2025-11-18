@@ -12,14 +12,20 @@ import { Response } from "../ai-elements/response";
 import { Actions } from "../ai-elements/actions";
 import { Loader } from "../ai-elements/loader";
 import { useTranslation } from "react-i18next";
+import { Link } from "@tanstack/react-router";
+import { UserType } from "utils/constants";
 
 
 
-export const ChatComponent = ({ messages, sendMessage, sendUserActivity, status, startConversation, endConversation }: {
+export const ChatComponent = ({ messages, sendMessage, sendUserActivity, status, startConversation, endConversation, agentState, demoVersion, firstMessage, userType }: {
     messages: MessageType[],
     sendMessage: ({ files, text }: { text: string, files?: FileUIPart[] }) => void,
     sendUserActivity: () => void,
     status: Status, startConversation: () => void, endConversation: () => void
+    agentState: 'not-started' | 'stopped'
+    firstMessage: string
+    demoVersion: boolean | undefined
+    userType: typeof UserType[number] | undefined
 }) => {
     const { t } = useTranslation();
     const [input, setInput] = useState('');
@@ -76,14 +82,84 @@ export const ChatComponent = ({ messages, sendMessage, sendUserActivity, status,
                 }
 
                 <Conversation className="h-full no-scrollbar">
-                    <ConversationContent className='bg-transparent p-0 min-h-full flex flex-col'>
-                        {messages.length === 0 && <div className='flex flex-col min-h-full grow-1 flex-1 items-center justify-center'>
-                            <div className='flex flex-col items-center justify-center bg-[#525252]/10 rounded-full p-4 object-center'>
-                                <img src={'/android-chrome-512x512.png'} className="w-[100px] h-[100px] object-contain text-white object-center " />
+                    <ConversationContent className='bg-transparent p-0 min-h-full flex flex-col '>
+                        {messages.length === 0 && agentState !== 'stopped' && <div className='flex flex-col min-h-full grow-1 flex-1 p-2 justify-center items-center'>
+                            <div className='flex absolute top-1 left-1 flex-col items-center justify-center bg-[#241540] opacity-90 rounded-[6px] p-2 object-center'>
+                                {firstMessage}
                             </div>
-                            <p className='text-gray-400 text-center mt-3'>{t('ai-chatbot.assistantNotStarted')}</p>
                         </div>}
-                        {messages.length > 0 && messages.map((message, i) => (
+
+                        {agentState === 'stopped' && <div className='flex flex-col min-h-full grow-1 flex-1 items-center justify-center'>
+
+                            {demoVersion && <div className="text-center p-6 bg-[#241540] rounded-lg mx-4">
+                                {userType === 'buyer' && (
+                                    <div className="space-y-4">
+                                        <p className="text-white text-lg">
+                                            {t('ai-chatbot.demo.buyer.message')}
+                                        </p>
+                                        <Link
+                                            to="/auth/$path"
+                                            params={{ path: "sign-in" }}
+                                            className="inline-block bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-3 rounded-md font-semibold hover:from-blue-600 hover:to-purple-700 transition-all"
+                                        >
+                                            {t('ai-chatbot.demo.buyer.loginButton')}
+                                        </Link>
+                                    </div>
+                                )}
+
+                                {userType === 'seller' && (
+                                    <div className="space-y-4">
+                                        <p className="text-white text-lg">
+                                            {t('ai-chatbot.demo.seller.message')}
+                                        </p>
+                                        <Link
+                                            to="/auth/$path"
+                                            params={{ path: "sign-in" }}
+                                            className="inline-block bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-3 rounded-md font-semibold hover:from-blue-600 hover:to-purple-700 transition-all"
+                                        >
+                                            {t('ai-chatbot.demo.seller.loginButton')}
+                                        </Link>
+                                    </div>
+                                )}
+
+                                {userType === undefined && (
+                                    <div className="space-y-4">
+                                        <p className="text-white text-lg">
+                                            {t('ai-chatbot.demo.undefined.message')}
+                                        </p>
+                                        <Link
+                                            to="/auth/$path"
+                                            params={{ path: "sign-in" }}
+                                            className="inline-block bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-3 rounded-md font-semibold hover:from-blue-600 hover:to-purple-700 transition-all"
+                                        >
+                                            {t('ai-chatbot.demo.undefined.loginButton')}
+                                        </Link>
+                                    </div>
+                                )}
+                            </div>}
+
+                            {!demoVersion && <div className="text-center p-6 bg-[#241540] rounded-lg mx-4">
+                                {userType === 'buyer' && (
+                                    <p className="text-white text-lg">
+                                        {t('ai-chatbot.production.buyer.message')}
+                                    </p>
+                                )}
+
+                                {userType === 'seller' && (
+                                    <p className="text-white text-lg">
+                                        {t('ai-chatbot.production.seller.message')}
+                                    </p>
+                                )}
+
+                                {userType === undefined && (
+                                    <p className="text-white text-lg">
+                                        {t('ai-chatbot.production.undefined.message')}
+                                    </p>
+                                )}
+                            </div>}
+
+                        </div>}
+                        {messages.length > 0 && agentState !== 'stopped' && messages.map((message, i) => (
                             <div key={message.id.toString()}>
                                 <div key={`${message.message}-${i}`}>
                                     {typeof message.message == 'string' ?

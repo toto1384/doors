@@ -12,13 +12,13 @@ import { PropertyFilters, PropertyObject } from 'utils/validation/types';
 import { create } from 'zustand';
 import appCss from '../styles.css?url';
 import { ThemeProvider, useTheme } from '@/components/providers/ThemeProvider';
-import { UserType } from 'utils/validation/dbSchemas';
 import { Toaster } from '@/components/ui/sonner';
 import { getHeaders } from '@tanstack/react-start/server';
 import { auth } from 'utils/auth';
 import { createServerFn } from '@tanstack/react-start';
 import { PostHogProvider, PostHogErrorBoundary } from 'posthog-js/react'
 import { PropertyFiltersObject } from 'utils/validation/propertyFilters';
+import { UserType } from 'utils/constants';
 
 export const getRootObjectsServerFn = createServerFn().handler(async ({ data: filters, }) => {
 
@@ -100,7 +100,7 @@ export const usePropertyAddStore = create<{
     postedStatus: { success: boolean, message: string } | undefined,
     setPostedStatus: (p: { success: boolean, message: string } | undefined) => void,
 
-    propertyType: 'edit' | 'add-photos', setPropertyType: (p: 'edit' | 'add-photos') => void
+    propertyType: 'edit' | 'add-photos' | 'final-edit', setPropertyType: (p: 'edit' | 'add-photos' | 'final-edit') => void
 }>()((set, get) => ({
     partialProperty: {},
     setPartialProperty: (p) => set({ partialProperty: p }),
@@ -117,7 +117,7 @@ export const usePropertyAddStore = create<{
     titlesAndDescriptions: [],
     setTitlesAndDescriptions: (p) => set({ titlesAndDescriptions: p }),
 
-    propertyType: 'edit', setPropertyType: () => set({ propertyType: 'edit' }),
+    propertyType: 'edit', setPropertyType: (e) => set({ propertyType: e }),
 }));
 
 

@@ -31,7 +31,7 @@ const tprSchema = z.object({
 })
 
 
-export function EditPropertyComponent<T extends (Partial<PropertyObject> | PropertyObject)>({ property, onPropertyChange, onSave }: { property: T, onPropertyChange: (property: T) => void, onSave: () => Promise<void> }) {
+export function EditPropertyComponent<T extends (Partial<PropertyObject> | PropertyObject)>({ property, onPropertyChange, onSave, saveWithoutEdit, landingPage }: { property: T, onPropertyChange: (property: T) => void, onSave: () => Promise<void>, saveWithoutEdit?: boolean, landingPage?: boolean }) {
 
     const [disabled, setDisabled] = useState(false)
 
@@ -56,9 +56,7 @@ export function EditPropertyComponent<T extends (Partial<PropertyObject> | Prope
         location: false,
     })
 
-    const [hasEdited, setHasEdited] = useState(false)
-
-
+    const [hasEdited, setHasEdited] = useState(saveWithoutEdit)
 
     // have the same layout as the normal property view, with edit buttons near. and when they are pressed it's switched to the edit mode
     // photos as they are with the component, title, price and  number of rooms & sq feet. then description, then facilities and then location
@@ -73,6 +71,7 @@ export function EditPropertyComponent<T extends (Partial<PropertyObject> | Prope
                     return startUpload(f)
                 }}
                 deleteFile={async (url) => {
+                    console.log('deleteFile', url)
                     onPropertyChange({ ...property, imageUrls: property.imageUrls?.filter(i => i != url) })
                     setHasEdited(true)
                 }}
@@ -140,7 +139,7 @@ export function EditPropertyComponent<T extends (Partial<PropertyObject> | Prope
         ><Pencil className="w-4 h-4" /></div>} />}
 
 
-        {(!editingStates.titlePriceRoomsSqFeet && !editingStates.description && !editingStates.location && !editingStates.facilities) && <div className="pb-20 md:pb-5 sticky bottom-10 md:bottom-0 bg-[#0E0118] px-4">
+        {(!editingStates.titlePriceRoomsSqFeet && !editingStates.description && !editingStates.location && !editingStates.facilities) && <div className={`pb-20 md:pb-5 sticky bottom-10 md:bottom-0 ${!landingPage && 'bg-[#0E0118]'} px-4`}>
 
             <Button
                 className="w-full mt-2 bg-gradient-to-br from-[#4C7CED] to-[#7B31DC] text-white text-xs px-4 py-2 rounded-[6px] "

@@ -216,7 +216,7 @@ export const useConversation = ({ flow }: { flow: 'buyer' | 'seller' }) => ({ cl
                 const photos = await clientTools.selectPropertyPhotos()
                 onMessage({ message: `Perfect, ai selectat fotografiile`, source: 'ai' })
 
-                await clientTools.publishProperty()
+                await clientTools.setFinalEditFunction()
                 onMessage({ message: `Perfect, ai publicat proprietatea`, source: 'ai' })
 
 

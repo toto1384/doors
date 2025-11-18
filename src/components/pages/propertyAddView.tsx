@@ -12,6 +12,9 @@ import { useRouter } from "@tanstack/react-router"
 import { useSize } from "utils/hooks/useSize"
 import { Label } from "../ui/label"
 import { AnimatePresence, motion } from "framer-motion";
+import { EditPropertyComponent } from "../editPropertyComponent"
+import { usePublishPropertyHook } from "../userAndAi/usePostPropertyAiHook"
+import { CheckCircle } from "lucide-react"
 
 const titleAndDescriptionSchema = z.object({
     title: z.string().min(2),
@@ -21,15 +24,15 @@ const titleAndDescriptionSchema = z.object({
 export const PropertyAddView = ({ demoVersion }: { demoVersion?: boolean }) => {
     const { t } = useTranslation('translation', { keyPrefix: 'property-add' })
 
-    const [displayMode, setDisplayMode] = useState<'edit' | 'add photos'>('edit')
-
-    const { titleAndDescResolver, titlesAndDescriptions, setTitlesAndDescriptions, postedStatus, partialProperty, setPartialProperty } = usePropertyAddStore(useShallow(state => ({
+    const { titleAndDescResolver, titlesAndDescriptions, setTitlesAndDescriptions, postedStatus, partialProperty, setPartialProperty, propertyType, setPropertyType } = usePropertyAddStore(useShallow(state => ({
         titleAndDescResolver: state.titleAndDescResolver,
         titlesAndDescriptions: state.titlesAndDescriptions,
         setTitlesAndDescriptions: state.setTitlesAndDescriptions,
         postedStatus: state.postedStatus,
         partialProperty: state.partialProperty,
         setPartialProperty: state.appendPartialProperty,
+        propertyType: state.propertyType,
+        setPropertyType: state.setPropertyType,
     })))
 
     const checkedSteps = [
@@ -58,9 +61,6 @@ export const PropertyAddView = ({ demoVersion }: { demoVersion?: boolean }) => {
     const { setProgressBar, setAiChatbotOpen } = usePopoversOpenStore(useShallow(state => ({ setProgressBar: state.setProgressBar, setAiChatbotOpen: state.setAiChatbotOpen, })))
 
 
-
-
-
     const router = useRouter()
     const size = useSize(true)
     const cutSize = size.gmd ? 5 : 3
@@ -70,30 +70,32 @@ export const PropertyAddView = ({ demoVersion }: { demoVersion?: boolean }) => {
     }, [completedSteps, totalSteps])
 
 
-    {/* useEffect(() => { */ }
-    {/*     setPartialProperty({ */ }
-    {/*         _id: '', */ }
-    {/*         status: 'available', */ }
-    {/*         propertyType: 'apartment', */ }
-    {/*         location: { fullLocationName: '', city: '', state: '', country: '', countryShort: '', }, */ }
-    {/*         numberOfRooms: 5, */ }
-    {/*         surfaceArea: 35, */ }
-    {/*         floor: 0, */ }
-    {/*         buildingYear: 0, */ }
-    {/*         furnished: false, */ }
-    {/*         heating: 'electric', */ }
-    {/*         features: [], */ }
-    {/*         price: { value: 0, currency: 'EUR' }, */ }
-    {/*         imageUrls: [], */ }
-    {/*         title: '', */ }
-    {/*         description: '', */ }
-    {/*     }) */ }
-    {/* }, []) */ }
+    useEffect(() => {
+        if (false) setPartialProperty({
+            _id: '',
+            status: 'available',
+            propertyType: 'apartment',
+            location: { fullLocationName: '', city: '', state: '', country: '', countryShort: '', },
+            numberOfRooms: 5,
+            surfaceArea: 35,
+            floor: 0,
+            buildingYear: 0,
+            furnished: false,
+            heating: 'electric',
+            features: [],
+            price: { value: 0, currency: 'EUR' },
+            imageUrls: [],
+            title: 'Title',
+            description: 'Description',
+        })
+    }, [])
 
     const { control, handleSubmit } = useForm({
         defaultValues: {},
         resolver: zodResolver(titleAndDescriptionSchema),
     })
+
+    const publishProperty = usePublishPropertyHook({ demoVersion })
 
 
     const width = demoVersion ? 200 : 200
@@ -101,7 +103,35 @@ export const PropertyAddView = ({ demoVersion }: { demoVersion?: boolean }) => {
     return <>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3 ">
 
-            <div className="md:col-span-2">
+            {propertyType === 'final-edit' && <div className="md:col-span-3 relative">
+                <EditPropertyComponent landingPage saveWithoutEdit property={partialProperty} onPropertyChange={(p) => {
+                    console.log('property', p)
+                    setPartialProperty(p)
+                }} onSave={async () => {
+                    await publishProperty()
+                }} />
+            </div>}
+
+            {postedStatus && <>
+                {!demoVersion && <div className="text-base font-medium text-white mb-4 md:col-span-3">
+                    {postedStatus.success ? <div className="flex flex-col items-center">
+                        <CheckCircle className="text-green-400 w-5 h-5 flex-shrink-0" />
+                        <p> Property saved successfully </p>
+
+                        <button onClick={() => router.navigate({ to: '/app/my-properties' })} className="ml-2 text-xs text-white hover:underline bg-gradient-to-br from-[#4C7CED] to-[#7B31DC] hover:bg-[#6A2BC4] px-2 py-1 rounded-[6px]">Go to my properties</button>
+                    </div> : 'Failed to save property details'}
+                </div>}
+
+                {demoVersion && <div className="text-base font-medium text-white mb-4 flex flex-col mx-auto items-center md:col-span-3">
+                    <CheckCircle className="text-green-400 w-5 h-5 flex-shrink-0" />
+                    <p> Property saved successfully. Log in to post your property. </p>
+                    <button onClick={() => router.navigate({ to: '/auth/$path', params: { path: 'sign-in' } })} className="mt-2 text-xs text-white hover:underline bg-gradient-to-br from-[#4C7CED] to-[#7B31DC] hover:bg-[#6A2BC4] px-2 py-1 rounded-[6px]">Login</button>
+                </div>}
+
+            </>
+            }
+
+            {(propertyType === 'edit' && !postedStatus) && <div className="md:col-span-2">
                 {/* Progress Section */}
                 <div className="px-6 py-4">
                     <div className="flex justify-between items-start">
@@ -175,12 +205,10 @@ export const PropertyAddView = ({ demoVersion }: { demoVersion?: boolean }) => {
 
                 </form>}
 
-                {(displayMode === 'edit' && !titlesAndDescriptions.length) && <div className='flex flex-col w-full pt-4 pb-5 px-6 space-y-2'>
+                {(propertyType === 'edit' && !titlesAndDescriptions.length) && <div className='flex flex-col w-full pt-4 pb-5 px-6 space-y-2'>
 
-                    {postedStatus && <h3 className="text-base font-medium text-white mb-4"> {postedStatus.success ? <div>
-                        Property saved successfully
-                        <button onClick={() => router.navigate({ to: '/app/my-properties' })} className="ml-2 text-xs text-white hover:underline bg-gradient-to-br from-[#4C7CED] to-[#7B31DC] hover:bg-[#6A2BC4] px-2 py-1 rounded-[6px]">Go to my properties</button>
-                    </div> : 'Failed to save property details'}</h3>}
+
+
                     {(!postedStatus && completedSteps === totalSteps) && <h3 className="text-base font-medium text-white mb-4"> Property details filled successfully</h3>}
                     {completedSteps !== totalSteps && <>
                         <h3 className="text-base font-medium text-white mb-4">{t('yourPreferences')}</h3>
@@ -247,10 +275,10 @@ export const PropertyAddView = ({ demoVersion }: { demoVersion?: boolean }) => {
                 </div>}
 
 
-            </div>
+            </div>}
 
 
-            <div className="hidden md:flex flex-row items-center justify-center">
+            {propertyType === 'edit' && !postedStatus && <div className="hidden md:flex flex-row items-center justify-center">
                 {/* Circular Progress Indicator */}
                 <div className={`relative  `} style={{ width: `${width}px`, height: `${width}px` }}>
                     <svg width={`${width}`} height={`${width}`} className="transform -rotate-90">
@@ -281,7 +309,7 @@ export const PropertyAddView = ({ demoVersion }: { demoVersion?: boolean }) => {
                         </div>
                     </div>
                 </div>
-            </div>
+            </div>}
         </div>
     </>
 

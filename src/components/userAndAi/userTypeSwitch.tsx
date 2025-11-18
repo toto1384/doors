@@ -3,7 +3,7 @@ import { useMutation } from "@tanstack/react-query"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { useTRPC } from "trpc/react"
-import { UserType } from "utils/validation/dbSchemas"
+import { UserType } from "utils/constants"
 import { useShallow } from "zustand/react/shallow"
 
 

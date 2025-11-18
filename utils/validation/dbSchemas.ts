@@ -5,7 +5,7 @@ import { LocationSchema } from './location';
 import { zDate } from './zodUtils';
 import { extendZod } from '@zodyac/zod-mongoose';
 import { ObjectId } from 'mongodb';
-import { PropertyHeatingValues, PropertyStatusValues, PropertyType } from 'utils/constants';
+import { PropertyHeatingValues, PropertyStatusValues, PropertyType, UserType } from 'utils/constants';
 
 
 extendZod(z as any)
@@ -55,6 +55,8 @@ export const UserPreferences = z.object({
 })
 export type UserPreferencesType = z.infer<typeof UserPreferences>;
 
+
+
 export const UserSchema = z.object({
     // _id: z.sting(),
     preferences: UserPreferences.optional(),
@@ -70,11 +72,8 @@ export const UserSchema = z.object({
     image: z.string(),
     createdAt: zDate,
     updatedAt: zDate,
-    userType: z.enum(PropertyType),
+    userType: z.enum(UserType),
 })
-
-
-export const UserType = ['buyer', 'seller', 'admin'] as const
 
 export const AccountSchema = z.object({
     _id: z.instanceof(ObjectId),

@@ -258,7 +258,9 @@
         "condition": "If you're a seller:",
         "cta": "Create free account and list now"
       },
-      "button": "Register for free"
+      "button": "Register for free",
+      "sellerButton": "Register for free to publish your property",
+      "buyerButton": "Register for free to access properties"
     },
     "footer": {
       "brand": "DOORS",
@@ -449,6 +451,31 @@
       "stop": "Stop",
       "copy": "Copy",
       "regenerate": "Regenerate"
+    },
+    "demo": {
+      "buyer": {
+        "message": "Your preferences have been saved, log in to see the properties",
+        "loginButton": "Login"
+      },
+      "seller": {
+        "message": "Your property has been created, log in to post it",
+        "loginButton": "Login"
+      },
+      "undefined": {
+        "message": "Your interview is finished. Login to see details",
+        "loginButton": "Login"
+      }
+    },
+    "production": {
+      "buyer": {
+        "message": "Your interview is done, feel free to start the conversation again if you wish to modify your preferences"
+      },
+      "seller": {
+        "message": "Your property has been created. Make sure to do your final editing before posting"
+      },
+      "undefined": {
+        "message": "Your interview is done, you can restart it again at any time"
+      }
     }
   },
   "privacy-policy": {

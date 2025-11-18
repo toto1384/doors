@@ -37,6 +37,9 @@ export const authAdditionalFields = {
     },
 } as const
 
+
+export const UserType = ['buyer', 'seller', 'admin'] as const
+
 export const PropertyType = ['apartment', 'house', 'hotel', 'office'] as const
 
 export const PropertyStatusValues = ['available', 'sold', 'pending', 'rented', 'off-market'] as const

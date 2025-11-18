@@ -9,7 +9,8 @@ import { UTApi } from 'uploadthing/server';
 import dbConnect from "utils/db/mongodb";
 import { getAccountModel, getPropertyModel, getUserModel } from "utils/validation/mongooseModels";
 import { ObjectId } from 'mongodb';
-import { UserPreferences, UserType } from "utils/validation/dbSchemas";
+import { UserPreferences, } from "utils/validation/dbSchemas";
+import { UserType } from "utils/constants";
 
 extendZod(z as any)
 

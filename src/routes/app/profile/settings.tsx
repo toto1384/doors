@@ -17,7 +17,6 @@ import { UserObject } from "utils/validation/types";
 import { useTRPC, useTRPCClient } from "trpc/react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import i18n from "@/components/i18n";
-import { UserType } from "utils/validation/dbSchemas";
 import { ChangeProfilePictureImageButton } from "@/components/ui/imageUploaders";
 import { UserTypeSwitch } from "@/components/userAndAi/userTypeSwitch";
 

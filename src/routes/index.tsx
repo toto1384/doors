@@ -329,7 +329,7 @@ const SellerDemoSection = ({ token }: { token: string }) => {
                         </div>
                         <div className={`${tab === 'results' ? 'block' : 'md:block hidden'} md:w-[70%] w-full max-h-full flex flex-col overflow-y-scroll`}>
                             {/* {JSON.stringify(demoPropertyFilters)} */}
-                            <div className="max-h-full w-full h-full overflow-y-scroll overflow-x-clip">
+                            <div className="max-h-full w-full h-full overflow-y-scroll overflow-x-clip relative">
                                 <PropertyAddView demoVersion />
                             </div>
 
@@ -342,7 +342,7 @@ const SellerDemoSection = ({ token }: { token: string }) => {
                     params={data ? {} : { path: "sign-in" }}
                     className="inline-block bg-gradient-to-r mx-auto mt-5 text-center from-blue-500 to-purple-600 text-white px-8 py-3 rounded-md font-semibold text-lg hover:from-blue-600 hover:to-purple-700 transition-all transform hover:scale-105 shadow-2xl"
                 >
-                    {t('landing-page.finalCta.button')}
+                    {t('landing-page.finalCta.sellerButton')}
                 </Link>
             </div>
         </section>

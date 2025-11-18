@@ -12,7 +12,7 @@ import { useSetPropertyFunctions } from './usePostPropertyAiHook';
 import { useChooseActions } from './useChooseActionsAiHook';
 import { ChatComponent } from './chatComponent';
 import { useConversation } from '@elevenlabs/react';
-import { UserType } from 'utils/validation/dbSchemas';
+import { UserType } from 'utils/constants';
 // import { useConversation as uc } from 'utils/hooks/mockElevenlabsHook';
 // const useConversation = uc({ flow: 'seller' })
 
@@ -53,6 +53,8 @@ export function ElevenLabsChatBotDemo<T extends boolean>({ conversationToken, us
     })))
 
 
+    const [agentState, setAgentState] = useState<'not-started' | 'stopped'>('not-started')
+
 
     const setPropertyFiltersFunctions = useChooseActions({ setMessages, demoVersion })
     const postPropertyFunctions = useSetPropertyFunctions({
@@ -60,14 +62,17 @@ export function ElevenLabsChatBotDemo<T extends boolean>({ conversationToken, us
     })
 
 
-    const userTypeVar = userType ?? user?.userType ?? '';
+    const userTypeVar = userType ?? user?.userType;
     const localeVar = locale ? ((locale.includes('-') ? locale.split('-')[0] : locale) as 'en' | 'ro') : 'ro';
+
+    const firstMessage = userTypeVar == undefined ? (localeVar == 'ro' ? 'Doresti sa cumperi sau sa vinzi o proprietate' : 'Are you looking to buy or to sell a property') :
+        userTypeVar === 'buyer' ? (localeVar == 'ro' ? "sunt aici sa te ajut sa iti gasesti noua proprietate. Cauti un apartament sau o casa?" : "I\'m here to help you buy a property. Are you looking for an apartment or a house?") :
+            (localeVar == "ro" ? "sunt aici sa te ajut sa iti vinzi proprietatea. Este vorba de apartament sau casa?" : 'I\'m here to help you sell your property. Are we talking about an apartment or a house?')
+
     const dynamicVariables = {
         'userName': user?.name ?? '',
-        "userType": userTypeVar,
-        "userTypeMessage": userTypeVar == undefined ? (localeVar == 'ro' ? 'Doresti sa cumperi sau sa vinzi o proprietate' : 'Are you looking to buy or to sell a property') :
-            userTypeVar === 'buyer' ? (localeVar == 'ro' ? "sunt aici sa te ajut sa iti gasesti noua proprietatea. Cauti un apartament sau o casa?" : "I\'m here to help you buy a property. Are you looking for an apartment or a house?") :
-                (localeVar == "ro" ? "sunt aici sa te ajut sa iti vinzi proprietatea. Este vorba de apartament sau casa?" : 'I\'m here to help you sell your property. Are we talking about an apartment or a house?'),
+        "userType": userTypeVar ?? '',
+        "userTypeMessage": firstMessage,
         'demoVersion': (demoVersion ?? false).toString(),
 
         "hasAllPreferencesSet": user ? !!((user.preferences?.propertyType?.length ?? 0) > 0 && (user.preferences?.budget?.min || user.preferences?.budget?.max) && user.preferences?.location?.fullLocationName && (user.preferences?.numberOfRooms?.length ?? 0) > 0 && (user.preferences?.facilities?.length ?? 0) > 0) : false,
@@ -104,6 +109,7 @@ export function ElevenLabsChatBotDemo<T extends boolean>({ conversationToken, us
     const startConversation = useCallback(async () => {
 
         async function start(token: string) {
+            setAgentState('not-started')
             const str = await conversation.startSession({
                 onMessage: (message) => {
                     setMessages((prev) => [...prev, { ...message, id: nanoid() }])
@@ -167,6 +173,7 @@ export function ElevenLabsChatBotDemo<T extends boolean>({ conversationToken, us
 
         setEndConversation(async () => {
             console.log('setEndConversation')
+            setAgentState('stopped')
             return conversation.endSession()
         })
 
@@ -185,6 +192,10 @@ export function ElevenLabsChatBotDemo<T extends boolean>({ conversationToken, us
 
     return <IsConnectedContext.Provider value={conversation.status === 'connected'}>
         <ChatComponent
+            agentState={agentState}
+            demoVersion={demoVersion}
+            userType={userTypeVar}
+            firstMessage={`${localeVar == 'ro' ? 'Salut' : 'Hello'}, ${firstMessage}`}
             status={conversation.status}
             sendUserActivity={conversation.sendUserActivity}
             messages={messages}
