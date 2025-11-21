@@ -84,7 +84,7 @@ export const ChatComponent = ({ messages, sendMessage, sendUserActivity, status,
                 <Conversation className="h-full no-scrollbar">
                     <ConversationContent className='bg-transparent p-0 min-h-full flex flex-col '>
                         {messages.length === 0 && agentState !== 'stopped' && <div className='flex flex-col min-h-full grow-1 flex-1 p-2 justify-center items-center'>
-                            <div className='flex absolute top-1 left-1 flex-col items-center justify-center bg-[#241540] opacity-90 rounded-[6px] p-2 object-center'>
+                            <div className='flex absolute top-3 left-2 right-6 flex-col text-sm items-center justify-center bg-[#241540] opacity-90 rounded-lg p-2 object-center'>
                                 {firstMessage}
                             </div>
                         </div>}

@@ -2,7 +2,7 @@ import { PropertyObject } from "utils/validation/types";
 import { MessageType } from "./aiChatbot";
 import { useTranslation } from "react-i18next";
 import { useRouter, useRouterState } from "@tanstack/react-router";
-import { useTRPCClient } from "trpc/react";
+import { useTRPC, useTRPCClient } from "trpc/react";
 import { usePopoversOpenStore, usePropertyAddStore, usePropertyFilterStore } from "@/routes/__root";
 import { useShallow } from "zustand/react/shallow";
 import { useClientToolSelectPhotos } from "utils/hooks/aiChatbotSelectImagesHook";
@@ -10,8 +10,9 @@ import { nanoid } from "nanoid";
 import { useClientToolChoice } from "utils/hooks/aiChatbotButtonHook";
 import { searchLocationByString } from "utils/googleMapsUtils";
 import { Facilities } from "utils/validation/propertyFilters";
-import { demoPropertyKey, PropertyHeating, PropertyTypeType } from "utils/constants";
-import { useQueryClient } from "@tanstack/react-query";
+import { demoPropertyKey, PropertyHeating, PropertyTypeType, propPreferencesKey } from "utils/constants";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { SellerAvailability } from "utils/scheduleUtils";
 
 
 export const usePublishPropertyHook = ({ demoVersion }: { demoVersion?: boolean }) => {
@@ -76,6 +77,9 @@ export const useSetPropertyFunctions = ({
     const router = useRouter()
     const routerState = useRouterState()
 
+    const trpc = useTRPC()
+    const updateUserPreferencesMutation = useMutation(trpc.auth.updateUserPreferences.mutationOptions())
+
     const ensureIsInAddMode = () => { if (routerState.location.pathname !== '/app/properties/add' && !demoVersion) router.navigate({ to: '/app/properties/add' }) }
 
     const { aiChatbotOpen, setAiChatbotOpen } = usePopoversOpenStore(useShallow(state => ({
@@ -100,6 +104,16 @@ export const useSetPropertyFunctions = ({
             setPropertyType('final-edit')
         },
         publishProperty,
+        setSellerAvailability: async ({ availabilityArray }: { availabilityArray: SellerAvailability[] }) => {
+
+            if (demoVersion) {
+                const originalPreferences = localStorage.getItem(propPreferencesKey)
+                const currentPreferences = { ...(originalPreferences ? JSON.parse(originalPreferences) : {}), sellerAvailability: availabilityArray };
+                return localStorage.setItem(propPreferencesKey, JSON.stringify(currentPreferences))
+            }
+            const updated = await updateUserPreferencesMutation.mutateAsync({ sellerAvailability: availabilityArray })
+            console.log('updated', updated)
+        },
         //add posting tools
         // this tool displays a photo select interface for the user to add their photos
         selectPropertyPhotos: useClientToolSelectPhotos({

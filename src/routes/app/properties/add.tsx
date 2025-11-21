@@ -3,13 +3,10 @@ import { useShallow } from "zustand/react/shallow"
 import { useTranslation } from 'react-i18next'
 import { usePropertyAddStore } from "@/routes/__root"
 import { PropertyAddView } from "@/components/pages/propertyAddView"
+
 export const Route = createFileRoute("/app/properties/add")({
     component: PropertyAdd,
 })
-
-
-
-
 
 function PropertyAdd() {
     const { t } = useTranslation('translation', { keyPrefix: 'property-add' })

@@ -253,6 +253,7 @@ export const MultiImageUpload: React.FC<{
                                 Browse
                                 <input
                                     type="file"
+                                    data-testid="image-upload-input"
                                     accept={accept}
                                     multiple
                                     className="hidden"

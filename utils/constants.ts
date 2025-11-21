@@ -37,6 +37,7 @@ export const authAdditionalFields = {
     },
 } as const
 
+export const appointmentStatus = ['pending', 'confirmed', 'cancelled-by-buyer', 'cancelled-by-seller', 'completed'] as const;
 
 export const UserType = ['buyer', 'seller', 'admin'] as const
 

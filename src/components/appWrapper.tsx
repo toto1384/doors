@@ -40,10 +40,7 @@ export default function AppRouteWrapper({
     })))
 
 
-
-    posthog.capture('my event', { property: 'value' })
-
-
+    console.log('session', session)
 
     useEffect(() => {
         if (!isPending && !session) {

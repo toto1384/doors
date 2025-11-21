@@ -51,7 +51,6 @@ export const PropertyAddView = ({ demoVersion }: { demoVersion?: boolean }) => {
         { label: `${t('fields.description')}${partialProperty.description ? `: ${partialProperty.description?.substring(0, 10)}...` : `: ${t('status.waiting')}`}`, isChecked: !!partialProperty?.description },
     ]
 
-    console.log('checkedSteps', checkedSteps)
     const checkedOnSteps = checkedSteps.filter(step => !step.isChecked)
 
     const completedSteps = checkedSteps.filter(step => step.isChecked).length
@@ -201,7 +200,7 @@ export const PropertyAddView = ({ demoVersion }: { demoVersion?: boolean }) => {
                         defaultValue={titlesAndDescriptions[0].description}
                     />
 
-                    <button type="submit" className="w-full mt-2 bg-gradient-to-br from-[#4C7CED] to-[#7B31DC] hover:bg-[#6A2BC4] text-white text-xs px-4 py-2 rounded-[6px]">Done</button>
+                    <button type="submit" data-testid="submit-done" className="w-full mt-2 bg-gradient-to-br from-[#4C7CED] to-[#7B31DC] hover:bg-[#6A2BC4] text-white text-xs px-4 py-2 rounded-[6px]">Done</button>
 
                 </form>}
 

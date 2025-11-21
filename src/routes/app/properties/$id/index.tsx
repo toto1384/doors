@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useRouter } from '@tanstack/react-router'
 import { useState, useEffect, useRef, ReactNode } from 'react'
-import { useTRPC } from '../../../../../trpc/react'
+import { useTRPC, useTRPCClient } from '../../../../../trpc/react'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -53,23 +53,17 @@ export const ScheduleViewComponent = ({ id, property }: { id: string, property: 
     const { t } = useTranslation()
 
     const trpc = useTRPC()
+    const trpcClient = useTRPCClient()
 
     const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false)
     const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1)
     const [selectedYear, setSelectedYear] = useState(new Date().getFullYear())
 
     // Scheduling queries and mutations
-    const { data: sellerAvailability } = useQuery(
-        trpc.appointments.getSellerAvailability.queryOptions({ 
-            propertyId: id,
-            month: selectedMonth,
-            year: selectedYear
-        })
-    )
-
-    const { data: existingBookings } = useQuery(
-        trpc.appointments.getExistingBookings.queryOptions({ propertyId: id })
-    )
+    const { data: sellerAvailability, isLoading, refetch } = useQuery({
+        queryKey: ['appointments.getSellerAvailability', id, selectedMonth, selectedYear],
+        queryFn: () => trpcClient.appointments.getSellerAvailability.query({ propertyId: id, month: selectedMonth, year: selectedYear }),
+    })
 
     const scheduleViewingMutation = useMutation(trpc.appointments.scheduleViewing.mutationOptions({
         onSuccess: () => {
@@ -93,21 +87,32 @@ export const ScheduleViewComponent = ({ id, property }: { id: string, property: 
             date: date,
             startTime: time,
             endTime: endTimeString,
-        });
+        }).then(() => refetch());
     }
 
     return <>
-        <Button className='bg-gradient-to-br from-[#4C7CED] to-[#7B31DC] text-white text-xs px-4 py-2 rounded-[6px]' onClick={() => setIsScheduleModalOpen(true)}>
-            {t('property-page.scheduleViewing')}
-        </Button>
+        {sellerAvailability?.alreadyScheduled ? <>
+            <Button className='bg-gradient-to-br from-[#4C7CED]/50 to-[#7B31DC]/50 text-white text-xs px-4 py-2 rounded-[6px]' disabled >
+                Scheduled: {sellerAvailability.alreadyScheduled.startTime} - {sellerAvailability.alreadyScheduled.endTime} : {format(sellerAvailability.alreadyScheduled.date, 'dd-MM-yyyy')}
+            </Button>
+        </> :
+            <Button className='bg-gradient-to-br from-[#4C7CED] to-[#7B31DC] text-white text-xs px-4 py-2 rounded-[6px]' onClick={() => setIsScheduleModalOpen(true)}>
+                {t('property-page.scheduleViewing')}
+            </Button>
+        }
 
         {/* Viewing Schedule Modal */}
         <ViewingScheduleModal
+            isLoading={isLoading}
+            month={new Date(selectedYear, selectedMonth - 1, 1)}
+            onMonthChange={(date) => {
+                setSelectedMonth(date.getMonth() + 1)
+                setSelectedYear(date.getFullYear())
+            }}
             isOpen={isScheduleModalOpen}
             onClose={() => setIsScheduleModalOpen(false)}
             property={property}
             sellerAvailability={sellerAvailability || { availableSlots: [] }}
-            existingBookings={existingBookings?.existingBookings || []}
             onScheduleViewing={handleScheduleViewing}
         />
     </>
@@ -405,7 +410,7 @@ function PropertyImageGallery({
 export function PropertyInfo({ property, additionalComponent, additionalSpacing }: { property: Partial<PropertyObject>, additionalComponent?: ReactNode, additionalSpacing?: boolean }) {
     return (
         <div className="px-4 mb-6">
-            <div className={`flex flex-row items-center gap-2 mb-2 ${additionalSpacing && 'justify-between'}`}>
+            <div className={`flex flex-col md:flex-row md:items-center gap-2 mb-2 ${additionalSpacing && 'justify-between'}`}>
                 <h1 className="text-xl font-light text-white">{property.title ?? 'No title set'}</h1>
                 {additionalComponent}
             </div>

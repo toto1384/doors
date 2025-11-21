@@ -14,7 +14,7 @@ import { ChatComponent } from './chatComponent';
 import { useConversation } from '@elevenlabs/react';
 import { UserType } from 'utils/constants';
 // import { useConversation as uc } from 'utils/hooks/mockElevenlabsHook';
-// const useConversation = uc({ flow: 'seller' })
+// const useConversation = uc({ flow: 'buyer' })
 
 export type MessageType = { source: 'user' | 'ai', message: string | ReactNode, id: string }
 
@@ -103,6 +103,8 @@ export function ElevenLabsChatBotDemo<T extends boolean>({ conversationToken, us
             },
         },
     });
+
+    console.log('conversation', conversation)
 
     const { isSpeaking, status, } = conversation
 

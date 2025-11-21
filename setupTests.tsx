@@ -1,17 +1,53 @@
 
-import { afterEach, beforeAll, expect } from 'vitest'
+import { afterEach, beforeAll, beforeEach, expect } from 'vitest'
 import { cleanup, render, RenderOptions, waitFor } from '@testing-library/react'
 import '@testing-library/jest-dom/vitest'
 
 import { createMemoryHistory, createRootRoute, createRoute, createRouter, Outlet, RegisteredRouter, RouterProvider } from '@tanstack/react-router';
 import { TRPCWrapper } from '@/components/providers/TrpcWrapper.tsx';
 import { ReactNode } from 'react';
+import i18n from './src/components/i18n';
 
 
 // runs a clean after each test case (e.g. clearing jsdom)
 afterEach(() => {
     cleanup();
 })
+
+beforeEach(() => {
+    i18n.changeLanguage('en');
+});
+
+// Mock authClient
+import { vi } from 'vitest';
+import { ThemeProvider } from '@/components/providers/ThemeProvider';
+
+vi.mock('utils/auth-client', () => ({
+    authClient: {
+        useSession: vi.fn(() => ({
+            data: {
+                user: {
+                    id: 'test-user-id',
+                    name: 'Test User',
+                    email: 'test@example.com',
+                    userType: 'buyer'
+                }
+            },
+            isPending: false
+        }))
+    }
+}));
+
+// Mock useUploadThingCompressed
+vi.mock('utils/uploadthingUtils', () => ({
+    useUploadThingCompressed: vi.fn(() => ({
+        startUpload: vi.fn().mockResolvedValue([
+            { ufsUrl: 'https://example.com/image1.jpg' },
+            { ufsUrl: 'https://example.com/image2.jpg' }
+        ]),
+        isUploading: false
+    }))
+}));
 
 
 beforeAll(() => {
@@ -20,6 +56,22 @@ beforeAll(() => {
         unobserve() { }
         disconnect() { }
     };
+
+    // Mock navigator.mediaDevices.getUserMedia
+    Object.defineProperty(global.navigator, 'mediaDevices', {
+        writable: true,
+        value: {
+            getUserMedia: vi.fn().mockResolvedValue({
+                getTracks: () => [],
+                getVideoTracks: () => [],
+                getAudioTracks: () => []
+            })
+        }
+    });
+
+    // Mock URL.createObjectURL
+    global.URL.createObjectURL = vi.fn(() => 'mocked-object-url');
+    global.URL.revokeObjectURL = vi.fn();
 });
 
 
@@ -85,9 +137,11 @@ export const renderWithRouter = async <R extends keyof Routes>(
 ): Promise<void> => {
     render(
         <MockedRouter initialLocation={initialLocation} mockRoute={mockRoute}>
-            <TRPCWrapper>
-                {component}
-            </TRPCWrapper>
+            <ThemeProvider theme={'dark'}>
+                <TRPCWrapper>
+                    {component}
+                </TRPCWrapper>
+            </ThemeProvider>
         </MockedRouter>,
         options,
     );

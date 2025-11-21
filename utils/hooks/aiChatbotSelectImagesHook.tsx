@@ -56,6 +56,7 @@ const PhotoSelector = ({ resolve }: { resolve: (photos: string[]) => void }) => 
         />
         {isUploading ? <>Loading...</> : <button
             key={'done'}
+            data-testid="done-image-button"
             disabled={!isConnected || disabled}
             onClick={() => {
                 console.log('images', images, isConnected)

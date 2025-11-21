@@ -5,10 +5,11 @@ import { LocationSchema } from './location';
 import { zDate } from './zodUtils';
 import { extendZod } from '@zodyac/zod-mongoose';
 import { ObjectId } from 'mongodb';
-import { PropertyHeatingValues, PropertyStatusValues, PropertyType, UserType } from 'utils/constants';
+import { appointmentStatus, PropertyHeatingValues, PropertyStatusValues, PropertyType, UserType } from 'utils/constants';
 
 
 extendZod(z as any)
+
 
 
 export const AppointmentSchema = z.object({
@@ -19,7 +20,7 @@ export const AppointmentSchema = z.object({
     buyerUserId: z.string(), // buyer
     sellerUserId: z.string(), // seller
     propertyId: z.string(),
-    status: z.enum(['pending', 'confirmed', 'cancelled', 'completed']).default('pending'),
+    status: z.enum(appointmentStatus).default('pending'),
     notes: z.string().optional(),
     createdAt: zDate.optional(),
     updatedAt: zDate.optional(),

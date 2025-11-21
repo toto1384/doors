@@ -6,6 +6,11 @@ import { getAppointmentModel, getPropertyModel, getUserModel } from "utils/valid
 import { AppointmentSchema } from "utils/validation/dbSchemas";
 import { startOfMonth, endOfMonth } from "date-fns";
 import { calculateAvailableSlots } from "utils/scheduleUtils";
+import { AppointmentObject } from "utils/validation/types";
+import mongoose from "mongoose";
+import { appointmentStatus } from "utils/constants";
+
+const bypassLimitations = false
 
 export const appointmentsRouter = createTRPCRouter({
     // Schedule a new viewing
@@ -30,8 +35,18 @@ export const appointmentsRouter = createTRPCRouter({
             }
 
             // Check if user is trying to book their own property
-            if (property.postedByUserId === ctx.user.id) {
+            if (!bypassLimitations && property?.postedByUserId === ctx.user.id) {
                 throw new TRPCError({ code: 'BAD_REQUEST', message: 'Cannot book viewing for your own property' });
+            }
+
+
+            const alreadyScheduled = await AppointmentModel.findOne({
+                propertyId: input.propertyId,
+                buyerUserId: ctx.user.id,
+            });
+
+            if (!bypassLimitations && alreadyScheduled) {
+                throw new TRPCError({ code: 'CONFLICT', message: 'You already have a scheduled viewing' });
             }
 
             // Check for existing appointments at the same time
@@ -52,17 +67,18 @@ export const appointmentsRouter = createTRPCRouter({
             }
 
             const appointmentObject = {
+                _id: new mongoose.Types.ObjectId() as any,
                 date: input.date,
                 startTime: input.startTime,
                 endTime: input.endTime,
-                initiatorUserId: ctx.user.id, // buyer
-                receiverUserId: property.postedByUserId, // seller
+                buyerUserId: ctx.user.id, // buyer
+                sellerUserId: property.postedByUserId, // seller
                 propertyId: input.propertyId,
                 status: 'pending',
                 notes: input.notes,
                 createdAt: new Date(),
                 updatedAt: new Date(),
-            }
+            } as AppointmentObject;
 
             console.log('appointmentObject', appointmentObject)
 
@@ -101,9 +117,17 @@ export const appointmentsRouter = createTRPCRouter({
                 throw new TRPCError({ code: 'NOT_FOUND', message: 'Seller not found' });
             }
 
+
+            const alreadyScheduled = await AppointmentModel.findOne({
+                propertyId: input.propertyId,
+                buyerUserId: ctx.user.id,
+            });
+
+
+
             const sellerAvailability = seller.preferences?.sellerAvailability || [
                 // Default availability: weekdays 9-18
-                { startDate: 'Monday', endDate: 'Friday', startTime: '09:00', endTime: '18:00' }
+                { startDate: 'Monday', endDate: 'Friday', startTime: '09:00', endTime: '17:00' }
             ];
 
             // Get all existing bookings for this property in the specified month
@@ -129,7 +153,7 @@ export const appointmentsRouter = createTRPCRouter({
                 skipPastDates: true
             });
 
-            return { availableSlots };
+            return { availableSlots, ownProperty: property.postedByUserId == ctx.user.id, alreadyScheduled: alreadyScheduled };
         }),
 
     // Get existing bookings for a property
@@ -165,8 +189,8 @@ export const appointmentsRouter = createTRPCRouter({
 
             const appointments = await AppointmentModel.find({
                 $or: [
-                    { initiatorUserId: ctx.user.id },
-                    { receiverUserId: ctx.user.id }
+                    { buyerUserId: ctx.user.id },
+                    { sellerUserId: ctx.user.id }
                 ]
             }).sort({ date: 1, startTime: 1 });
 
@@ -200,7 +224,7 @@ export const appointmentsRouter = createTRPCRouter({
             const PropertyModel = getPropertyModel(db);
 
             const appointments = await AppointmentModel.find({
-                receiverUserId: ctx.user.id,
+                sellerUserId: ctx.user.id,
                 date: { $gte: new Date() }
             }).sort({ date: 1, startTime: 1 });
 
@@ -233,29 +257,47 @@ export const appointmentsRouter = createTRPCRouter({
             const AppointmentModel = getAppointmentModel(db);
             const PropertyModel = getPropertyModel(db);
 
-            const appointments = await AppointmentModel.find({
-                initiatorUserId: ctx.user.id,
-                date: { $gte: new Date() }
-            }).sort({ date: 1, startTime: 1 });
-
-            // Populate with property details
-            const appointmentsWithProperties = await Promise.all(
-                appointments.map(async (appointment) => {
-                    const property = await PropertyModel.findById(appointment.propertyId);
-                    return {
-                        ...appointment.toObject(),
-                        property: property ? {
-                            title: property.title,
-                            location: property.location,
-                            imageUrls: property.imageUrls,
-                            price: property.price,
-                            numberOfRooms: property.numberOfRooms,
-                            numberOfBathrooms: property.numberOfBathrooms,
-                            surfaceArea: property.surfaceArea
-                        } : null
-                    };
-                })
-            );
+            const appointmentsWithProperties = await AppointmentModel.aggregate([
+                {
+                    $match: {
+                        buyerUserId: ctx.user.id,
+                        date: { $gte: new Date() }
+                    }
+                },
+                {
+                    $lookup: {
+                        from: 'properties',
+                        localField: 'propertyId',
+                        foreignField: '_id',
+                        as: 'propertyData'
+                    }
+                },
+                {
+                    $addFields: {
+                        property: {
+                            $cond: {
+                                if: { $gt: [{ $size: '$propertyData' }, 0] },
+                                then: {
+                                    title: { $arrayElemAt: ['$propertyData.title', 0] },
+                                    location: { $arrayElemAt: ['$propertyData.location', 0] },
+                                    imageUrls: { $arrayElemAt: ['$propertyData.imageUrls', 0] },
+                                    price: { $arrayElemAt: ['$propertyData.price', 0] },
+                                    numberOfRooms: { $arrayElemAt: ['$propertyData.numberOfRooms', 0] },
+                                    numberOfBathrooms: { $arrayElemAt: ['$propertyData.numberOfBathrooms', 0] },
+                                    surfaceArea: { $arrayElemAt: ['$propertyData.surfaceArea', 0] }
+                                },
+                                else: null
+                            }
+                        }
+                    }
+                },
+                {
+                    $unset: 'propertyData'
+                },
+                {
+                    $sort: { date: 1, startTime: 1 }
+                }
+            ]);
 
             return { appointments: appointmentsWithProperties };
         }),
@@ -264,7 +306,7 @@ export const appointmentsRouter = createTRPCRouter({
     updateAppointmentStatus: authProcedure
         .input(z.object({
             appointmentId: z.string(),
-            status: z.enum(['confirmed', 'cancelled', 'completed'])
+            status: z.enum(appointmentStatus)
         }))
         .mutation(async ({ ctx, input }) => {
             const db = await dbConnect();
@@ -275,16 +317,10 @@ export const appointmentsRouter = createTRPCRouter({
                 throw new TRPCError({ code: 'NOT_FOUND', message: 'Appointment not found' });
             }
 
-            // Only seller can confirm/cancel, both parties can mark as completed
-            if (input.status === 'confirmed' || input.status === 'cancelled') {
-                if (appointment.sellerUserId !== ctx.user.id) {
-                    throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Only seller can confirm or cancel appointments' });
-                }
-            } else if (input.status === 'completed') {
-                if (appointment.buyerUserId !== ctx.user.id && appointment.sellerUserId !== ctx.user.id) {
-                    throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Only appointment participants can mark as completed' });
-                }
+            if (ctx.user.id !== appointment.buyerUserId && ctx.user.id !== appointment.sellerUserId) {
+                throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Only appointment participants can mark as completed' });
             }
+
 
             await AppointmentModel.findByIdAndUpdate(input.appointmentId, {
                 status: input.status,

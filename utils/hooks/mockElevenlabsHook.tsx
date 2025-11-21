@@ -87,6 +87,7 @@ export const useConversation = ({ flow }: { flow: 'buyer' | 'seller' }) => ({ cl
     const [messages, setMessages] = React.useState<string[]>([])
 
     return {
+        test: true,
         sendContextualUpdate: (str: string) => { },
         status, isSpeaking,
         sendUserActivity: () => { },
@@ -104,9 +105,9 @@ export const useConversation = ({ flow }: { flow: 'buyer' | 'seller' }) => ({ cl
             onAgentToolResponse: (message: any) => void,
             onModeChange: (prop: string) => void,
         }) => {
-            GetAllTools().then(tools => {
-                console.log('tools', tools)
-            })
+            // GetAllTools().then(tools => {
+            //     console.log('tools', tools)
+            // })
             //here start sending the messages
             setConversationEvents({ onConnect, onDisconnect, onMessage })
             setStatus('connected')
@@ -215,6 +216,12 @@ export const useConversation = ({ flow }: { flow: 'buyer' | 'seller' }) => ({ cl
                 onMessage({ message: 'Acum incarca Pozele', source: 'ai' })
                 const photos = await clientTools.selectPropertyPhotos()
                 onMessage({ message: `Perfect, ai selectat fotografiile`, source: 'ai' })
+
+                onMessage({ message: `Perfect, acum spune ce availabilitate ai`, source: 'ai' })
+                onMessage({ message: 'De luni pana miercuri de la 12 la 14', source: 'user' })
+                const availability = await clientTools.setSellerAvailability({
+                    availabilityArray: [{ startDate: 'Monday', endDate: 'Wednesday', startTime: '12:00', endTime: '14:00' },]
+                })
 
                 await clientTools.setFinalEditFunction()
                 onMessage({ message: `Perfect, ai publicat proprietatea`, source: 'ai' })

@@ -1,8 +1,8 @@
-import { getDaysInMonth } from 'date-fns';
+import { getDaysInMonth, addHours, format, parse, isBefore } from 'date-fns';
 
 export interface SellerAvailability {
-    startDate: string; // Day of week (Monday, Tuesday, etc.)
-    endDate: string;   // Day of week
+    startDate: 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday';
+    endDate: 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday';
     startTime: string; // HH:mm format
     endTime: string;   // HH:mm format
 }
@@ -33,9 +33,9 @@ export interface AvailabilityCalculationInput {
  */
 export function calculateAvailableSlots(input: AvailabilityCalculationInput): AvailableSlot[] {
     const { sellerAvailability, existingBookings, month, year, skipPastDates = true } = input;
-    
+
     const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-    
+
     /**
      * Checks if a day of the week falls within an availability range
      * Handles week wraparound (e.g., Friday to Monday)
@@ -44,7 +44,7 @@ export function calculateAvailableSlots(input: AvailabilityCalculationInput): Av
         const startIndex = dayNames.indexOf(startDay);
         const endIndex = dayNames.indexOf(endDay);
         const dayIndex = dayNames.indexOf(dayName);
-        
+
         if (startIndex <= endIndex) {
             return dayIndex >= startIndex && dayIndex <= endIndex;
         } else {
@@ -54,29 +54,22 @@ export function calculateAvailableSlots(input: AvailabilityCalculationInput): Av
     };
 
     /**
-     * Generates 1-hour time slots between start and end time
+     * Generates 1-hour time slots between start and end time using date-fns
      */
     const generateTimeSlots = (startTime: string, endTime: string): string[] => {
         const slots: string[] = [];
-        const start = parseInt(startTime.split(':')[0]);
-        const startMinutes = parseInt(startTime.split(':')[1]);
-        const end = parseInt(endTime.split(':')[0]);
-        const endMinutes = parseInt(endTime.split(':')[1]);
-        
-        let currentHour = start;
-        let currentMinutes = startMinutes;
-        
-        while (currentHour < end || (currentHour === end && currentMinutes < endMinutes)) {
-            const timeSlot = `${currentHour.toString().padStart(2, '0')}:${currentMinutes.toString().padStart(2, '0')}`;
-            slots.push(timeSlot);
-            
-            currentMinutes += 60; // 1-hour slots
-            if (currentMinutes >= 60) {
-                currentHour += Math.floor(currentMinutes / 60);
-                currentMinutes = currentMinutes % 60;
-            }
+        const baseDate = new Date(2000, 0, 1); // Use a fixed date for time calculations
+
+        const startDateTime = parse(startTime, 'HH:mm', baseDate);
+        const endDateTime = parse(endTime, 'HH:mm', baseDate);
+
+        let currentTime = startDateTime;
+
+        while (isBefore(currentTime, endDateTime)) {
+            slots.push(format(currentTime, 'HH:mm'));
+            currentTime = addHours(currentTime, 1);
         }
-        
+
         return slots;
     };
 
@@ -88,7 +81,7 @@ export function calculateAvailableSlots(input: AvailabilityCalculationInput): Av
         const currentDate = new Date(year, month - 1, day);
         const dayName = dayNames[currentDate.getDay()];
         const dateString = `${day.toString().padStart(2, '0')}-${month.toString().padStart(2, '0')}-${year}`;
-        
+
         // Skip past dates if requested
         if (skipPastDates && currentDate < today) {
             continue;
@@ -111,9 +104,9 @@ export function calculateAvailableSlots(input: AvailabilityCalculationInput): Av
         const bookedSlots = existingBookings
             .filter(booking => {
                 const bookingDate = new Date(booking.date);
-                return bookingDate.getDate() === day && 
-                       bookingDate.getMonth() === month - 1 && 
-                       bookingDate.getFullYear() === year;
+                return bookingDate.getDate() === day &&
+                    bookingDate.getMonth() === month - 1 &&
+                    bookingDate.getFullYear() === year;
             })
             .map(booking => booking.startTime);
 
@@ -136,16 +129,16 @@ export function calculateAvailableSlots(input: AvailabilityCalculationInput): Av
  * @returns Array of random seller availability periods
  */
 export function generateRandomSellerAvailability(numPeriods: number = 2): SellerAvailability[] {
-    const dayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    const dayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] as const;
     const availability: SellerAvailability[] = [];
 
     for (let i = 0; i < numPeriods; i++) {
         const startDayIndex = Math.floor(Math.random() * dayNames.length);
         const endDayIndex = (startDayIndex + Math.floor(Math.random() * 3)) % dayNames.length; // Max 3 days range
-        
+
         const startHour = 8 + Math.floor(Math.random() * 4); // 8-11 AM
         const endHour = startHour + 4 + Math.floor(Math.random() * 6); // 4-10 hours later
-        
+
         availability.push({
             startDate: dayNames[startDayIndex],
             endDate: dayNames[endDayIndex],
@@ -167,12 +160,12 @@ export function generateRandomSellerAvailability(numPeriods: number = 2): Seller
 export function generateRandomBookings(month: number, year: number, numBookings: number = 5): ExistingBooking[] {
     const bookings: ExistingBooking[] = [];
     const daysInMonth = getDaysInMonth(new Date(year, month - 1, 1));
-    
+
     for (let i = 0; i < numBookings; i++) {
         const day = 1 + Math.floor(Math.random() * daysInMonth);
         const startHour = 9 + Math.floor(Math.random() * 10); // 9 AM - 7 PM
         const endHour = startHour + 1; // 1 hour duration
-        
+
         bookings.push({
             date: new Date(year, month - 1, day),
             startTime: `${startHour.toString().padStart(2, '0')}:00`,

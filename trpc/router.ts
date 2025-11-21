@@ -1,5 +1,5 @@
 import { TRPCError, type TRPCRouterRecord } from "@trpc/server";
-import { z } from "zod/v3";
+import z from "zod/v3";
 
 import { extendZod } from "@zodyac/zod-mongoose";
 import { authProcedure, createTRPCRouter, publicProcedure, } from "./init";
@@ -66,16 +66,14 @@ export const trpcRouter = createTRPCRouter({
             const db = await dbConnect();
             const UserModel = getUserModel(db);
 
-            const user = await UserModel.updateOne({ _id: ctx.user.id }, {
-                $set: {
-                    "preferences.propertyType": input.propertyType,
-                    "preferences.budget": input.budget,
-                    "preferences.facilities": input.facilities,
-                    "preferences.location": input.location,
-                    "preferences.numberOfRooms": input.numberOfRooms,
+            const updateFields: any = {};
+            Object.keys(input).forEach(key => {
+                if (input[key as keyof z.infer<typeof UserPreferences>] !== undefined) {
+                    updateFields[`preferences.${key}`] = input[key as keyof z.infer<typeof UserPreferences>];
                 }
-            })
-            console.log('gh', input, user)
+            });
+
+            const user = await UserModel.updateOne({ _id: ctx.user.id }, { $set: updateFields })
 
             if (!user) {
                 throw new TRPCError({ code: 'UNAUTHORIZED', message: 'User not found' });
@@ -97,3 +95,4 @@ export const trpcRouter = createTRPCRouter({
     }
 });
 export type TRPCRouter = typeof trpcRouter;
+
