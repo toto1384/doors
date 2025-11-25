@@ -10,6 +10,7 @@ import { useTRPC, useTRPCClient } from "trpc/react";
 import { format, isToday } from "date-fns";
 import { NotificationObject } from "utils/validation/types";
 import { NotificationsContext } from "./appWrapper";
+import i18n from "./i18n";
 
 interface NotificationItem {
     id: string;
@@ -52,20 +53,20 @@ export function NotificationsContent({ className, open }: { className?: string, 
                 <div className="mb-4">
                     <img
                         src="/icons/emptyIllustration.svg"
-                        alt="No notifications"
+                        alt={t('notifications.emptyState.altText')}
                         className="w-16 h-16 mx-auto"
                     />
                 </div>
-                <h4 className="text-xl font-semibold mb-2">Empty</h4>
+                <h4 className="text-xl font-semibold mb-2">{t('notifications.emptyState.title')}</h4>
                 <p className="text-gray-300 text-sm">
-                    You don't have any notifications at this time
+                    {t('notifications.emptyState.message')}
                 </p>
             </div>}
 
 
             {todayNotifications.length > 0 && (
                 <div className="mb-6">
-                    <h4 className="text-sm font-medium mb-3 text-gray-300">Today</h4>
+                    <h4 className="text-sm font-medium mb-3 text-gray-300">{t('notifications.timeLabels.today')}</h4>
                     <div className="space-y-3">
                         {todayNotifications.map((notification) => (<NotificationItem notification={notification} />))}
                     </div>
@@ -74,7 +75,7 @@ export function NotificationsContent({ className, open }: { className?: string, 
 
             {olderNotifications.length > 0 && (
                 <div>
-                    <h4 className="text-sm font-medium mb-3 text-gray-300">Yesterday</h4>
+                    <h4 className="text-sm font-medium mb-3 text-gray-300">{t('notifications.timeLabels.yesterday')}</h4>
                     <div className="space-y-3">
                         {olderNotifications.map((notification) => (<NotificationItem notification={notification} />))}
                     </div>
@@ -87,6 +88,7 @@ export function NotificationsContent({ className, open }: { className?: string, 
 
 function NotificationItem({ notification }: { notification: NotificationObject }) {
     const router = useRouter()
+    const language = i18n.language
     return (
         <div
             key={notification._id}
@@ -98,14 +100,14 @@ function NotificationItem({ notification }: { notification: NotificationObject }
             </div>
             <div className="flex-1 min-w-0">
                 {/*<p className="text-sm font-medium">{format(new Date(notification.createdAt), 'dd-MM-yyyy')}</p>*/}
-                <p className="text-xs text-gray-400">{notification.message}</p>
+                <p className="text-xs text-gray-400">{notification[language === 'en' ? 'messageEn' : 'messageRo']}</p>
             </div>
         </div>
     );
 }
 
 export function NotificationsDropdown({ className }: { className?: string }) {
-
+    const { t } = useTranslation();
     const [open, setOpen] = useState(false);
     const notifications = useContext(NotificationsContext);
 
@@ -116,7 +118,7 @@ export function NotificationsDropdown({ className }: { className?: string }) {
                     <img
                         src="/icons/notifications.svg"
                         className="w-[18px] h-[18px] invert-[85] dark:invert-0"
-                        alt="Notifications"
+                        alt={t('notifications.title')}
                     />
                     {notifications.filter(i => !i.read).length > 0 && <Badge
                         variant="destructive"
@@ -125,7 +127,7 @@ export function NotificationsDropdown({ className }: { className?: string }) {
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="p-6 w-80 max-h-96 border-0 bg-[#1A0F33] text-white rounded-lg" align="end">
-                <h3 className="text-lg font-semibold text-center mb-4">Notification</h3>
+                <h3 className="text-lg font-semibold text-center mb-4">{t('notifications.title')}</h3>
                 <NotificationsContent open={open} className={''} />
 
             </DropdownMenuContent>

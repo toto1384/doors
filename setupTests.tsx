@@ -114,6 +114,9 @@ export const MockedRouter: React.FC<MockedRouterProps> = ({
                 component: () => children,
                 beforeLoad: () => mockRoute.context,
                 loader: () => mockRoute.loaderData,
+                notFoundComponent(props) {
+                    return <div>Not found {JSON.stringify(props.data)}</div>
+                },
             }),
         ]);
     }

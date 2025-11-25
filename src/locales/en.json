@@ -700,5 +700,17 @@
     "processing": "Processing...",
     "optional": "Optional",
     "required": "Required"
+  },
+  "notifications": {
+    "title": "Notification",
+    "emptyState": {
+      "title": "Empty",
+      "message": "You don't have any notifications at this time",
+      "altText": "No notifications"
+    },
+    "timeLabels": {
+      "today": "Today",
+      "yesterday": "Yesterday"
+    }
   }
 }

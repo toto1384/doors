@@ -682,5 +682,17 @@
     "processing": "Se procesează...",
     "optional": "Opțional",
     "required": "Obligatoriu"
+  },
+  "notifications": {
+    "title": "Notificări",
+    "emptyState": {
+      "title": "Gol",
+      "message": "Nu ai nicio notificare în acest moment",
+      "altText": "Nicio notificare"
+    },
+    "timeLabels": {
+      "today": "Astăzi",
+      "yesterday": "Ieri"
+    }
   }
 }

@@ -14,7 +14,8 @@ extendZod(z as any)
 export const NotificationSchema = z.object({
     _id: z.string().optional(),
     userId: z.string(),
-    message: z.string(),
+    messageRo: z.string(),
+    messageEn: z.string(),
     read: z.boolean(),
     link: z.string(),
     image: z.string(),

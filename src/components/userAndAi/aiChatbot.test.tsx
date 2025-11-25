@@ -1,8 +1,7 @@
-import React, { ReactNode } from "react";
+import { ReactNode } from "react";
 import { useConversation } from "utils/hooks/mockElevenlabsHook";
 import { describe, expect, it, vi, afterEach, beforeEach } from "vitest";
 import { renderWithRouter } from "../../../setupTests.tsx";
-import { ElevenLabsChatBotDemo } from "./aiChatbot";
 import { act, screen, cleanup, fireEvent, waitFor } from '@testing-library/react';
 import { Route as PropertyAddRoute } from '../../../src/routes/app/properties/add';
 import AppRouteWrapper from "../appWrapper.tsx";
@@ -13,7 +12,7 @@ vi.mock('@elevenlabs/react', async (original) => {
 
     return {
         ...originalImport,
-        useConversation: vi.fn(useConversation({ flow: 'buyer' })),
+        useConversation: vi.fn(useConversation({ flow: 'seller' })),
     };
 });
 
@@ -71,7 +70,7 @@ describe('AI Chatbot', () => {
         })
 
 
-        const houseButton = screen.queryByText('House')
+        const houseButton = screen.queryByText('House', { selector: 'button' })
 
         expect(houseButton).toBeInTheDocument()
 
@@ -80,6 +79,7 @@ describe('AI Chatbot', () => {
         })
 
 
+        console.log('screen', screen.getAllByText('Electric'))
         const electricButton = screen.queryByText('Electric')
 
         expect(electricButton).toBeInTheDocument()

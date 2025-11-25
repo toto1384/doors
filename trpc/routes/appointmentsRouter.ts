@@ -8,9 +8,8 @@ import { startOfMonth, endOfMonth, format } from "date-fns";
 import { calculateAvailableSlots } from "utils/scheduleUtils";
 import { AppointmentObject } from "utils/validation/types";
 import mongoose from "mongoose";
-import { appointmentStatus } from "utils/constants";
+import { appointmentStatus, bypassLimitations } from "utils/constants";
 
-const bypassLimitations = true
 
 export const appointmentsRouter = createTRPCRouter({
     // Schedule a new viewing
@@ -90,7 +89,8 @@ export const appointmentsRouter = createTRPCRouter({
             await NotificationModel.create({
                 _id: new mongoose.Types.ObjectId() as any,
                 userId: property.postedByUserId,
-                message: `Someone has scheduled a viewing for "${property.title}" on ${format(appointment.date, 'dd-MM-yyyy')}. Click here to view.`,
+                messageEn: `Someone has scheduled a viewing for "${property.title}" on ${format(appointment.date, 'dd-MM-yyyy')}. Click here to view.`,
+                messageRo: `Cineva a programat o vizionare pentru "${property.title}" pe ${format(appointment.date, 'dd-MM-yyyy')}. Click aici pentru a vizualiza.`,
                 read: false,
                 image: property.imageUrls[0],
                 link: "/app/my-properties/bookings?date=" + encodeURIComponent(format(appointment.date, 'yyyy-MM-dd')),
@@ -319,7 +319,8 @@ export const appointmentsRouter = createTRPCRouter({
     updateAppointmentStatus: authProcedure
         .input(z.object({
             appointmentId: z.string(),
-            status: z.enum(appointmentStatus)
+            status: z.enum(appointmentStatus),
+            userLanguage: z.string().optional()
         }))
         .mutation(async ({ ctx, input }) => {
             const db = await dbConnect();
@@ -354,7 +355,8 @@ export const appointmentsRouter = createTRPCRouter({
             await NotificationModel.create({
                 _id: new mongoose.Types.ObjectId() as any,
                 userId: ctx.user.id === appointment.buyerUserId ? appointment.sellerUserId : appointment.buyerUserId,
-                message: `Appointment on ${format(appointment.date, 'dd-MM-yyyy')} has been ${input.status}.`,
+                messageEn: `Appointment on ${format(appointment.date, 'dd-MM-yyyy')} has been ${input.status}.`,
+                messageRo: `Programarea din ${format(appointment.date, 'dd-MM-yyyy')} a fost ${input.status}.`,
                 read: false,
                 image: property.imageUrls[0],
                 link: (ctx.user.id === appointment.buyerUserId ? "/app/my-properties/bookings" : "/app/appointments")

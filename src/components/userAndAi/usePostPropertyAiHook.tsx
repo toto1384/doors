@@ -80,7 +80,10 @@ export const useSetPropertyFunctions = ({
     const trpc = useTRPC()
     const updateUserPreferencesMutation = useMutation(trpc.auth.updateUserPreferences.mutationOptions())
 
-    const ensureIsInAddMode = () => { if (routerState.location.pathname !== '/app/properties/add' && !demoVersion) router.navigate({ to: '/app/properties/add' }) }
+    const ensureIsInAddMode = () => {
+        console.log('ensureIsInAddMode', routerState.location.pathname, routerState.location.pathname !== '/app/properties/add', !demoVersion)
+        if (routerState.location.pathname !== '/app/properties/add' && !demoVersion) router.navigate({ to: '/app/properties/add' })
+    }
 
     const { aiChatbotOpen, setAiChatbotOpen } = usePopoversOpenStore(useShallow(state => ({
         aiChatbotOpen: state.aiChatbotOpen,
@@ -212,6 +215,7 @@ export const useSetPropertyFunctions = ({
                 { value: t('propertyTypes.office'), key: 'office' },
             ],
             additionalOnClick(value) {
+                console.log('setPropertyType', value)
                 updateGhostProperty({ propertyType: value as any })
                 ensureIsInAddMode()
             },

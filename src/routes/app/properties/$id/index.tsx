@@ -21,9 +21,8 @@ import { BathIcon, BedIcon, PropertyFeatureIcon, SurfaceAreaIcon } from '@/compo
 import { format, addDays, isAfter, isBefore, startOfDay, endOfDay, parse, isWithinInterval } from 'date-fns'
 import { useSize } from 'utils/hooks/useSize'
 import { ImageFallback } from '@/components/basics/imageFallback'
+import { bypassLimitations } from 'utils/constants'
 
-
-const bypassLimitations = true
 
 const getProperty = createServerFn().validator((params) => z.object({ id: z.string() }).parse(params)).handler(async ({ data: { id } }) => {
 
