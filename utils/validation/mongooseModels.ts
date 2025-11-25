@@ -1,6 +1,6 @@
 import mongoose, { Document, Model, } from 'mongoose'
-import { PropertyObject, UserObject, AppointmentObject } from "./types";
-import { AccountObject, AccountSchema, PropertySchema, UserSchema, AppointmentSchema, } from "./dbSchemas";
+import { PropertyObject, UserObject, AppointmentObject, NotificationObject } from "./types";
+import { AccountObject, AccountSchema, PropertySchema, UserSchema, AppointmentSchema, NotificationSchema, } from "./dbSchemas";
 
 
 import { zodSchema } from "@zodyac/zod-mongoose";
@@ -44,6 +44,13 @@ export const getAppointmentModel = (mong: typeof mongoose) => {
 }
 
 
+export const getNotificationModel = (mong: typeof mongoose) => {
+    const mgse = mong ?? mongoose;
+
+    if (mgse.models.Notification) return mgse.models.Notification as Model<NotificationObject & Document>
+
+    return mgse.model<NotificationObject & Document>('Notification', zodSchema(NotificationSchema as any), 'notifications')
+}
 
 
 

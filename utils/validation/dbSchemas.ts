@@ -11,6 +11,17 @@ import { appointmentStatus, PropertyHeatingValues, PropertyStatusValues, Propert
 extendZod(z as any)
 
 
+export const NotificationSchema = z.object({
+    _id: z.string().optional(),
+    userId: z.string(),
+    message: z.string(),
+    read: z.boolean(),
+    link: z.string(),
+    image: z.string(),
+    createdAt: zDate,
+    updatedAt: zDate,
+})
+
 
 export const AppointmentSchema = z.object({
     _id: z.string().optional(),

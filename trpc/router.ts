@@ -1,16 +1,12 @@
-import { TRPCError, type TRPCRouterRecord } from "@trpc/server";
 import z from "zod/v3";
 
 import { extendZod } from "@zodyac/zod-mongoose";
-import { authProcedure, createTRPCRouter, publicProcedure, } from "./init";
+import { authProcedure, createTRPCRouter, } from "./init";
 import { propertiesRouter } from "./routes/propertiesRouter";
 import { appointmentsRouter } from "./routes/appointmentsRouter";
-import { UTApi } from 'uploadthing/server';
 import dbConnect from "utils/db/mongodb";
-import { getAccountModel, getPropertyModel, getUserModel } from "utils/validation/mongooseModels";
-import { ObjectId } from 'mongodb';
-import { UserPreferences, } from "utils/validation/dbSchemas";
-import { UserType } from "utils/constants";
+import { getNotificationModel, getPropertyModel } from "utils/validation/mongooseModels";
+import { authRouter } from "./routes/authRouter";
 
 extendZod(z as any)
 
@@ -19,69 +15,23 @@ extendZod(z as any)
 export const trpcRouter = createTRPCRouter({
     properties: propertiesRouter,
     appointments: appointmentsRouter,
-    auth: {
-        getToken: publicProcedure.query(async ({ ctx }) => {
-            console.log(process.env.VITE_AGENT_ID, process.env.ELEVENLABS_API_KEY)
-            const response = await fetch(
-                `https://api.elevenlabs.io/v1/convai/conversation/token?agent_id=${process.env.VITE_AGENT_ID}`,
-                { headers: { "xi-api-key": process.env.ELEVENLABS_API_KEY, } as any }
-            );
-            const body = await response.json();
-
-            return { token: body.token as string };
-        }),
-
-        updateNewsletter: authProcedure.input(z.object({
-            emailNotifications: z.boolean(),
-            pushNotifications: z.boolean(),
-            aiNotifications: z.boolean(),
-        })).mutation(async ({ ctx, input }) => {
+    auth: authRouter,
+    notifications: {
+        get: authProcedure.query(async ({ ctx }) => {
             const db = await dbConnect();
-            const UserModel = getUserModel(db);
+            const NotificationModel = getNotificationModel(db);
 
-            console.log('gh', ctx.user)
-            const user = await UserModel.findOneAndUpdate({ _id: ctx.user.id }, { $set: { notifications: input } })
-            if (!user) {
-                throw new TRPCError({ code: 'UNAUTHORIZED', message: 'User not found' });
-            }
-
-            return { success: true };
+            const notifications = await NotificationModel.find({ userId: ctx.user.id }).sort({ createdAt: -1 }).limit(20);
+            return { notifications };
         }),
-
-        changeUserType: authProcedure.input(z.object({ userType: z.enum(UserType) })).mutation(async ({ ctx, input }) => {
+        markAsRead: authProcedure.input(z.object({ ids: z.array(z.string()) })).mutation(async ({ ctx, input }) => {
             const db = await dbConnect();
-            const UserModel = getUserModel(db);
+            const NotificationModel = getNotificationModel(db);
 
-            const user = await UserModel.updateOne({ _id: ctx.user.id }, { userType: input.userType })
-            console.log('gh', input.userType, user, { userType: input.userType })
-
-            if (!user) {
-                throw new TRPCError({ code: 'UNAUTHORIZED', message: 'User not found' });
-            }
-
-            return { success: true };
+            const notifications = await NotificationModel.updateMany({ _id: { $in: input.ids } }, { read: true });
+            return { notifications };
         }),
-
-        updateUserPreferences: authProcedure.input(UserPreferences).mutation(async ({ ctx, input }) => {
-            const db = await dbConnect();
-            const UserModel = getUserModel(db);
-
-            const updateFields: any = {};
-            Object.keys(input).forEach(key => {
-                if (input[key as keyof z.infer<typeof UserPreferences>] !== undefined) {
-                    updateFields[`preferences.${key}`] = input[key as keyof z.infer<typeof UserPreferences>];
-                }
-            });
-
-            const user = await UserModel.updateOne({ _id: ctx.user.id }, { $set: updateFields })
-
-            if (!user) {
-                throw new TRPCError({ code: 'UNAUTHORIZED', message: 'User not found' });
-            }
-
-            return { success: true };
-        }),
-    } satisfies TRPCRouterRecord,
+    },
     photos: {
         delete: authProcedure.input(z.object({ id: z.string() })).mutation(async ({ ctx, input }) => {
             const db = await dbConnect();

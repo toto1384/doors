@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
 import { useQuery, useMutation } from '@tanstack/react-query'
 import { Calendar } from '@/components/ui/calendar'
@@ -10,15 +10,22 @@ import { useTranslation } from 'react-i18next'
 import { useTRPC } from '../../../../trpc/react'
 import { toast } from 'sonner'
 import { AppointmentCard } from '@/components/appointments/AppointmentCard'
+import { zDate } from 'utils/validation/zodUtils'
+import z from 'zod/v3'
 
 export const Route = createFileRoute('/app/my-properties/bookings')({
     component: BookingsManagementPage,
+    validateSearch: z.object({
+        date: z.string().optional(),
+    })
 })
 
 function BookingsManagementPage() {
     const { t } = useTranslation()
-    const [selectedDate, setSelectedDate] = useState<Date | undefined>()
     const [currentMonth, setCurrentMonth] = useState(new Date())
+    const navigate = useNavigate()
+    const searchParams = Route.useSearch()
+    const selectedDate = searchParams?.date ? new Date(searchParams.date) : undefined
     const trpc = useTRPC()
 
     // Get all appointments where user is the receiver (seller)
@@ -56,7 +63,7 @@ function BookingsManagementPage() {
     }
 
     const handleDateSelect = (date: Date | undefined) => {
-        setSelectedDate(date)
+        navigate({ to: '/app/my-properties/bookings', search: { date: date ? format(date, 'yyyy-MM-dd') : undefined } })
     }
 
     return (

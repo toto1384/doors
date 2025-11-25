@@ -23,6 +23,8 @@ import { useSize } from 'utils/hooks/useSize'
 import { ImageFallback } from '@/components/basics/imageFallback'
 
 
+const bypassLimitations = true
+
 const getProperty = createServerFn().validator((params) => z.object({ id: z.string() }).parse(params)).handler(async ({ data: { id } }) => {
 
     const headers = getHeaders()
@@ -91,7 +93,7 @@ export const ScheduleViewComponent = ({ id, property }: { id: string, property: 
     }
 
     return <>
-        {sellerAvailability?.alreadyScheduled ? <>
+        {!bypassLimitations && sellerAvailability?.alreadyScheduled ? <>
             <Button className='bg-gradient-to-br from-[#4C7CED]/50 to-[#7B31DC]/50 text-white text-xs px-4 py-2 rounded-[6px]' disabled >
                 Scheduled: {sellerAvailability.alreadyScheduled.startTime} - {sellerAvailability.alreadyScheduled.endTime} : {format(sellerAvailability.alreadyScheduled.date, 'dd-MM-yyyy')}
             </Button>

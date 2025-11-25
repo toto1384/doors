@@ -6,7 +6,7 @@ import { ElevenLabsChatBotDemo } from "./userAndAi/aiChatbot";
 import { Link, useRouter } from "@tanstack/react-router";
 import { useTheme } from './providers/ThemeProvider';
 import { Button } from "./ui/button";
-import { useEffect } from "react";
+import { createContext, useEffect } from "react";
 import { authClient } from "utils/auth-client";
 import { ProfileDropdown } from "./profile-dropdown";
 import { useTranslation } from "react-i18next";
@@ -14,10 +14,15 @@ import { NotificationsDropdown } from "./notifications-dropdown";
 import { HeartIcon, HomeIcon, NotificationsOutlineIcon, TokensOutlineIcon } from "./icons/homeIcons";
 import { usePopoversOpenStore } from "@/routes/__root";
 import { useShallow } from "zustand/react/shallow";
-import { UserObject } from "utils/validation/types";
+import { NotificationObject, UserObject } from "utils/validation/types";
 import { posthog } from "posthog-js";
 import { UserType } from "utils/constants";
+import { useQuery } from "@tanstack/react-query";
+import { useTRPCClient } from "trpc/react";
+import { Badge } from "./ui/badge";
 
+
+export const NotificationsContext = createContext<NotificationObject[]>([]);
 
 export default function AppRouteWrapper({
     children,
@@ -39,6 +44,15 @@ export default function AppRouteWrapper({
         setUserType: state.setUserType,
     })))
 
+    const trpcClient = useTRPCClient();
+    const notificationsData = useQuery(
+        {
+            queryKey: ['notifications'],
+            refetchInterval: 30000, // Poll every 30s
+            queryFn: () => trpcClient.notifications.get.query(),
+        }
+    )
+
 
     console.log('session', session)
 
@@ -59,7 +73,7 @@ export default function AppRouteWrapper({
 
 
     return (
-        <>
+        <NotificationsContext.Provider value={notificationsData.data?.notifications || []}>
             <div className="flex flex-col h-dvh overflow-clip relative max-w-[1900px] mx-auto">
 
 
@@ -107,7 +121,17 @@ export default function AppRouteWrapper({
 
                         {[
                             { name: 'Home', icon: (selected: boolean) => <HomeIcon color={selected ? '#8A4FFF' : '#919EAB'} />, link: '/app' },
-                            { name: 'Notifications', icon: (selected: boolean) => <NotificationsOutlineIcon color={selected ? '#8A4FFF' : '#919EAB'} />, link: '/app/notifications' },
+                            {
+                                name: 'Notifications', icon: (selected: boolean) => <div className="relative">
+
+                                    <NotificationsOutlineIcon color={selected ? '#8A4FFF' : '#919EAB'} />
+                                    {(notificationsData.data?.notifications?.filter(i => !i.read).length ?? 0) > 0 && <Badge
+                                        variant="destructive"
+                                        className="absolute -top-1 -right-1 w-2 h-2 p-0 text-xs"
+                                    />}
+                                </div>
+                                , link: '/app/notifications'
+                            },
                         ].map((item, index) => (<NavBarItem key={index} {...item} />))}
 
 
@@ -126,7 +150,7 @@ export default function AppRouteWrapper({
                     </div>
                 </div>
             </div>
-        </>
+        </NotificationsContext.Provider>
     );
 }
 

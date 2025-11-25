@@ -2,15 +2,15 @@ import { TRPCError } from "@trpc/server";
 import { z } from "zod/v3";
 import { authProcedure, createTRPCRouter } from "../init";
 import dbConnect from "utils/db/mongodb";
-import { getAppointmentModel, getPropertyModel, getUserModel } from "utils/validation/mongooseModels";
+import { getAppointmentModel, getNotificationModel, getPropertyModel, getUserModel } from "utils/validation/mongooseModels";
 import { AppointmentSchema } from "utils/validation/dbSchemas";
-import { startOfMonth, endOfMonth } from "date-fns";
+import { startOfMonth, endOfMonth, format } from "date-fns";
 import { calculateAvailableSlots } from "utils/scheduleUtils";
 import { AppointmentObject } from "utils/validation/types";
 import mongoose from "mongoose";
 import { appointmentStatus } from "utils/constants";
 
-const bypassLimitations = false
+const bypassLimitations = true
 
 export const appointmentsRouter = createTRPCRouter({
     // Schedule a new viewing
@@ -27,6 +27,7 @@ export const appointmentsRouter = createTRPCRouter({
             const AppointmentModel = getAppointmentModel(db);
             const PropertyModel = getPropertyModel(db);
             const UserModel = getUserModel(db);
+            const NotificationModel = getNotificationModel(db);
 
             // Get property to find seller
             const property = await PropertyModel.findById(input.propertyId);
@@ -84,6 +85,18 @@ export const appointmentsRouter = createTRPCRouter({
 
             // Create new appointment
             const appointment = await AppointmentModel.create(appointmentObject);
+
+            // Create notification
+            await NotificationModel.create({
+                _id: new mongoose.Types.ObjectId() as any,
+                userId: property.postedByUserId,
+                message: `Someone has scheduled a viewing for "${property.title}" on ${format(appointment.date, 'dd-MM-yyyy')}. Click here to view.`,
+                read: false,
+                image: property.imageUrls[0],
+                link: "/app/my-properties/bookings?date=" + encodeURIComponent(format(appointment.date, 'yyyy-MM-dd')),
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            });
 
             return { success: true, appointmentId: appointment._id };
         }),
@@ -311,10 +324,18 @@ export const appointmentsRouter = createTRPCRouter({
         .mutation(async ({ ctx, input }) => {
             const db = await dbConnect();
             const AppointmentModel = getAppointmentModel(db);
+            const NotificationModel = getNotificationModel(db);
+            const PropertyModel = getPropertyModel(db);
 
             const appointment = await AppointmentModel.findById(input.appointmentId);
             if (!appointment) {
                 throw new TRPCError({ code: 'NOT_FOUND', message: 'Appointment not found' });
+            }
+
+
+            const property = await PropertyModel.findById(appointment.propertyId);
+            if (!property) {
+                throw new TRPCError({ code: 'NOT_FOUND', message: 'Property not found' });
             }
 
             if (ctx.user.id !== appointment.buyerUserId && ctx.user.id !== appointment.sellerUserId) {
@@ -322,9 +343,24 @@ export const appointmentsRouter = createTRPCRouter({
             }
 
 
-            await AppointmentModel.findByIdAndUpdate(input.appointmentId, {
+            const newAppointment = await AppointmentModel.findByIdAndUpdate(input.appointmentId, {
                 status: input.status,
                 updatedAt: new Date()
+            });
+
+            if (!newAppointment) throw new TRPCError({ code: 'NOT_FOUND', message: 'Appointment not found' });
+
+            // Create notification
+            await NotificationModel.create({
+                _id: new mongoose.Types.ObjectId() as any,
+                userId: ctx.user.id === appointment.buyerUserId ? appointment.sellerUserId : appointment.buyerUserId,
+                message: `Appointment on ${format(appointment.date, 'dd-MM-yyyy')} has been ${input.status}.`,
+                read: false,
+                image: property.imageUrls[0],
+                link: (ctx.user.id === appointment.buyerUserId ? "/app/my-properties/bookings" : "/app/appointments")
+                    + "?date=" + encodeURIComponent(format(appointment.date, 'yyyy-MM-dd')),
+                createdAt: new Date(),
+                updatedAt: new Date(),
             });
 
             return { success: true };

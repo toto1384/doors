@@ -40,7 +40,7 @@ export function AppointmentCard({ appointment, onStatusUpdate, userRole }: Appoi
     return (
         <Card className="bg-[#2A2A3E]/50 p-1 border-slate-600 hover:bg-[#2A2A3E]/70 transition-colors">
             <CardContent className="p-1">
-                <div className="flex items-start gap-4">
+                <div className="flex flex-col md:flex-row items-start gap-4">
                     {/* Property Image */}
                     {appointment.property?.imageUrls?.[0] && (
                         <img

@@ -1,11 +1,12 @@
 import z from "zod/v3";
 import { LocationSchema, } from "./location";
-import { AppointmentSchema, PropertySchema, UserSchema } from "./dbSchemas";
+import { AppointmentSchema, NotificationSchema, PropertySchema, UserSchema } from "./dbSchemas";
 import { propertyFiltersSchema } from "./propertyFilters";
 
 export type LocationObject = z.infer<typeof LocationSchema>;
 
 
+export type NotificationObject = z.infer<typeof NotificationSchema>;
 
 export type AppointmentObject = z.infer<typeof AppointmentSchema>;
 
