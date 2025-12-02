@@ -11,6 +11,8 @@
       "subtitle": "DOORS puts control back where it belongs — in the hands of buyers and sellers.",
       "description": "No agents. No commissions. Just you, your personal Doors assistant and a platform that makes buying or selling your home faster, clearer and completely stress-free.",
       "startConversation": "Start Conversation",
+      "talkToAna": "Talk to Ana",
+      "freeDemo": "Try free demo. No account needed",
       "actionSelector": {
         "buy": "🏠 Buying",
         "sell": "🏡 Selling"
@@ -414,7 +416,8 @@
     "seller": "Seller",
     "myProperties": "My properties",
     "myAppointments": "My Appointments",
-    "manageBookings": "Manage Bookings"
+    "manageBookings": "Manage Bookings",
+    "billing": "Billing"
   },
   "ai-chatbot": {
     "assistant": "Doors Assistant",
@@ -490,6 +493,11 @@
   },
   "property-page": {
     "scheduleViewing": "Schedule a Viewing",
+    "paywall": {
+      "title": "You need to buy purchase more viewings",
+      "message": "No need for expensive agents, just get a couple of viewings and your dream property will be yours!",
+      "buttonText": "Buy Viewings"
+    },
     "share": {
       "title": "Share Property",
       "linkCopied": "Link copied to clipboard!",

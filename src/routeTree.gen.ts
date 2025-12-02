@@ -31,6 +31,7 @@ import { Route as AppPropertiesIdIndexRouteImport } from './routes/app/propertie
 import { Route as AppPropertiesIdEditRouteImport } from './routes/app/properties/$id/edit'
 import { ServerRoute as ApiUploadthingServerRouteImport } from './routes/api/uploadthing'
 import { ServerRoute as ApiTrpcSplatServerRouteImport } from './routes/api/trpc/$'
+import { ServerRoute as ApiAutumnSplatServerRouteImport } from './routes/api/autumn.$'
 import { ServerRoute as ApiAuthSplatServerRouteImport } from './routes/api/auth/$'
 
 const rootServerRouteImport = createServerRootRoute()
@@ -133,6 +134,11 @@ const ApiUploadthingServerRoute = ApiUploadthingServerRouteImport.update({
 const ApiTrpcSplatServerRoute = ApiTrpcSplatServerRouteImport.update({
   id: '/api/trpc/$',
   path: '/api/trpc/$',
+  getParentRoute: () => rootServerRouteImport,
+} as any)
+const ApiAutumnSplatServerRoute = ApiAutumnSplatServerRouteImport.update({
+  id: '/api/autumn/$',
+  path: '/api/autumn/$',
   getParentRoute: () => rootServerRouteImport,
 } as any)
 const ApiAuthSplatServerRoute = ApiAuthSplatServerRouteImport.update({
@@ -288,30 +294,43 @@ export interface RootRouteChildren {
 export interface FileServerRoutesByFullPath {
   '/api/uploadthing': typeof ApiUploadthingServerRoute
   '/api/auth/$': typeof ApiAuthSplatServerRoute
+  '/api/autumn/$': typeof ApiAutumnSplatServerRoute
   '/api/trpc/$': typeof ApiTrpcSplatServerRoute
 }
 export interface FileServerRoutesByTo {
   '/api/uploadthing': typeof ApiUploadthingServerRoute
   '/api/auth/$': typeof ApiAuthSplatServerRoute
+  '/api/autumn/$': typeof ApiAutumnSplatServerRoute
   '/api/trpc/$': typeof ApiTrpcSplatServerRoute
 }
 export interface FileServerRoutesById {
   __root__: typeof rootServerRouteImport
   '/api/uploadthing': typeof ApiUploadthingServerRoute
   '/api/auth/$': typeof ApiAuthSplatServerRoute
+  '/api/autumn/$': typeof ApiAutumnSplatServerRoute
   '/api/trpc/$': typeof ApiTrpcSplatServerRoute
 }
 export interface FileServerRouteTypes {
   fileServerRoutesByFullPath: FileServerRoutesByFullPath
-  fullPaths: '/api/uploadthing' | '/api/auth/$' | '/api/trpc/$'
+  fullPaths:
+    | '/api/uploadthing'
+    | '/api/auth/$'
+    | '/api/autumn/$'
+    | '/api/trpc/$'
   fileServerRoutesByTo: FileServerRoutesByTo
-  to: '/api/uploadthing' | '/api/auth/$' | '/api/trpc/$'
-  id: '__root__' | '/api/uploadthing' | '/api/auth/$' | '/api/trpc/$'
+  to: '/api/uploadthing' | '/api/auth/$' | '/api/autumn/$' | '/api/trpc/$'
+  id:
+    | '__root__'
+    | '/api/uploadthing'
+    | '/api/auth/$'
+    | '/api/autumn/$'
+    | '/api/trpc/$'
   fileServerRoutesById: FileServerRoutesById
 }
 export interface RootServerRouteChildren {
   ApiUploadthingServerRoute: typeof ApiUploadthingServerRoute
   ApiAuthSplatServerRoute: typeof ApiAuthSplatServerRoute
+  ApiAutumnSplatServerRoute: typeof ApiAutumnSplatServerRoute
   ApiTrpcSplatServerRoute: typeof ApiTrpcSplatServerRoute
 }
 
@@ -461,6 +480,13 @@ declare module '@tanstack/react-start/server' {
       preLoaderRoute: typeof ApiTrpcSplatServerRouteImport
       parentRoute: typeof rootServerRouteImport
     }
+    '/api/autumn/$': {
+      id: '/api/autumn/$'
+      path: '/api/autumn/$'
+      fullPath: '/api/autumn/$'
+      preLoaderRoute: typeof ApiAutumnSplatServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
     '/api/auth/$': {
       id: '/api/auth/$'
       path: '/api/auth/$'
@@ -497,6 +523,7 @@ export const routeTree = rootRouteImport
 const rootServerRouteChildren: RootServerRouteChildren = {
   ApiUploadthingServerRoute: ApiUploadthingServerRoute,
   ApiAuthSplatServerRoute: ApiAuthSplatServerRoute,
+  ApiAutumnSplatServerRoute: ApiAutumnSplatServerRoute,
   ApiTrpcSplatServerRoute: ApiTrpcSplatServerRoute,
 }
 export const serverRouteTree = rootServerRouteImport

@@ -11,6 +11,8 @@
       "subtitle": "DOORS readuce controlul acolo unde îi este locul — în mâinile cumpărătorilor și vânzătorilor.",
       "description": "Fără agenți. Fără comisioane. Doar tu, asistentul tău personal Doors și o platformă care face cumpărarea sau vânzarea locuinței mai rapidă, clară și complet fără stres.",
       "startConversation": "Incepe Conversatia",
+      "talkToAna": "Vorbește cu Ana",
+      "freeDemo": "Încearcă demo gratuit. Nu este necesar cont",
       "actionSelector": {
         "buy": "🏠 Cumpăr",
         "sell": "🏡 Vând"
@@ -396,7 +398,8 @@
     "seller": "Vânzător",
     "myProperties": "Proprietățile mele",
     "myAppointments": "Programările mele",
-    "manageBookings": "Gestionare rezervări"
+    "manageBookings": "Gestionare rezervări",
+    "billing": "Facturare"
   },
   "ai-chatbot": {
     "assistant": "Asistent Doors",
@@ -472,6 +475,11 @@
   },
   "property-page": {
     "scheduleViewing": "Programeaza o vizionare",
+    "paywall": {
+      "title": "Trebuie să cumperi mai multe vizionări",
+      "message": "Nu este nevoie de agenți scumpi, doar cumpără câteva vizionări și proprietatea visurilor tale va fi a ta!",
+      "buttonText": "Cumpără vizionări"
+    },
     "share": {
       "title": "Distribuie proprietatea",
       "linkCopied": "Link copiat în clipboard!",

@@ -1,370 +1,393 @@
 import { TRPCError } from "@trpc/server";
-import { z } from "zod/v3";
-import { authProcedure, createTRPCRouter } from "../init";
-import dbConnect from "utils/db/mongodb";
-import { getAppointmentModel, getNotificationModel, getPropertyModel, getUserModel } from "utils/validation/mongooseModels";
-import { AppointmentSchema } from "utils/validation/dbSchemas";
-import { startOfMonth, endOfMonth, format } from "date-fns";
-import { calculateAvailableSlots } from "utils/scheduleUtils";
-import { AppointmentObject } from "utils/validation/types";
+import { Autumn as autumn } from "autumn-js";
+import { endOfMonth, format, startOfMonth } from "date-fns";
 import mongoose from "mongoose";
 import { appointmentStatus, bypassLimitations } from "utils/constants";
-
+import dbConnect from "utils/db/mongodb";
+import { calculateAvailableSlots } from "utils/scheduleUtils";
+import { AppointmentSchema } from "utils/validation/dbSchemas";
+import {
+	getAppointmentModel,
+	getNotificationModel,
+	getPropertyModel,
+	getUserModel,
+} from "utils/validation/mongooseModels";
+import { AppointmentObject } from "utils/validation/types";
+import { z } from "zod/v3";
+import { authProcedure, createTRPCRouter } from "../init";
 
 export const appointmentsRouter = createTRPCRouter({
-    // Schedule a new viewing
-    scheduleViewing: authProcedure
-        .input(z.object({
-            propertyId: z.string(),
-            date: z.date(),
-            startTime: z.string(),
-            endTime: z.string(),
-            notes: z.string().optional(),
-        }))
-        .mutation(async ({ ctx, input }) => {
-            const db = await dbConnect();
-            const AppointmentModel = getAppointmentModel(db);
-            const PropertyModel = getPropertyModel(db);
-            const UserModel = getUserModel(db);
-            const NotificationModel = getNotificationModel(db);
+	// Schedule a new viewing
+	scheduleViewing: authProcedure
+		.input(
+			z.object({
+				propertyId: z.string(),
+				date: z.date(),
+				startTime: z.string(),
+				endTime: z.string(),
+				notes: z.string().optional(),
+			}),
+		)
+		.mutation(async ({ ctx, input }) => {
+			const db = await dbConnect();
+			const AppointmentModel = getAppointmentModel(db);
+			const PropertyModel = getPropertyModel(db);
+			const UserModel = getUserModel(db);
+			const NotificationModel = getNotificationModel(db);
 
-            // Get property to find seller
-            const property = await PropertyModel.findById(input.propertyId);
-            if (!property) {
-                throw new TRPCError({ code: 'NOT_FOUND', message: 'Property not found' });
-            }
+			const allowed = await autumn.check({
+				customer_id: ctx.user.id,
+				feature_id: "appointmnts",
+			});
 
-            // Check if user is trying to book their own property
-            if (!bypassLimitations && property?.postedByUserId === ctx.user.id) {
-                throw new TRPCError({ code: 'BAD_REQUEST', message: 'Cannot book viewing for your own property' });
-            }
+			if (!allowed.data?.allowed) {
+				throw new TRPCError({ code: "UNAUTHORIZED", message: "You need to buy more viewings to schedule a viewing" });
+			}
 
+			const res = await autumn.track({
+				customer_id: ctx.user.id,
+				feature_id: "appointmnts",
+			});
 
-            const alreadyScheduled = await AppointmentModel.findOne({
-                propertyId: input.propertyId,
-                buyerUserId: ctx.user.id,
-            });
+			console.log("resappts", res);
 
-            if (!bypassLimitations && alreadyScheduled) {
-                throw new TRPCError({ code: 'CONFLICT', message: 'You already have a scheduled viewing' });
-            }
+			// Get property to find seller
+			const property = await PropertyModel.findById(input.propertyId);
+			if (!property) {
+				throw new TRPCError({ code: "NOT_FOUND", message: "Property not found" });
+			}
 
-            // Check for existing appointments at the same time
-            const existingAppointment = await AppointmentModel.findOne({
-                propertyId: input.propertyId,
-                date: input.date,
-                $or: [
-                    {
-                        startTime: { $lt: input.endTime },
-                        endTime: { $gt: input.startTime }
-                    }
-                ],
-                status: { $in: ['pending', 'confirmed'] }
-            });
+			// Check if user is trying to book their own property
+			if (!bypassLimitations && property?.postedByUserId === ctx.user.id) {
+				throw new TRPCError({ code: "BAD_REQUEST", message: "Cannot book viewing for your own property" });
+			}
 
-            if (existingAppointment) {
-                throw new TRPCError({ code: 'CONFLICT', message: 'Time slot is already booked' });
-            }
+			const alreadyScheduled = await AppointmentModel.findOne({
+				propertyId: input.propertyId,
+				buyerUserId: ctx.user.id,
+			});
 
-            const appointmentObject = {
-                _id: new mongoose.Types.ObjectId() as any,
-                date: input.date,
-                startTime: input.startTime,
-                endTime: input.endTime,
-                buyerUserId: ctx.user.id, // buyer
-                sellerUserId: property.postedByUserId, // seller
-                propertyId: input.propertyId,
-                status: 'pending',
-                notes: input.notes,
-                createdAt: new Date(),
-                updatedAt: new Date(),
-            } as AppointmentObject;
+			if (!bypassLimitations && alreadyScheduled) {
+				throw new TRPCError({ code: "CONFLICT", message: "You already have a scheduled viewing" });
+			}
 
-            console.log('appointmentObject', appointmentObject)
+			// Check for existing appointments at the same time
+			const existingAppointment = await AppointmentModel.findOne({
+				propertyId: input.propertyId,
+				date: input.date,
+				$or: [
+					{
+						startTime: { $lt: input.endTime },
+						endTime: { $gt: input.startTime },
+					},
+				],
+				status: { $in: ["pending", "confirmed"] },
+			});
 
-            // Create new appointment
-            const appointment = await AppointmentModel.create(appointmentObject);
+			if (existingAppointment) {
+				throw new TRPCError({ code: "CONFLICT", message: "Time slot is already booked" });
+			}
 
-            // Create notification
-            await NotificationModel.create({
-                _id: new mongoose.Types.ObjectId() as any,
-                userId: property.postedByUserId,
-                messageEn: `Someone has scheduled a viewing for "${property.title}" on ${format(appointment.date, 'dd-MM-yyyy')}. Click here to view.`,
-                messageRo: `Cineva a programat o vizionare pentru "${property.title}" pe ${format(appointment.date, 'dd-MM-yyyy')}. Click aici pentru a vizualiza.`,
-                read: false,
-                image: property.imageUrls[0],
-                link: "/app/my-properties/bookings?date=" + encodeURIComponent(format(appointment.date, 'yyyy-MM-dd')),
-                createdAt: new Date(),
-                updatedAt: new Date(),
-            });
+			const appointmentObject = {
+				_id: new mongoose.Types.ObjectId() as any,
+				date: input.date,
+				startTime: input.startTime,
+				endTime: input.endTime,
+				buyerUserId: ctx.user.id, // buyer
+				sellerUserId: property.postedByUserId, // seller
+				propertyId: input.propertyId,
+				status: "pending",
+				notes: input.notes,
+				createdAt: new Date(),
+				updatedAt: new Date(),
+			} as AppointmentObject;
 
-            return { success: true, appointmentId: appointment._id };
-        }),
+			console.log("appointmentObject", appointmentObject);
 
-    // Get seller availability for a property
-    //
-    // i should probably write a unit test for this
-    //
-    // 1 unit test for scheduling the viewing
-    getSellerAvailability: authProcedure
-        .input(z.object({
-            propertyId: z.string(),
-            month: z.number().min(1).max(12),
-            year: z.number().min(2024)
-        }))
-        .query(async ({ ctx, input }) => {
-            const db = await dbConnect();
-            const PropertyModel = getPropertyModel(db);
-            const UserModel = getUserModel(db);
-            const AppointmentModel = getAppointmentModel(db);
+			// Create new appointment
+			const appointment = await AppointmentModel.create(appointmentObject);
 
-            // Get property to find seller
-            const property = await PropertyModel.findById(input.propertyId);
-            if (!property) {
-                throw new TRPCError({ code: 'NOT_FOUND', message: 'Property not found' });
-            }
+			// Create notification
+			await NotificationModel.create({
+				_id: new mongoose.Types.ObjectId() as any,
+				userId: property.postedByUserId,
+				messageEn: `Someone has scheduled a viewing for "${property.title}" on ${format(appointment.date, "dd-MM-yyyy")}. Click here to view.`,
+				messageRo: `Cineva a programat o vizionare pentru "${property.title}" pe ${format(appointment.date, "dd-MM-yyyy")}. Click aici pentru a vizualiza.`,
+				read: false,
+				image: property.imageUrls[0],
+				link: "/app/my-properties/bookings?date=" + encodeURIComponent(format(appointment.date, "yyyy-MM-dd")),
+				createdAt: new Date(),
+				updatedAt: new Date(),
+			});
 
-            // Get seller's availability
-            const seller = await UserModel.findById(property.postedByUserId);
-            if (!seller) {
-                throw new TRPCError({ code: 'NOT_FOUND', message: 'Seller not found' });
-            }
+			return { success: true, appointmentId: appointment._id };
+		}),
 
+	// Get seller availability for a property
+	//
+	// i should probably write a unit test for this
+	//
+	// 1 unit test for scheduling the viewing
+	getSellerAvailability: authProcedure
+		.input(
+			z.object({
+				propertyId: z.string(),
+				month: z.number().min(1).max(12),
+				year: z.number().min(2024),
+			}),
+		)
+		.query(async ({ ctx, input }) => {
+			const db = await dbConnect();
+			const PropertyModel = getPropertyModel(db);
+			const UserModel = getUserModel(db);
+			const AppointmentModel = getAppointmentModel(db);
 
-            const alreadyScheduled = await AppointmentModel.findOne({
-                propertyId: input.propertyId,
-                buyerUserId: ctx.user.id,
-            });
+			// Get property to find seller
+			const property = await PropertyModel.findById(input.propertyId);
+			if (!property) {
+				throw new TRPCError({ code: "NOT_FOUND", message: "Property not found" });
+			}
 
+			// Get seller's availability
+			const seller = await UserModel.findById(property.postedByUserId);
+			if (!seller) {
+				throw new TRPCError({ code: "NOT_FOUND", message: "Seller not found" });
+			}
 
+			const alreadyScheduled = await AppointmentModel.findOne({
+				propertyId: input.propertyId,
+				buyerUserId: ctx.user.id,
+			});
 
-            const sellerAvailability = seller.preferences?.sellerAvailability || [
-                // Default availability: weekdays 9-18
-                { startDate: 'Monday', endDate: 'Friday', startTime: '09:00', endTime: '17:00' }
-            ];
+			const sellerAvailability = seller.preferences?.sellerAvailability || [
+				// Default availability: weekdays 9-18
+				{ startDate: "Monday", endDate: "Friday", startTime: "09:00", endTime: "17:00" },
+			];
 
-            // Get all existing bookings for this property in the specified month
-            const monthStart = startOfMonth(new Date(input.year, input.month - 1, 1));
-            const monthEnd = endOfMonth(new Date(input.year, input.month - 1, 1));
+			// Get all existing bookings for this property in the specified month
+			const monthStart = startOfMonth(new Date(input.year, input.month - 1, 1));
+			const monthEnd = endOfMonth(new Date(input.year, input.month - 1, 1));
 
-            const existingBookings = await AppointmentModel.find({
-                propertyId: input.propertyId,
-                status: { $in: ['pending', 'confirmed'] },
-                date: { $gte: monthStart, $lte: monthEnd }
-            });
+			const existingBookings = await AppointmentModel.find({
+				propertyId: input.propertyId,
+				status: { $in: ["pending", "confirmed"] },
+				date: { $gte: monthStart, $lte: monthEnd },
+			});
 
-            // Use the utility function to calculate available slots
-            const availableSlots = calculateAvailableSlots({
-                sellerAvailability,
-                existingBookings: existingBookings.map(booking => ({
-                    date: booking.date,
-                    startTime: booking.startTime,
-                    endTime: booking.endTime
-                })),
-                month: input.month,
-                year: input.year,
-                skipPastDates: true
-            });
+			// Use the utility function to calculate available slots
+			const availableSlots = calculateAvailableSlots({
+				sellerAvailability,
+				existingBookings: existingBookings.map((booking) => ({
+					date: booking.date,
+					startTime: booking.startTime,
+					endTime: booking.endTime,
+				})),
+				month: input.month,
+				year: input.year,
+				skipPastDates: true,
+			});
 
-            return { availableSlots, ownProperty: property.postedByUserId == ctx.user.id, alreadyScheduled: alreadyScheduled };
-        }),
+			return {
+				availableSlots,
+				ownProperty: property.postedByUserId == ctx.user.id,
+				alreadyScheduled: alreadyScheduled,
+			};
+		}),
 
-    // Get existing bookings for a property
-    getExistingBookings: authProcedure
-        .input(z.object({ propertyId: z.string() }))
-        .query(async ({ ctx, input }) => {
-            const db = await dbConnect();
-            const AppointmentModel = getAppointmentModel(db);
+	// Get existing bookings for a property
+	getExistingBookings: authProcedure.input(z.object({ propertyId: z.string() })).query(async ({ ctx, input }) => {
+		const db = await dbConnect();
+		const AppointmentModel = getAppointmentModel(db);
 
-            // Get all confirmed/pending appointments for the property
-            const appointments = await AppointmentModel.find({
-                propertyId: input.propertyId,
-                status: { $in: ['pending', 'confirmed'] },
-                date: { $gte: new Date() } // Only future appointments
-            }).sort({ date: 1, startTime: 1 });
+		// Get all confirmed/pending appointments for the property
+		const appointments = await AppointmentModel.find({
+			propertyId: input.propertyId,
+			status: { $in: ["pending", "confirmed"] },
+			date: { $gte: new Date() }, // Only future appointments
+		}).sort({ date: 1, startTime: 1 });
 
-            return {
-                existingBookings: appointments.map(apt => ({
-                    date: apt.date,
-                    startTime: apt.startTime,
-                    endTime: apt.endTime,
-                    status: apt.status
-                }))
-            };
-        }),
+		return {
+			existingBookings: appointments.map((apt) => ({
+				date: apt.date,
+				startTime: apt.startTime,
+				endTime: apt.endTime,
+				status: apt.status,
+			})),
+		};
+	}),
 
-    // Get user's appointments
-    getUserAppointments: authProcedure
-        .query(async ({ ctx }) => {
-            const db = await dbConnect();
-            const AppointmentModel = getAppointmentModel(db);
-            const PropertyModel = getPropertyModel(db);
+	// Get user's appointments
+	getUserAppointments: authProcedure.query(async ({ ctx }) => {
+		const db = await dbConnect();
+		const AppointmentModel = getAppointmentModel(db);
+		const PropertyModel = getPropertyModel(db);
 
-            const appointments = await AppointmentModel.find({
-                $or: [
-                    { buyerUserId: ctx.user.id },
-                    { sellerUserId: ctx.user.id }
-                ]
-            }).sort({ date: 1, startTime: 1 });
+		const appointments = await AppointmentModel.find({
+			$or: [{ buyerUserId: ctx.user.id }, { sellerUserId: ctx.user.id }],
+		}).sort({ date: 1, startTime: 1 });
 
-            // Populate with property details
-            const appointmentsWithProperties = await Promise.all(
-                appointments.map(async (appointment) => {
-                    const property = await PropertyModel.findById(appointment.propertyId);
-                    return {
-                        ...appointment.toObject(),
-                        property: property ? {
-                            title: property.title,
-                            location: property.location,
-                            imageUrls: property.imageUrls,
-                            price: property.price,
-                            numberOfRooms: property.numberOfRooms,
-                            numberOfBathrooms: property.numberOfBathrooms,
-                            surfaceArea: property.surfaceArea
-                        } : null
-                    };
-                })
-            );
+		// Populate with property details
+		const appointmentsWithProperties = await Promise.all(
+			appointments.map(async (appointment) => {
+				const property = await PropertyModel.findById(appointment.propertyId);
+				return {
+					...appointment.toObject(),
+					property: property
+						? {
+								title: property.title,
+								location: property.location,
+								imageUrls: property.imageUrls,
+								price: property.price,
+								numberOfRooms: property.numberOfRooms,
+								numberOfBathrooms: property.numberOfBathrooms,
+								surfaceArea: property.surfaceArea,
+							}
+						: null,
+				};
+			}),
+		);
 
-            return { appointments: appointmentsWithProperties };
-        }),
+		return { appointments: appointmentsWithProperties };
+	}),
 
-    // Get seller's appointments (where user is receiver)
-    getSellerAppointments: authProcedure
-        .query(async ({ ctx }) => {
-            const db = await dbConnect();
-            const AppointmentModel = getAppointmentModel(db);
-            const PropertyModel = getPropertyModel(db);
+	// Get seller's appointments (where user is receiver)
+	getSellerAppointments: authProcedure.query(async ({ ctx }) => {
+		const db = await dbConnect();
+		const AppointmentModel = getAppointmentModel(db);
+		const PropertyModel = getPropertyModel(db);
 
-            const appointments = await AppointmentModel.find({
-                sellerUserId: ctx.user.id,
-                date: { $gte: new Date() }
-            }).sort({ date: 1, startTime: 1 });
+		const appointments = await AppointmentModel.find({
+			sellerUserId: ctx.user.id,
+			date: { $gte: new Date() },
+		}).sort({ date: 1, startTime: 1 });
 
-            // Populate with property details
-            const appointmentsWithProperties = await Promise.all(
-                appointments.map(async (appointment) => {
-                    const property = await PropertyModel.findById(appointment.propertyId);
-                    return {
-                        ...appointment.toObject(),
-                        property: property ? {
-                            title: property.title,
-                            location: property.location,
-                            imageUrls: property.imageUrls,
-                            price: property.price,
-                            numberOfRooms: property.numberOfRooms,
-                            numberOfBathrooms: property.numberOfBathrooms,
-                            surfaceArea: property.surfaceArea
-                        } : null
-                    };
-                })
-            );
+		// Populate with property details
+		const appointmentsWithProperties = await Promise.all(
+			appointments.map(async (appointment) => {
+				const property = await PropertyModel.findById(appointment.propertyId);
+				return {
+					...appointment.toObject(),
+					property: property
+						? {
+								title: property.title,
+								location: property.location,
+								imageUrls: property.imageUrls,
+								price: property.price,
+								numberOfRooms: property.numberOfRooms,
+								numberOfBathrooms: property.numberOfBathrooms,
+								surfaceArea: property.surfaceArea,
+							}
+						: null,
+				};
+			}),
+		);
 
-            return { appointments: appointmentsWithProperties };
-        }),
+		return { appointments: appointmentsWithProperties };
+	}),
 
-    // Get buyer's appointments (where user is initiator)
-    getBuyerAppointments: authProcedure
-        .query(async ({ ctx }) => {
-            const db = await dbConnect();
-            const AppointmentModel = getAppointmentModel(db);
-            const PropertyModel = getPropertyModel(db);
+	// Get buyer's appointments (where user is initiator)
+	getBuyerAppointments: authProcedure.query(async ({ ctx }) => {
+		const db = await dbConnect();
+		const AppointmentModel = getAppointmentModel(db);
+		const PropertyModel = getPropertyModel(db);
 
-            const appointmentsWithProperties = await AppointmentModel.aggregate([
-                {
-                    $match: {
-                        buyerUserId: ctx.user.id,
-                        date: { $gte: new Date() }
-                    }
-                },
-                {
-                    $lookup: {
-                        from: 'properties',
-                        localField: 'propertyId',
-                        foreignField: '_id',
-                        as: 'propertyData'
-                    }
-                },
-                {
-                    $addFields: {
-                        property: {
-                            $cond: {
-                                if: { $gt: [{ $size: '$propertyData' }, 0] },
-                                then: {
-                                    title: { $arrayElemAt: ['$propertyData.title', 0] },
-                                    location: { $arrayElemAt: ['$propertyData.location', 0] },
-                                    imageUrls: { $arrayElemAt: ['$propertyData.imageUrls', 0] },
-                                    price: { $arrayElemAt: ['$propertyData.price', 0] },
-                                    numberOfRooms: { $arrayElemAt: ['$propertyData.numberOfRooms', 0] },
-                                    numberOfBathrooms: { $arrayElemAt: ['$propertyData.numberOfBathrooms', 0] },
-                                    surfaceArea: { $arrayElemAt: ['$propertyData.surfaceArea', 0] }
-                                },
-                                else: null
-                            }
-                        }
-                    }
-                },
-                {
-                    $unset: 'propertyData'
-                },
-                {
-                    $sort: { date: 1, startTime: 1 }
-                }
-            ]);
+		const appointmentsWithProperties = await AppointmentModel.aggregate([
+			{
+				$match: {
+					buyerUserId: ctx.user.id,
+					date: { $gte: new Date() },
+				},
+			},
+			{
+				$lookup: {
+					from: "properties",
+					localField: "propertyId",
+					foreignField: "_id",
+					as: "propertyData",
+				},
+			},
+			{
+				$addFields: {
+					property: {
+						$cond: {
+							if: { $gt: [{ $size: "$propertyData" }, 0] },
+							then: {
+								title: { $arrayElemAt: ["$propertyData.title", 0] },
+								location: { $arrayElemAt: ["$propertyData.location", 0] },
+								imageUrls: { $arrayElemAt: ["$propertyData.imageUrls", 0] },
+								price: { $arrayElemAt: ["$propertyData.price", 0] },
+								numberOfRooms: { $arrayElemAt: ["$propertyData.numberOfRooms", 0] },
+								numberOfBathrooms: { $arrayElemAt: ["$propertyData.numberOfBathrooms", 0] },
+								surfaceArea: { $arrayElemAt: ["$propertyData.surfaceArea", 0] },
+							},
+							else: null,
+						},
+					},
+				},
+			},
+			{
+				$unset: "propertyData",
+			},
+			{
+				$sort: { date: 1, startTime: 1 },
+			},
+		]);
 
-            return { appointments: appointmentsWithProperties };
-        }),
+		return { appointments: appointmentsWithProperties };
+	}),
 
-    // Update appointment status
-    updateAppointmentStatus: authProcedure
-        .input(z.object({
-            appointmentId: z.string(),
-            status: z.enum(appointmentStatus),
-            userLanguage: z.string().optional()
-        }))
-        .mutation(async ({ ctx, input }) => {
-            const db = await dbConnect();
-            const AppointmentModel = getAppointmentModel(db);
-            const NotificationModel = getNotificationModel(db);
-            const PropertyModel = getPropertyModel(db);
+	// Update appointment status
+	updateAppointmentStatus: authProcedure
+		.input(
+			z.object({
+				appointmentId: z.string(),
+				status: z.enum(appointmentStatus),
+				userLanguage: z.string().optional(),
+			}),
+		)
+		.mutation(async ({ ctx, input }) => {
+			const db = await dbConnect();
+			const AppointmentModel = getAppointmentModel(db);
+			const NotificationModel = getNotificationModel(db);
+			const PropertyModel = getPropertyModel(db);
 
-            const appointment = await AppointmentModel.findById(input.appointmentId);
-            if (!appointment) {
-                throw new TRPCError({ code: 'NOT_FOUND', message: 'Appointment not found' });
-            }
+			const appointment = await AppointmentModel.findById(input.appointmentId);
+			if (!appointment) {
+				throw new TRPCError({ code: "NOT_FOUND", message: "Appointment not found" });
+			}
 
+			const property = await PropertyModel.findById(appointment.propertyId);
+			if (!property) {
+				throw new TRPCError({ code: "NOT_FOUND", message: "Property not found" });
+			}
 
-            const property = await PropertyModel.findById(appointment.propertyId);
-            if (!property) {
-                throw new TRPCError({ code: 'NOT_FOUND', message: 'Property not found' });
-            }
+			if (ctx.user.id !== appointment.buyerUserId && ctx.user.id !== appointment.sellerUserId) {
+				throw new TRPCError({ code: "UNAUTHORIZED", message: "Only appointment participants can mark as completed" });
+			}
 
-            if (ctx.user.id !== appointment.buyerUserId && ctx.user.id !== appointment.sellerUserId) {
-                throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Only appointment participants can mark as completed' });
-            }
+			const newAppointment = await AppointmentModel.findByIdAndUpdate(input.appointmentId, {
+				status: input.status,
+				updatedAt: new Date(),
+			});
 
+			if (!newAppointment) throw new TRPCError({ code: "NOT_FOUND", message: "Appointment not found" });
 
-            const newAppointment = await AppointmentModel.findByIdAndUpdate(input.appointmentId, {
-                status: input.status,
-                updatedAt: new Date()
-            });
+			// Create notification
+			await NotificationModel.create({
+				_id: new mongoose.Types.ObjectId() as any,
+				userId: ctx.user.id === appointment.buyerUserId ? appointment.sellerUserId : appointment.buyerUserId,
+				messageEn: `Appointment on ${format(appointment.date, "dd-MM-yyyy")} has been ${input.status}.`,
+				messageRo: `Programarea din ${format(appointment.date, "dd-MM-yyyy")} a fost ${input.status}.`,
+				read: false,
+				image: property.imageUrls[0],
+				link:
+					(ctx.user.id === appointment.buyerUserId ? "/app/my-properties/bookings" : "/app/appointments") +
+					"?date=" +
+					encodeURIComponent(format(appointment.date, "yyyy-MM-dd")),
+				createdAt: new Date(),
+				updatedAt: new Date(),
+			});
 
-            if (!newAppointment) throw new TRPCError({ code: 'NOT_FOUND', message: 'Appointment not found' });
-
-            // Create notification
-            await NotificationModel.create({
-                _id: new mongoose.Types.ObjectId() as any,
-                userId: ctx.user.id === appointment.buyerUserId ? appointment.sellerUserId : appointment.buyerUserId,
-                messageEn: `Appointment on ${format(appointment.date, 'dd-MM-yyyy')} has been ${input.status}.`,
-                messageRo: `Programarea din ${format(appointment.date, 'dd-MM-yyyy')} a fost ${input.status}.`,
-                read: false,
-                image: property.imageUrls[0],
-                link: (ctx.user.id === appointment.buyerUserId ? "/app/my-properties/bookings" : "/app/appointments")
-                    + "?date=" + encodeURIComponent(format(appointment.date, 'yyyy-MM-dd')),
-                createdAt: new Date(),
-                updatedAt: new Date(),
-            });
-
-            return { success: true };
-        })
+			return { success: true };
+		}),
 });
