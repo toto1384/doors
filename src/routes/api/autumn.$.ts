@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { createServerFileRoute } from "@tanstack/react-start/server";
 import { autumnHandler } from "autumn-js/tanstack";
-import { auth } from "utils/auth";
+import { auth } from "@/utils/auth";
 
 const handler = autumnHandler({
 	identify: async ({ request }) => {

@@ -551,6 +551,7 @@
     "new-construction": "Construcție nouă",
     "city-center": "Centrul orașului",
     "furnished": "Mobilat",
+    "notFurnished": "Nemobilat",
     "central_heating": "Încălzire centrală",
     "centralHeating": "Încălzire centrală",
     "internet": "Internet",
@@ -702,5 +703,30 @@
       "today": "Astăzi",
       "yesterday": "Ieri"
     }
+  },
+  "units": {
+    "sqft": "m²",
+    "noSurfaceArea": "Nu este setată suprafața",
+    "floor": "Etaj",
+    "rooms": "Camere",
+    "bathrooms": "Băi",
+    "noTitle": "Titlu nesetat",
+    "noPrice": "Preț nesetat",
+    "noBathrooms": "Numărul de băi nesetat",
+    "buildingYear": "Anul construcției",
+    "owner": "Proprietar",
+    "memberSince": "Membru din",
+    "location": "Locație",
+    "noLocation": "Locație nesetată",
+    "noDescription": "Descriere nesetată",
+    "readMore": "Citește mai mult...",
+    "readLess": "Citește mai puțin...",
+    "failedScheduleViewing": "Eșec la programarea vizionării",
+    "viewingScheduledSuccess": "Vizionarea a fost programată cu succes!",
+    "openingCheckout": "Se deschide checkout-ul...",
+    "overview": "Descriere",
+    "extra": "Extra",
+    "noFeatures": "Nicio facilitate setată",
+    "scheduled": "Programat"
   }
 }

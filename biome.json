@@ -6,5 +6,12 @@
     "formatter": {
       "quoteStyle": "double"
     }
+  },
+    "assist": {
+    "actions": {
+      "source": {
+        "organizeImports": "on"
+      }
+    }
   }
 }

@@ -1,133 +1,120 @@
-'use client';
+"use client";
 
-import { Button } from 'src/components/ui/button';
+import { Languages } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import { cn } from "@/lib/utils";
+import { Button } from "@/src/components/ui/button";
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from 'src/components/ui/dropdown-menu';
-import { Languages } from 'lucide-react';
-import { cn } from 'lib/utils';
-import { useTranslation } from 'react-i18next';
-import i18n from './i18n';
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuTrigger,
+} from "@/src/components/ui/dropdown-menu";
+import i18n from "./i18n";
 
 interface LanguageToggleProps {
-    className?: string;
-    variant?: 'default' | 'outline' | 'ghost' | 'minimal';
+	className?: string;
+	variant?: "default" | "outline" | "ghost" | "minimal";
 }
-
 
 export function LanguageToggleVariant() {
+	// const {t} = useTranslation('translation', {keyPrefix: 'profile-page.language'})
 
+	const locale = i18n.language;
 
-    // const {t} = useTranslation('translation', {keyPrefix: 'profile-page.language'})
+	const handleLanguageChange = (newLocale: string) => {
+		i18n.changeLanguage(newLocale);
+	};
 
-    const locale = i18n.language;
-
-    const handleLanguageChange = (newLocale: string) => {
-        i18n.changeLanguage(newLocale);
-    };
-
-    return <div className='rounded-[5px] border-white border flex flex-row items-center p-0.5'>
-        <button
-            className={(locale == 'ro' ? 'bg-gradient-to-br from-[#4C7CED] to-[#7B31DC]' : '') + ` text-white text-xs px-2.5 py-[3px] rounded hover:from-blue-600 hover:to-purple-700 transition-all`}
-            onClick={() => handleLanguageChange('ro')}
-        >
-            RO
-        </button>
-        <button
-            className={(locale.includes('en') ? 'bg-gradient-to-br from-[#4C7CED] to-[#7B31DC]' : '') + ` text-white text-xs px-2.5 py-[3px] rounded hover:from-blue-600 hover:to-purple-700 transition-all`}
-            onClick={() => handleLanguageChange('en')}
-        >
-            EN
-        </button>
-    </div>
+	return (
+		<div className="rounded-[5px] border-white border flex flex-row items-center p-0.5">
+			<button
+				className={
+					(locale == "ro" ? "bg-gradient-to-br from-[#4C7CED] to-[#7B31DC]" : "") +
+					` text-white text-xs px-2.5 py-[3px] rounded hover:from-blue-600 hover:to-purple-700 transition-all`
+				}
+				onClick={() => handleLanguageChange("ro")}
+			>
+				RO
+			</button>
+			<button
+				className={
+					(locale.includes("en") ? "bg-gradient-to-br from-[#4C7CED] to-[#7B31DC]" : "") +
+					` text-white text-xs px-2.5 py-[3px] rounded hover:from-blue-600 hover:to-purple-700 transition-all`
+				}
+				onClick={() => handleLanguageChange("en")}
+			>
+				EN
+			</button>
+		</div>
+	);
 }
 
-export function LanguageToggle({ className, variant = 'ghost' }: LanguageToggleProps) {
-    const { t } = useTranslation('translation', { keyPrefix: 'profile-page.language' });
-    const locale = i18n.language
+export function LanguageToggle({ className, variant = "ghost" }: LanguageToggleProps) {
+	const { t } = useTranslation("translation", { keyPrefix: "profile-page.language" });
+	const locale = i18n.language;
 
-    const handleLanguageChange = (newLocale: string) => {
-        i18n.changeLanguage(newLocale);
-    };
+	const handleLanguageChange = (newLocale: string) => {
+		i18n.changeLanguage(newLocale);
+	};
 
-    const currentLanguageName = locale.includes('en') ? t('english') : t('romanian');
+	const currentLanguageName = locale.includes("en") ? t("english") : t("romanian");
 
-    if (variant === 'minimal') {
-        return (
-            <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                    <Button
-                        variant="ghost"
-                        size="sm"
-                        className={cn(
-                            "h-8 px-2 text-sm font-medium hover:bg-slate-100 dark:hover:bg-slate-800",
-                            className
-                        )}
-                    >
-                        {locale.toUpperCase()}
-                    </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="min-w-[120px]">
-                    <DropdownMenuItem
-                        onClick={() => handleLanguageChange('ro')}
-                        className={cn(
-                            "cursor-pointer",
-                            locale === 'ro' && "bg-slate-100 dark:bg-slate-800"
-                        )}
-                    >
-                        🇷🇴 {t('romanian')}
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                        onClick={() => handleLanguageChange('en')}
-                        className={cn(
-                            "cursor-pointer",
-                            locale === 'en' && "bg-slate-100 dark:bg-slate-800"
-                        )}
-                    >
-                        🇺🇸 {t('english')}
-                    </DropdownMenuItem>
-                </DropdownMenuContent>
-            </DropdownMenu>
-        );
-    }
+	if (variant === "minimal") {
+		return (
+			<DropdownMenu>
+				<DropdownMenuTrigger asChild>
+					<Button
+						variant="ghost"
+						size="sm"
+						className={cn("h-8 px-2 text-sm font-medium hover:bg-slate-100 dark:hover:bg-slate-800", className)}
+					>
+						{locale.toUpperCase()}
+					</Button>
+				</DropdownMenuTrigger>
+				<DropdownMenuContent align="end" className="min-w-[120px]">
+					<DropdownMenuItem
+						onClick={() => handleLanguageChange("ro")}
+						className={cn("cursor-pointer", locale === "ro" && "bg-slate-100 dark:bg-slate-800")}
+					>
+						🇷 {t("romanian")}
+					</DropdownMenuItem>
+					<DropdownMenuItem
+						onClick={() => handleLanguageChange("en")}
+						className={cn("cursor-pointer", locale === "en" && "bg-slate-100 dark:bg-slate-800")}
+					>
+						🇺 {t("english")}
+					</DropdownMenuItem>
+				</DropdownMenuContent>
+			</DropdownMenu>
+		);
+	}
 
-    return (
-        <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-                <Button
-                    variant={variant}
-                    className={cn("flex items-center gap-2", className)}
-                >
-                    <Languages className="h-4 w-4" />
-                    <span className="hidden sm:inline">{currentLanguageName}</span>
-                    <span className="sm:hidden">{locale.toUpperCase()}</span>
-                </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="min-w-[160px]">
-                <DropdownMenuItem
-                    onClick={() => handleLanguageChange('ro')}
-                    className={cn(
-                        "cursor-pointer flex items-center gap-2",
-                        locale === 'ro' && "bg-slate-100 dark:bg-slate-800"
-                    )}
-                >
-                    <span className="text-lg">🇷🇴</span>
-                    <span>{t('romanian')}</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                    onClick={() => handleLanguageChange('en')}
-                    className={cn(
-                        "cursor-pointer flex items-center gap-2",
-                        locale === 'en' && "bg-slate-100 dark:bg-slate-800"
-                    )}
-                >
-                    <span className="text-lg">🇺🇸</span>
-                    <span>{t('english')}</span>
-                </DropdownMenuItem>
-            </DropdownMenuContent>
-        </DropdownMenu>
-    );
+	return (
+		<DropdownMenu>
+			<DropdownMenuTrigger asChild>
+				<Button variant={variant} className={cn("flex items-center gap-2", className)}>
+					<Languages className="h-4 w-4" />
+					<span className="hidden sm:inline">{currentLanguageName}</span>
+					<span className="sm:hidden">{locale.toUpperCase()}</span>
+				</Button>
+			</DropdownMenuTrigger>
+			<DropdownMenuContent align="end" className="min-w-[160px]">
+				<DropdownMenuItem
+					onClick={() => handleLanguageChange("ro")}
+					className={cn("cursor-pointer flex items-center gap-2", locale === "ro" && "bg-slate-100 dark:bg-slate-800")}
+				>
+					<span className="text-lg">🇷</span>
+					<span>{t("romanian")}</span>
+				</DropdownMenuItem>
+				<DropdownMenuItem
+					onClick={() => handleLanguageChange("en")}
+					className={cn("cursor-pointer flex items-center gap-2", locale === "en" && "bg-slate-100 dark:bg-slate-800")}
+				>
+					<span className="text-lg">🇺</span>
+					<span>{t("english")}</span>
+				</DropdownMenuItem>
+			</DropdownMenuContent>
+		</DropdownMenu>
+	);
 }

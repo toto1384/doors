@@ -2,18 +2,18 @@ import { TRPCError } from "@trpc/server";
 import { Autumn as autumn } from "autumn-js";
 import { endOfMonth, format, startOfMonth } from "date-fns";
 import mongoose from "mongoose";
-import { appointmentStatus, bypassLimitations } from "utils/constants";
-import dbConnect from "utils/db/mongodb";
-import { calculateAvailableSlots } from "utils/scheduleUtils";
-import { AppointmentSchema } from "utils/validation/dbSchemas";
+import { z } from "zod/v3";
+import { appointmentStatus, bypassLimitations } from "@/utils/constants";
+import dbConnect from "@/utils/db/mongodb";
+import { calculateAvailableSlots } from "@/utils/scheduleUtils";
+import { AppointmentSchema } from "@/utils/validation/dbSchemas";
 import {
 	getAppointmentModel,
 	getNotificationModel,
 	getPropertyModel,
 	getUserModel,
-} from "utils/validation/mongooseModels";
-import { AppointmentObject } from "utils/validation/types";
-import { z } from "zod/v3";
+} from "@/utils/validation/mongooseModels";
+import { AppointmentObject } from "@/utils/validation/types";
 import { authProcedure, createTRPCRouter } from "../init";
 
 export const appointmentsRouter = createTRPCRouter({

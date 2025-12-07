@@ -1,9 +1,8 @@
 import { usePaywall } from "autumn-js/react";
-
-import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogFooter, DialogTitle } from "@/components/ui/dialog";
-import { getPaywallContent } from "@/lib/autumn/paywall-content";
 import { cn } from "@/lib/utils";
+import { Button } from "@/src/components/ui/button";
+import { Dialog, DialogContent, DialogFooter, DialogTitle } from "@/src/components/ui/dialog";
+import { getPaywallContent } from "@/src/lib/autumn/paywall-content";
 
 export interface PaywallDialogProps {
 	open: boolean;

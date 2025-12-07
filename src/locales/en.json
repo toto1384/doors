@@ -569,6 +569,7 @@
     "new-construction": "New Construction",
     "city-center": "City Center",
     "furnished": "Furnished",
+    "notFurnished": "Not furnished",
     "central_heating": "Central Heating",
     "centralHeating": "Central Heating",
     "internet": "Internet",
@@ -720,5 +721,30 @@
       "today": "Today",
       "yesterday": "Yesterday"
     }
+  },
+  "units": {
+    "sqft": "sqft",
+    "noSurfaceArea": "No surface area set",
+    "floor": "Floor",
+    "rooms": "Room(s)",
+    "bathrooms": "Bath(s)",
+    "noTitle": "No title set",
+    "noPrice": "No price set",
+    "noBathrooms": "No number of bathrooms set",
+    "buildingYear": "Building year",
+    "owner": "Owner",
+    "memberSince": "Member since",
+    "location": "Location",
+    "noLocation": "No location set",
+    "noDescription": "No description set",
+    "readMore": "Read more...",
+    "readLess": "Read less...",
+    "failedScheduleViewing": "Failed to schedule viewing",
+    "viewingScheduledSuccess": "Viewing scheduled successfully!",
+    "openingCheckout": "Opening checkout...",
+    "overview": "Overview",
+    "extra": "Extra",
+    "noFeatures": "No features set",
+    "scheduled": "Scheduled"
   }
 }

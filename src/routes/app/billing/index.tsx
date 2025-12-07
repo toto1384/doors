@@ -5,10 +5,10 @@ import { format } from "date-fns";
 import { ChevronLeft, ChevronRight, CreditCard } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
-import { FloatingInput } from "@/components/ui/floating-input";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Button } from "@/src/components/ui/button";
+import { FloatingInput } from "@/src/components/ui/floating-input";
+import { Input } from "@/src/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/src/components/ui/select";
 
 export const Route = createFileRoute("/app/billing/")({
 	component: BillingPage,

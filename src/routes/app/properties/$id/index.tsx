@@ -4,26 +4,27 @@ import { createServerFn } from "@tanstack/react-start";
 import { getHeaders } from "@tanstack/react-start/server";
 import { CheckoutDialog, useCustomer } from "autumn-js/react";
 import { addDays, endOfDay, format, isAfter, isBefore, isWithinInterval, parse, startOfDay } from "date-fns";
-import { MapPin, MessageCircle, Phone } from "lucide-react";
+import { Armchair, CalendarRange, MapPin, MessageCircle, Phone, SquareArrowUp } from "lucide-react";
 import { ReactNode, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
-import { trpcRouter } from "trpc/router";
-import { auth } from "utils/auth";
-import { bypassLimitations } from "utils/constants";
-import { useSize } from "utils/hooks/useSize";
-import { formatPrice } from "utils/mainUtils";
-import { PropertyObject, UserObject } from "utils/validation/types";
 import z from "zod/v3";
-import PaywallDialog from "@/components/autumn/paywall-dialog";
-import { ImageFallback } from "@/components/basics/imageFallback";
-import { BathIcon, BedIcon, PropertyFeatureIcon, SurfaceAreaIcon } from "@/components/icons/propertyIcons";
-import { GoogleMapPreview } from "@/components/maps/GoogleMapPreview";
-import { ViewingScheduleModal } from "@/components/scheduling/ViewingScheduleModal";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import PaywallDialog from "@/src/components/autumn/paywall-dialog";
+import { ImageFallback } from "@/src/components/basics/imageFallback";
+import { BathIcon, BedIcon, PropertyFeatureIcon, SurfaceAreaIcon } from "@/src/components/icons/propertyIcons";
+import { GoogleMapPreview } from "@/src/components/maps/GoogleMapPreview";
+import { ViewingScheduleModal } from "@/src/components/scheduling/ViewingScheduleModal";
+import { Button } from "@/src/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/src/components/ui/card";
+import { auth } from "@/utils/auth";
+import { bypassLimitations } from "@/utils/constants";
+import { useSize } from "@/utils/hooks/useSize";
+import { formatPrice } from "@/utils/mainUtils";
+import { PropertyObject, UserObject } from "@/utils/validation/types";
+import { createTRPCRouter } from "../../../../../trpc/init";
 import { useTRPC, useTRPCClient } from "../../../../../trpc/react";
+import { trpcRouter } from "../../../../../trpc/router";
+import i18n from "../../../../components/i18n";
 
 const getProperty = createServerFn()
 	.validator((params) => z.object({ id: z.string() }).parse(params))
@@ -76,11 +77,11 @@ export const ScheduleViewComponent = ({ id, property }: { id: string; property: 
 	const scheduleViewingMutation = useMutation(
 		trpc.appointments.scheduleViewing.mutationOptions({
 			onSuccess: () => {
-				toast.success("Viewing scheduled successfully!");
+				toast.success(t("units.viewingScheduledSuccess"));
 				setIsScheduleModalOpen(false);
 			},
 			onError: (error) => {
-				toast.error(error.message || "Failed to schedule viewing");
+				toast.error(error.message || t("units.failedScheduleViewing"));
 			},
 		}),
 	);
@@ -111,7 +112,8 @@ export const ScheduleViewComponent = ({ id, property }: { id: string; property: 
 						className="bg-gradient-to-br from-[#4C7CED]/50 to-[#7B31DC]/50 text-white text-xs px-4 py-2 rounded-[6px]"
 						disabled
 					>
-						Scheduled: {sellerAvailability.alreadyScheduled.startTime} - {sellerAvailability.alreadyScheduled.endTime} :{" "}
+						{t("units.scheduled")}: {sellerAvailability.alreadyScheduled.startTime} -{" "}
+						{sellerAvailability.alreadyScheduled.endTime} :{" "}
 						{format(sellerAvailability.alreadyScheduled.date, "dd-MM-yyyy")}
 					</Button>
 				</>
@@ -128,7 +130,7 @@ export const ScheduleViewComponent = ({ id, property }: { id: string; property: 
 									message={t("property-page.paywall.message")}
 									buttonText={t("property-page.paywall.buttonText")}
 									onClick={async () => {
-										toast("Opening checkout...");
+										toast(t("units.openingCheckout"));
 										await attach({
 											productId: "pro_plan",
 											forceCheckout: true,
@@ -199,11 +201,7 @@ function PropertyDetailRoute() {
 					<PropertyInfo
 						property={property}
 						additionalSpacing
-						additionalComponent={
-							<>
-								<ScheduleViewComponent id={id} property={property} />
-							</>
-						}
+						additionalComponent={<ScheduleViewComponent id={id} property={property} />}
 					/>
 					<DescriptionSection property={property} />
 					<FeaturesSection property={property} />
@@ -531,32 +529,59 @@ export function PropertyInfo({
 	additionalComponent?: ReactNode;
 	additionalSpacing?: boolean;
 }) {
+	const { t } = useTranslation();
+	const { t: tFacilities } = useTranslation("translation", { keyPrefix: "facilities" });
 	return (
 		<div className="px-4 mb-6">
 			<div className={`flex flex-col md:flex-row md:items-center gap-2 mb-2 ${additionalSpacing && "justify-between"}`}>
-				<h1 className="text-xl font-light text-white">{property.title ?? "No title set"}</h1>
+				<h1 className="text-xl font-light text-white">{property.title ?? t("units.noTitle")}</h1>
 				{additionalComponent}
 			</div>
-			<div className="text-lg text-white mb-4">{property.price ? formatPrice(property.price) : "No price set"}</div>
+			<div className="text-lg text-white mb-4">{property.price ? formatPrice(property.price) : t("units.noPrice")}</div>
 
 			{/* Property specifications horizontal layout */}
-			<div className="flex items-center gap-6 text-white text-xs">
-				<div className="flex items-center gap-2">
-					<BedIcon className="w-8 h-8 bg-white/5 p-2 rounded-full" color="#7B31DC" />
-					<span>{property.numberOfRooms ? `${property.numberOfRooms} Room(s)` : "No number of rooms set"}</span>
-				</div>
-				{property.numberOfBathrooms && (
+			<div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-white text-xs">
+				{property.numberOfRooms != undefined && (
+					<div className="flex items-center gap-2">
+						<BedIcon className="w-8 h-8 bg-white/5 p-2 rounded-full" color="#7B31DC" />
+						<span>{`${property.numberOfRooms} ${t("units.rooms")}`}</span>
+					</div>
+				)}
+				{property.numberOfBathrooms != undefined && (
 					<div className="flex items-center gap-2">
 						<BathIcon className="w-8 h-8 bg-white/5 p-2 rounded-full" color="#7B31DC" />
 						<span>
-							{property.numberOfBathrooms ? `${property.numberOfBathrooms} Bath(s)` : "No number of bathrooms set"}
+							{property.numberOfBathrooms
+								? `${property.numberOfBathrooms} ${t("units.bathrooms")}`
+								: t("units.noBathrooms")}
 						</span>
 					</div>
 				)}
 				<div className="flex items-center gap-2">
 					<SurfaceAreaIcon className="w-8 h-8 bg-white/5 p-2 rounded-full" color="#7B31DC" />
-					<span>{property.surfaceArea ? `${property.surfaceArea} sqft` : "No surface area set"}</span>
+					<span>{property.surfaceArea ? `${property.surfaceArea} ${t("units.sqft")}` : t("units.noSurfaceArea")}</span>
 				</div>
+				{property.floor != undefined && (
+					<div className="flex items-center gap-2">
+						<SquareArrowUp className="w-8 h-8 bg-white/5 p-2 rounded-full" color="#7B31DC" />
+						<span>
+							{`${t("units.floor")}: ${property.floor + (property.buildingFloors ? `/${property.buildingFloors}` : ``)}`}
+						</span>
+					</div>
+				)}
+				<div className="flex items-center gap-2">
+					<Armchair className="w-8 h-8 bg-white/5 p-2 rounded-full" color="#7B31DC" />
+
+					<span>{property.furnished ? tFacilities("furnished") : tFacilities("notFurnished")}</span>
+				</div>
+				{property.buildingYear && (
+					<div className="flex items-center gap-2">
+						<CalendarRange className="w-8 h-8 bg-white/5 p-2 rounded-full" color="#7B31DC" />
+						<span>
+							{t("units.buildingYear")}: {property.buildingYear}
+						</span>
+					</div>
+				)}
 			</div>
 		</div>
 	);
@@ -564,10 +589,11 @@ export function PropertyInfo({
 
 // Component: Owner Section
 function OwnerSection({ owner }: { owner: UserObject }) {
+	const { t } = useTranslation();
 	return (
 		<div className="flex items-center justify-between px-4 py-6 border-b border-gray-800">
 			<div>
-				<h2 className="text-lg font-medium text-white mb-4">Owner</h2>
+				<h2 className="text-lg font-medium text-white mb-4">{t("units.owner")}</h2>
 				<div className="flex items-center gap-3">
 					<div className="relative">
 						<img src="/api/placeholder/48/48" alt="Irene Patte" className="w-12 h-12 rounded-full object-cover" />
@@ -576,7 +602,9 @@ function OwnerSection({ owner }: { owner: UserObject }) {
 					<div>
 						<h3 className="text-white font-medium">{owner.name}</h3>
 						{owner.createdAt && (
-							<p className="text-gray-400 text-sm">Member since {format(new Date(owner.createdAt), "yyyy")}</p>
+							<p className="text-gray-400 text-sm">
+								{t("units.memberSince")} {format(new Date(owner.createdAt), "yyyy")}
+							</p>
 						)}
 					</div>
 				</div>
@@ -602,6 +630,7 @@ export function DescriptionSection({
 	property: Partial<PropertyObject>;
 	additionalComponent?: ReactNode;
 }) {
+	const { t } = useTranslation();
 	const [isExpanded, setIsExpanded] = useState(false);
 	const textRef = useRef<HTMLParagraphElement>(null);
 
@@ -630,7 +659,7 @@ export function DescriptionSection({
 	return (
 		<div className="px-4 mb-6">
 			<div className="flex flex-row items-center gap-2 mb-2">
-				<h2 className="text-base font-medium text-white ">Overview</h2>
+				<h2 className="text-base font-medium text-white ">{t("units.overview")}</h2>
 				{additionalComponent}
 			</div>
 			<p
@@ -639,11 +668,11 @@ export function DescriptionSection({
 					!isExpanded && showReadMore ? "line-clamp-2" : ""
 				}`}
 			>
-				{property.description ?? "No description set"}
+				{property.description ?? t("units.noDescription")}
 			</p>
 			{showReadMore && (
 				<button onClick={() => setIsExpanded(!isExpanded)} className="text-[#7B31DC] mt-2 hover:underline">
-					{isExpanded ? "Read less..." : "Read more..."}
+					{isExpanded ? t("units.readLess") : t("units.readMore")}
 				</button>
 			)}
 		</div>
@@ -658,15 +687,16 @@ export function LocationSection({
 	property: Partial<PropertyObject>;
 	additionalComponent?: ReactNode;
 }) {
+	const { t } = useTranslation();
 	return (
 		<div className="px-4 mb-6">
 			<div className="flex flex-row items-center gap-2 mb-4">
-				<h2 className="text-base font-medium text-white">Location</h2>
+				<h2 className="text-base font-medium text-white">{t("units.location")}</h2>
 				{additionalComponent}
 			</div>
 			<div className="flex items-center gap-1 text-[#919EAB] text-xs mb-2">
 				<MapPin className="w-3 h-3 " />
-				<span>{property.location?.fullLocationName ?? "No location set"}</span>
+				<span>{property.location?.fullLocationName ?? t("units.noLocation")}</span>
 			</div>
 			{property.location && (
 				<div className="bg-gray-800 rounded-lg h-64 overflow-hidden">
@@ -685,12 +715,13 @@ export function FeaturesSection({
 	property: Partial<PropertyObject>;
 	additionalComponent?: ReactNode;
 }) {
-	const { t } = useTranslation("translation", { keyPrefix: "facilities" });
+	const { t: tFacilities } = useTranslation("translation", { keyPrefix: "facilities" });
+	const { t } = useTranslation();
 
 	return (
 		<div className="px-4 mb-6">
 			<div className="flex flex-row items-center gap-2 mb-2">
-				<h2 className="text-base font-medium text-white">Features</h2>
+				<h2 className="text-base font-medium text-white">{t("units.extra")}</h2>
 				{additionalComponent}
 			</div>
 			<div className="flex flex-wrap gap-4">
@@ -700,7 +731,7 @@ export function FeaturesSection({
 							<PropertyFeatureIcon feature={feature} color={"#919EAB"} />
 						</div>
 						<span className="text-xs text-white">
-							{t(
+							{tFacilities(
 								feature,
 								feature.replace("-", " ").replace(/\b\w/g, (l) => l.toUpperCase()),
 							)}
@@ -709,7 +740,7 @@ export function FeaturesSection({
 				))}
 				{property.features?.length === 0 && (
 					<div className="flex flex-col items-center text-center">
-						<span className="text-xs text-white">No features set</span>
+						<span className="text-xs text-white">{t("units.noFeatures")}</span>
 					</div>
 				)}
 			</div>

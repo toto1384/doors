@@ -1,277 +1,298 @@
-import { PropertyObject } from "utils/validation/types";
-import { MessageType } from "./aiChatbot";
-import { useTranslation } from "react-i18next";
-import { useRouter, useRouterState } from "@tanstack/react-router";
-import { useTRPC, useTRPCClient } from "trpc/react";
-import { usePopoversOpenStore, usePropertyAddStore, usePropertyFilterStore } from "@/routes/__root";
-import { useShallow } from "zustand/react/shallow";
-import { useClientToolSelectPhotos } from "utils/hooks/aiChatbotSelectImagesHook";
-import { nanoid } from "nanoid";
-import { useClientToolChoice } from "utils/hooks/aiChatbotButtonHook";
-import { searchLocationByString } from "utils/googleMapsUtils";
-import { Facilities } from "utils/validation/propertyFilters";
-import { demoPropertyKey, PropertyHeating, PropertyTypeType, propPreferencesKey } from "utils/constants";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { SellerAvailability } from "utils/scheduleUtils";
-
+import { useRouter, useRouterState } from "@tanstack/react-router";
+import { nanoid } from "nanoid";
+import { useTranslation } from "react-i18next";
+import { useShallow } from "zustand/react/shallow";
+import { usePopoversOpenStore, usePropertyAddStore, usePropertyFilterStore } from "@/src/routes/__root";
+import { useTRPC, useTRPCClient } from "@/trpc/react";
+import { demoPropertyKey, PropertyHeating, PropertyTypeType, propPreferencesKey } from "@/utils/constants";
+import { searchLocationByString } from "@/utils/googleMapsUtils";
+import { useClientToolChoice } from "@/utils/hooks/aiChatbotButtonHook";
+import { useClientToolSelectPhotos } from "@/utils/hooks/aiChatbotSelectImagesHook";
+import { SellerAvailability } from "@/utils/scheduleUtils";
+import { Facilities } from "@/utils/validation/propertyFilters";
+import { PropertyObject } from "@/utils/validation/types";
+import { MessageType } from "./aiChatbot";
 
 export const usePublishPropertyHook = ({ demoVersion }: { demoVersion?: boolean }) => {
-    const router = useRouter()
-    const trpcClient = useTRPCClient()
-    const queryClient = useQueryClient()
+	const router = useRouter();
+	const trpcClient = useTRPCClient();
+	const queryClient = useQueryClient();
 
-    const { endConversation } = usePropertyFilterStore(useShallow(state => ({
-        endConversation: state.endConversation,
-    })))
+	const { endConversation } = usePropertyFilterStore(
+		useShallow((state) => ({
+			endConversation: state.endConversation,
+		})),
+	);
 
-    const { setTitlesAndDescriptions, setTitleAndDescResolver, getPartialProperty, setPostedStatus } = usePropertyAddStore(useShallow(state => ({
-        setTitlesAndDescriptions: state.setTitlesAndDescriptions,
-        setTitleAndDescResolver: state.setTitleAndDescResolver,
-        getPartialProperty: state.getPartialProperty,
-        setPostedStatus: state.setPostedStatus,
+	const { setTitlesAndDescriptions, setTitleAndDescResolver, getPartialProperty, setPostedStatus } =
+		usePropertyAddStore(
+			useShallow((state) => ({
+				setTitlesAndDescriptions: state.setTitlesAndDescriptions,
+				setTitleAndDescResolver: state.setTitleAndDescResolver,
+				getPartialProperty: state.getPartialProperty,
+				setPostedStatus: state.setPostedStatus,
+			})),
+		);
 
-    })))
+	const { setProgressBar, aiChatbotOpen, setAiChatbotOpen } = usePopoversOpenStore(
+		useShallow((state) => ({
+			setProgressBar: state.setProgressBar,
+			aiChatbotOpen: state.aiChatbotOpen,
+			setAiChatbotOpen: state.setAiChatbotOpen,
+		})),
+	);
 
-    const { setProgressBar, aiChatbotOpen, setAiChatbotOpen } = usePopoversOpenStore(useShallow(state => ({
-        setProgressBar: state.setProgressBar,
-        aiChatbotOpen: state.aiChatbotOpen,
-        setAiChatbotOpen: state.setAiChatbotOpen,
-    })))
-
-    return async () => {
-        const ghostProperty = getPartialProperty()
-        console.log('publishProperty', ghostProperty)
-        try {
-            let result
-            if (demoVersion) {
-                localStorage.setItem(demoPropertyKey, JSON.stringify(ghostProperty))
-                result = JSON.stringify(ghostProperty)
-                setPostedStatus({ success: true, message: 'Property saved as demo. Login to post' })
-                setProgressBar(undefined)
-            } else {
-                result = await trpcClient.properties.postProperty.mutate({ property: ghostProperty as any })
-                setPostedStatus({ success: result.success, message: result.message })
-                if (result.success) setProgressBar(undefined)
-                router.navigate({ to: '/app/my-properties' })
-            }
-            await endConversation()
-            queryClient.invalidateQueries({ queryKey: ['my-properties'] })
-            return JSON.stringify(result)
-        } catch (error) {
-            console.log('error', error)
-            return JSON.stringify({ success: false, message: error })
-        }
-    }
-}
+	return async () => {
+		const ghostProperty = getPartialProperty();
+		console.log("publishProperty", ghostProperty);
+		try {
+			let result;
+			if (demoVersion) {
+				localStorage.setItem(demoPropertyKey, JSON.stringify(ghostProperty));
+				result = JSON.stringify(ghostProperty);
+				setPostedStatus({ success: true, message: "Property saved as demo. Login to post" });
+				setProgressBar(undefined);
+			} else {
+				result = await trpcClient.properties.postProperty.mutate({ property: ghostProperty as any });
+				setPostedStatus({ success: result.success, message: result.message });
+				if (result.success) setProgressBar(undefined);
+				router.navigate({ to: "/app/my-properties" });
+			}
+			await endConversation();
+			queryClient.invalidateQueries({ queryKey: ["my-properties", "auth.getToken"] });
+			return JSON.stringify(result);
+		} catch (error) {
+			console.log("error", error);
+			return JSON.stringify({ success: false, message: error });
+		}
+	};
+};
 
 export const useSetPropertyFunctions = ({
-    setMessages,
-    updateGhostProperty,
-    demoVersion
+	setMessages,
+	updateGhostProperty,
+	demoVersion,
 }: {
-    setMessages: React.Dispatch<React.SetStateAction<MessageType[]>>;
-    updateGhostProperty: (property: Partial<PropertyObject>) => void;
-    demoVersion?: boolean;
+	setMessages: React.Dispatch<React.SetStateAction<MessageType[]>>;
+	updateGhostProperty: (property: Partial<PropertyObject>) => void;
+	demoVersion?: boolean;
 }) => {
-    const { t } = useTranslation('translation', { keyPrefix: 'ai-chatbot' });
-    const router = useRouter()
-    const routerState = useRouterState()
+	const { t } = useTranslation("translation", { keyPrefix: "ai-chatbot" });
+	const router = useRouter();
+	const routerState = useRouterState();
 
-    const trpc = useTRPC()
-    const updateUserPreferencesMutation = useMutation(trpc.auth.updateUserPreferences.mutationOptions())
+	const trpc = useTRPC();
+	const updateUserPreferencesMutation = useMutation(trpc.auth.updateUserPreferences.mutationOptions());
 
-    const ensureIsInAddMode = () => {
-        console.log('ensureIsInAddMode', routerState.location.pathname, routerState.location.pathname !== '/app/properties/add', !demoVersion)
-        if (routerState.location.pathname !== '/app/properties/add' && !demoVersion) router.navigate({ to: '/app/properties/add' })
-    }
+	const ensureIsInAddMode = () => {
+		console.log(
+			"ensureIsInAddMode",
+			routerState.location.pathname,
+			routerState.location.pathname !== "/app/properties/add",
+			!demoVersion,
+		);
+		if (routerState.location.pathname !== "/app/properties/add" && !demoVersion)
+			router.navigate({ to: "/app/properties/add" });
+	};
 
-    const { aiChatbotOpen, setAiChatbotOpen } = usePopoversOpenStore(useShallow(state => ({
-        aiChatbotOpen: state.aiChatbotOpen,
-        setAiChatbotOpen: state.setAiChatbotOpen,
-    })))
+	const { aiChatbotOpen, setAiChatbotOpen } = usePopoversOpenStore(
+		useShallow((state) => ({
+			aiChatbotOpen: state.aiChatbotOpen,
+			setAiChatbotOpen: state.setAiChatbotOpen,
+		})),
+	);
 
-    const { setTitlesAndDescriptions, setTitleAndDescResolver, setPropertyType, propertyType } = usePropertyAddStore(useShallow(state => ({
-        setTitlesAndDescriptions: state.setTitlesAndDescriptions,
-        setTitleAndDescResolver: state.setTitleAndDescResolver,
-        setPropertyType: state.setPropertyType,
-        propertyType: state.propertyType,
-    })))
+	const { setTitlesAndDescriptions, setTitleAndDescResolver, setPropertyType, propertyType } = usePropertyAddStore(
+		useShallow((state) => ({
+			setTitlesAndDescriptions: state.setTitlesAndDescriptions,
+			setTitleAndDescResolver: state.setTitleAndDescResolver,
+			setPropertyType: state.setPropertyType,
+			propertyType: state.propertyType,
+		})),
+	);
 
+	const publishProperty = usePublishPropertyHook({ demoVersion });
 
-    const publishProperty = usePublishPropertyHook({ demoVersion })
+	return {
+		setFinalEditFunction: async () => {
+			console.log("setFinalEditFunction", "final-edit");
+			setPropertyType("final-edit");
+		},
+		publishProperty,
+		setSellerAvailability: async ({ availabilityArray }: { availabilityArray: SellerAvailability[] }) => {
+			if (demoVersion) {
+				const originalPreferences = localStorage.getItem(propPreferencesKey);
+				const currentPreferences = {
+					...(originalPreferences ? JSON.parse(originalPreferences) : {}),
+					sellerAvailability: availabilityArray,
+				};
+				return localStorage.setItem(propPreferencesKey, JSON.stringify(currentPreferences));
+			}
+			const updated = await updateUserPreferencesMutation.mutateAsync({ sellerAvailability: availabilityArray });
+			console.log("updated", updated);
+		},
+		//add posting tools
+		// this tool displays a photo select interface for the user to add their photos
+		selectPropertyPhotos: useClientToolSelectPhotos({
+			onShowPhotoSelector(photosSelectorNode) {
+				setMessages((prev) => [...prev, { message: photosSelectorNode, source: "user", id: nanoid() }]);
+			},
+			additionalOnClick(photos) {
+				updateGhostProperty({ imageUrls: photos });
+				ensureIsInAddMode();
+			},
+		}).clientToolFunction,
 
+		// this tool opens a displays an takes 2 titles and 2 descriptions that they are formed by the properties inputed by the user. the user can choose from those or write custom ones
+		setPropertyTitleAndDescription: ({
+			title1,
+			title2,
+			description1,
+			description2,
+		}: {
+			title1: string;
+			title2: string;
+			description1: string;
+			description2: string;
+		}) => {
+			setTitlesAndDescriptions([
+				{ title: title1, description: description1 },
+				{ title: title2, description: description2 },
+			]);
+			ensureIsInAddMode();
+			if (aiChatbotOpen) setAiChatbotOpen(false);
 
-    return {
-        setFinalEditFunction: async () => {
-            console.log('setFinalEditFunction', 'final-edit')
-            setPropertyType('final-edit')
-        },
-        publishProperty,
-        setSellerAvailability: async ({ availabilityArray }: { availabilityArray: SellerAvailability[] }) => {
+			return new Promise<string>((resolve) => {
+				setTitleAndDescResolver((title, description) => {
+					resolve(`${title} ${description}`);
+					updateGhostProperty({ title, description });
+					if (!aiChatbotOpen) setAiChatbotOpen(true);
+					setTitlesAndDescriptions([]);
+				});
+			});
+		},
 
-            if (demoVersion) {
-                const originalPreferences = localStorage.getItem(propPreferencesKey)
-                const currentPreferences = { ...(originalPreferences ? JSON.parse(originalPreferences) : {}), sellerAvailability: availabilityArray };
-                return localStorage.setItem(propPreferencesKey, JSON.stringify(currentPreferences))
-            }
-            const updated = await updateUserPreferencesMutation.mutateAsync({ sellerAvailability: availabilityArray })
-            console.log('updated', updated)
-        },
-        //add posting tools
-        // this tool displays a photo select interface for the user to add their photos
-        selectPropertyPhotos: useClientToolSelectPhotos({
-            onShowPhotoSelector(photosSelectorNode) {
-                setMessages(prev => [...prev, { message: photosSelectorNode, source: 'user', id: nanoid() }]);
-            },
-            additionalOnClick(photos) {
-                updateGhostProperty({ imageUrls: photos })
-                ensureIsInAddMode()
+		// this tools displays buttons in the ai chat to select the facilities of the property that he wants to post
+		setPropertyFeatures: useClientToolChoice({
+			choices: [
+				{ value: t("facilities.parking"), key: "parking" },
+				{ value: t("facilities.balcony"), key: "balcony" },
+				{ value: t("facilities.terrace"), key: "terrace" },
+				{ value: t("facilities.garden"), key: "garden" },
+				{ value: t("facilities.elevator"), key: "elevator" },
+				{ value: t("facilities.airConditioning"), key: "air-conditioning" },
+				{ value: t("facilities.centralHeating"), key: "central-heating" },
+				{ value: t("facilities.furnished"), key: "furnished" },
+			],
+			multiple: true,
+			additionalOnClick(value) {
+				updateGhostProperty({ features: value as any[] });
+				ensureIsInAddMode();
+			},
 
-            },
-        }).clientToolFunction,
+			onShowButtons: (buttonsNode) => {
+				setMessages((prev) => [...prev, { message: buttonsNode, source: "user", id: nanoid() }]);
+			},
+		}).clientToolFunction,
 
-        // this tool opens a displays an takes 2 titles and 2 descriptions that they are formed by the properties inputed by the user. the user can choose from those or write custom ones
-        setPropertyTitleAndDescription: ({ title1, title2, description1, description2 }: { title1: string, title2: string, description1: string, description2: string }) => {
-            setTitlesAndDescriptions([{ title: title1, description: description1 }, { title: title2, description: description2 }])
-            ensureIsInAddMode()
-            if (aiChatbotOpen) setAiChatbotOpen(false)
+		// this sets the price of the property after the user tells it to the agent
+		setPropertyPrice: ({ value, currency }: { value: number; currency: "EUR" | "USD" | "RON" }) => {
+			updateGhostProperty({ price: { value, currency } });
+			ensureIsInAddMode();
+		},
 
-            return new Promise<string>((resolve) => {
-                setTitleAndDescResolver((title, description) => {
-                    resolve(`${title} ${description}`)
-                    updateGhostProperty({ title, description })
-                    if (!aiChatbotOpen) setAiChatbotOpen(true)
-                    setTitlesAndDescriptions([])
-                })
-            })
-        },
+		// this sets the number the rooms of the property after the user tells it to the agent
+		setPropertyNumberOfRooms: ({ numberOfRooms }: { numberOfRooms: number }) => {
+			updateGhostProperty({ numberOfRooms });
+			ensureIsInAddMode();
+		},
 
-        // this tools displays buttons in the ai chat to select the facilities of the property that he wants to post
-        setPropertyFeatures: useClientToolChoice({
-            choices: [
-                { value: t('facilities.parking'), key: 'parking' },
-                { value: t('facilities.balcony'), key: 'balcony' },
-                { value: t('facilities.terrace'), key: 'terrace' },
-                { value: t('facilities.garden'), key: 'garden' },
-                { value: t('facilities.elevator'), key: 'elevator' },
-                { value: t('facilities.airConditioning'), key: 'air-conditioning' },
-                { value: t('facilities.centralHeating'), key: 'central-heating' },
-                { value: t('facilities.furnished'), key: 'furnished' },
-            ],
-            multiple: true,
-            additionalOnClick(value) {
-                updateGhostProperty({ features: value as any[] })
-                ensureIsInAddMode()
-            },
+		// this sets the surface area of the property after the user tells it to the agent
+		setPropertySurfaceArea: ({ surfaceArea }: { surfaceArea: number }) => {
+			updateGhostProperty({ surfaceArea });
+			ensureIsInAddMode();
+		},
 
-            onShowButtons: (buttonsNode) => {
-                setMessages(prev => [...prev, { message: buttonsNode, source: 'user', id: nanoid() }]);
-            },
-        }).clientToolFunction,
+		// this sets the furnishing status of the property after the user tells it to the agent
+		setPropertyFurnished: ({ furnished }: { furnished: boolean }) => {
+			updateGhostProperty({ furnished });
+			ensureIsInAddMode();
+		},
 
-        // this sets the price of the property after the user tells it to the agent
-        setPropertyPrice: ({ value, currency }: { value: number, currency: 'EUR' | 'USD' | 'RON' }) => {
-            updateGhostProperty({ price: { value, currency } });
-            ensureIsInAddMode()
-        },
+		//todo: have to test for the specific streets to see that they are inputed correctly
+		// this sets the location of the property after the user tells it to the agent
+		setPropertyLocation: async ({ location }: { location: string }) => {
+			const locationResult = await searchLocationByString(location);
+			updateGhostProperty({ location: locationResult ?? undefined });
+			ensureIsInAddMode();
 
-        // this sets the number the rooms of the property after the user tells it to the agent
-        setPropertyNumberOfRooms: ({ numberOfRooms }: { numberOfRooms: number }) => {
-            updateGhostProperty({ numberOfRooms });
-            ensureIsInAddMode()
-        },
+			return JSON.stringify({ locationName: locationResult?.fullLocationName });
+		},
 
-        // this sets the surface area of the property after the user tells it to the agent
-        setPropertySurfaceArea: ({ surfaceArea }: { surfaceArea: number }) => {
-            updateGhostProperty({ surfaceArea });
-            ensureIsInAddMode()
-        },
+		// this displays the buttons in the ai chat to select the type of the property that he wants to post
+		setPropertyType: useClientToolChoice({
+			choices: [
+				{ value: t("propertyTypes.house"), key: "house" },
+				{ value: t("propertyTypes.apartment"), key: "apartment" },
+				{ value: t("propertyTypes.hotel"), key: "hotel" },
+				{ value: t("propertyTypes.office"), key: "office" },
+			],
+			additionalOnClick(value) {
+				console.log("setPropertyType", value);
+				updateGhostProperty({ propertyType: value as any });
+				ensureIsInAddMode();
+			},
+			onShowButtons: (buttonsNode) => {
+				setMessages((prev) => [...prev, { message: buttonsNode, source: "user", id: nanoid() }]);
+			},
+		}).clientToolFunction,
 
+		// this displays the buttons in the ai chat to select the heating of the property that he wants to post
+		setPropertyHeating: useClientToolChoice({
+			choices: [
+				{ value: t("heating.gas"), key: "gas" },
+				{ value: t("heating.electric"), key: "electric" },
+				{ value: t("heating.3rd_party"), key: "3rd_party" },
+			],
+			additionalOnClick(value) {
+				updateGhostProperty({ heating: value as any });
+				ensureIsInAddMode();
+			},
+			onShowButtons: (buttonsNode) => {
+				setMessages((prev) => [...prev, { message: buttonsNode, source: "user", id: nanoid() }]);
+			},
+		}).clientToolFunction,
 
-        // this sets the furnishing status of the property after the user tells it to the agent
-        setPropertyFurnished: ({ furnished }: { furnished: boolean }) => {
-            updateGhostProperty({ furnished });
-            ensureIsInAddMode()
-        },
+		// // this displays the buttons in the ai chat to select the number of floors of the property that he wants to post
+		// setPropertyFeatures: () => {
+		// },
 
+		// this sets the floor of the property after the user tells it to the agent
+		setPropertyFloor: ({ propertyFloor }: { propertyFloor: number }) => {
+			updateGhostProperty({ floor: propertyFloor });
+			ensureIsInAddMode();
+		},
 
-        //todo: have to test for the specific streets to see that they are inputed correctly
-        // this sets the location of the property after the user tells it to the agent
-        setPropertyLocation: async ({ location }: { location: string }) => {
+		// this sets the building year of the property after the user tells it to the agent
+		setBuildingYear: ({ buildingYear }: { buildingYear: number }) => {
+			updateGhostProperty({ buildingYear });
+			ensureIsInAddMode();
+		},
 
-            const locationResult = await searchLocationByString(location);
-            updateGhostProperty({ location: locationResult ?? undefined });
-            ensureIsInAddMode()
+		setPropertyFeaturesVoice: ({ features }: { features: (typeof Facilities)[number][] }) => {
+			updateGhostProperty({ features });
+			ensureIsInAddMode();
+		},
 
-            return JSON.stringify({ locationName: locationResult?.fullLocationName })
-        },
+		setPropertyHeatingVoice: ({ heating }: { heating: PropertyHeating }) => {
+			updateGhostProperty({ heating });
+			ensureIsInAddMode();
+		},
 
-        // this displays the buttons in the ai chat to select the type of the property that he wants to post
-        setPropertyType: useClientToolChoice({
-            choices: [
-                { value: t('propertyTypes.house'), key: 'house' },
-                { value: t('propertyTypes.apartment'), key: 'apartment' },
-                { value: t('propertyTypes.hotel'), key: 'hotel' },
-                { value: t('propertyTypes.office'), key: 'office' },
-            ],
-            additionalOnClick(value) {
-                console.log('setPropertyType', value)
-                updateGhostProperty({ propertyType: value as any })
-                ensureIsInAddMode()
-            },
-            onShowButtons: (buttonsNode) => {
-                setMessages(prev => [...prev, { message: buttonsNode, source: 'user', id: nanoid() }]);
-            },
-        }).clientToolFunction,
-
-        // this displays the buttons in the ai chat to select the heating of the property that he wants to post
-        setPropertyHeating: useClientToolChoice({
-            choices: [
-                { value: t('heating.gas'), key: 'gas' },
-                { value: t('heating.electric'), key: 'electric' },
-                { value: t('heating.3rd_party'), key: '3rd_party' },
-            ],
-            additionalOnClick(value) {
-                updateGhostProperty({ heating: value as any })
-                ensureIsInAddMode()
-            },
-            onShowButtons: (buttonsNode) => {
-                setMessages(prev => [...prev, { message: buttonsNode, source: 'user', id: nanoid() }]);
-            },
-        }).clientToolFunction,
-
-
-        // // this displays the buttons in the ai chat to select the number of floors of the property that he wants to post
-        // setPropertyFeatures: () => {
-        // },
-
-        // this sets the floor of the property after the user tells it to the agent
-        setPropertyFloor: ({ propertyFloor }: { propertyFloor: number }) => {
-            updateGhostProperty({ floor: propertyFloor });
-            ensureIsInAddMode()
-        },
-
-        // this sets the building year of the property after the user tells it to the agent
-        setBuildingYear: ({ buildingYear }: { buildingYear: number }) => {
-            updateGhostProperty({ buildingYear });
-            ensureIsInAddMode()
-        },
-
-
-        setPropertyFeaturesVoice: ({ features }: { features: typeof Facilities[number][] }) => {
-            updateGhostProperty({ features });
-            ensureIsInAddMode()
-        },
-
-        setPropertyHeatingVoice: ({ heating }: { heating: PropertyHeating }) => {
-            updateGhostProperty({ heating });
-            ensureIsInAddMode()
-        },
-
-
-        setPropertyTypeVoice: ({ propertyType }: { propertyType: PropertyTypeType }) => {
-            updateGhostProperty({ propertyType });
-            ensureIsInAddMode()
-        },
-    }
-}
+		setPropertyTypeVoice: ({ propertyType }: { propertyType: PropertyTypeType }) => {
+			updateGhostProperty({ propertyType });
+			ensureIsInAddMode();
+		},
+	};
+};

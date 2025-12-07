@@ -1,210 +1,220 @@
-import { TanstackDevtools } from '@tanstack/react-devtools';
-import { HeadContent, Outlet, Scripts, createRootRoute, useRouterState } from '@tanstack/react-router';
-import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools';
-import '../components/i18n';
+import { TanstackDevtools } from "@tanstack/react-devtools";
+import { createRootRoute, HeadContent, Outlet, Scripts, useRouterState } from "@tanstack/react-router";
+import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
+import "../components/i18n";
+import { createServerFn } from "@tanstack/react-start";
+import { getHeaders } from "@tanstack/react-start/server";
 import { AutumnProvider } from "autumn-js/react";
+import { PostHogErrorBoundary, PostHogProvider } from "posthog-js/react";
+import { createContext, useState } from "react";
+import { create } from "zustand";
+import AppRouteWrapper from "@/src/components/appWrapper";
+import { GoogleMapsProvider } from "@/src/components/providers/GoogleMapsProvider";
+import { ThemeProvider, useTheme } from "@/src/components/providers/ThemeProvider";
+import { TRPCWrapper } from "@/src/components/providers/TrpcWrapper";
+import { Toaster } from "@/src/components/ui/sonner";
+import { auth } from "@/utils/auth";
+import { UserType } from "@/utils/constants";
+import { PropertyFiltersObject } from "@/utils/validation/propertyFilters";
+import { PropertyFilters, PropertyObject } from "@/utils/validation/types";
+import appCss from "../styles.css?url";
 
-import AppRouteWrapper from '@/components/appWrapper';
-import { GoogleMapsProvider } from '@/components/providers/GoogleMapsProvider';
-import { TRPCWrapper } from '@/components/providers/TrpcWrapper';
-import { createContext, useState } from 'react';
-import { PropertyFilters, PropertyObject } from 'utils/validation/types';
-import { create } from 'zustand';
-import appCss from '../styles.css?url';
-import { ThemeProvider, useTheme } from '@/components/providers/ThemeProvider';
-import { Toaster } from '@/components/ui/sonner';
-import { getHeaders } from '@tanstack/react-start/server';
-import { auth } from 'utils/auth';
-import { createServerFn } from '@tanstack/react-start';
-import { PostHogProvider, PostHogErrorBoundary } from 'posthog-js/react'
-import { PropertyFiltersObject } from 'utils/validation/propertyFilters';
-import { UserType } from 'utils/constants';
+export const getRootObjectsServerFn = createServerFn().handler(async ({ data: filters }) => {
+	const response = await fetch(
+		`https://api.elevenlabs.io/v1/convai/conversation/token?agent_id=${process.env.VITE_AGENT_ID}`,
+		{ headers: { "xi-api-key": process.env.ELEVENLABS_API_KEY } as any },
+	);
+	const body = await response.json();
 
-export const getRootObjectsServerFn = createServerFn().handler(async ({ data: filters, }) => {
-
-    const response = await fetch(
-        `https://api.elevenlabs.io/v1/convai/conversation/token?agent_id=${process.env.VITE_AGENT_ID}`,
-        { headers: { "xi-api-key": process.env.ELEVENLABS_API_KEY, } as any }
-    );
-    const body = await response.json();
-
-
-    return { token: body.token as string, }
-})
-
+	return { token: body.token as string };
+});
 
 export const Route = createRootRoute({
-    head: () => ({
-        meta: [
-            {
-                charSet: 'utf-8',
-            },
-            {
-                name: 'viewport',
-                content: 'width=device-width, initial-scale=1',
-            },
-            {
-                title: 'Doors Imobiliare',
-            },
-        ],
-        links: [
-            {
-                rel: 'stylesheet',
-                href: appCss,
-            },
-        ],
-    }),
-    notFoundComponent: (p) => <div>Not found</div>,
-    loader: async () => {
+	head: () => ({
+		meta: [
+			{
+				charSet: "utf-8",
+			},
+			{
+				name: "viewport",
+				content: "width=device-width, initial-scale=1",
+			},
+			{
+				title: "Doors Imobiliare",
+			},
+		],
+		links: [
+			{
+				rel: "stylesheet",
+				href: appCss,
+			},
+		],
+	}),
+	notFoundComponent: (p) => <div>Not found</div>,
+	loader: async () => {
+		return await getRootObjectsServerFn();
+	},
 
-        return await getRootObjectsServerFn()
-    },
+	shellComponent: RootComponent,
+});
 
-    shellComponent: RootComponent,
-})
-
-
-type ProgressBarTypeValues = { progress: number, totalSteps: number, checkedSteps: number }
+type ProgressBarTypeValues = { progress: number; totalSteps: number; checkedSteps: number };
 
 export const usePopoversOpenStore = create<{
-    aiChatbotOpen: boolean,
-    setAiChatbotOpen: (open: boolean) => void,
-    menuOpen: boolean,
-    setMenuOpen: (open: boolean) => void,
-    userType: typeof UserType[number],
-    setUserType: (p: typeof UserType[number]) => void,
+	aiChatbotOpen: boolean;
+	setAiChatbotOpen: (open: boolean) => void;
+	menuOpen: boolean;
+	setMenuOpen: (open: boolean) => void;
+	userType: (typeof UserType)[number];
+	setUserType: (p: (typeof UserType)[number]) => void;
 
-    progressBar: ProgressBarTypeValues | undefined,
-    setProgressBar: (p: ProgressBarTypeValues | undefined) => void,
+	progressBar: ProgressBarTypeValues | undefined;
+	setProgressBar: (p: ProgressBarTypeValues | undefined) => void;
 }>()((set) => ({
-    aiChatbotOpen: false, setAiChatbotOpen: (p) => set({ aiChatbotOpen: p }), menuOpen: false, setMenuOpen: (p) => set({ menuOpen: p }),
-    userType: 'buyer', setUserType: (p) => set({ userType: p }),
-    progressBar: undefined, setProgressBar: (p) => set({ progressBar: p }),
+	aiChatbotOpen: false,
+	setAiChatbotOpen: (p) => set({ aiChatbotOpen: p }),
+	menuOpen: false,
+	setMenuOpen: (p) => set({ menuOpen: p }),
+	userType: "buyer",
+	setUserType: (p) => set({ userType: p }),
+	progressBar: undefined,
+	setProgressBar: (p) => set({ progressBar: p }),
 }));
 
 export const usePropertyAddStore = create<{
-    partialProperty: Partial<PropertyObject>,
-    getPartialProperty: () => Partial<PropertyObject>,
-    setPartialProperty: (p: Partial<PropertyObject>) => void,
-    updatePropertyPhotos: (images: string[]) => Promise<void>,
-    setUpdatePropertyPhotos: (fn: (images: string[]) => Promise<void>) => void,
-    appendPartialProperty: (p: Partial<PropertyObject>) => void,
+	partialProperty: Partial<PropertyObject>;
+	getPartialProperty: () => Partial<PropertyObject>;
+	setPartialProperty: (p: Partial<PropertyObject>) => void;
+	updatePropertyPhotos: (images: string[]) => Promise<void>;
+	setUpdatePropertyPhotos: (fn: (images: string[]) => Promise<void>) => void;
+	appendPartialProperty: (p: Partial<PropertyObject>) => void;
 
-    titleAndDescResolver: ((title: string, description: string) => void) | undefined,
-    setTitleAndDescResolver: (fn: ((title: string, description: string) => void) | undefined) => void,
+	titleAndDescResolver: ((title: string, description: string) => void) | undefined;
+	setTitleAndDescResolver: (fn: ((title: string, description: string) => void) | undefined) => void;
 
-    titlesAndDescriptions: { title: string, description: string }[],
-    setTitlesAndDescriptions: (p: { title: string, description: string }[]) => void,
+	titlesAndDescriptions: { title: string; description: string }[];
+	setTitlesAndDescriptions: (p: { title: string; description: string }[]) => void;
 
+	postedStatus: { success: boolean; message: string } | undefined;
+	setPostedStatus: (p: { success: boolean; message: string } | undefined) => void;
 
-    postedStatus: { success: boolean, message: string } | undefined,
-    setPostedStatus: (p: { success: boolean, message: string } | undefined) => void,
-
-    propertyType: 'edit' | 'add-photos' | 'final-edit', setPropertyType: (p: 'edit' | 'add-photos' | 'final-edit') => void
+	propertyType: "edit" | "add-photos" | "final-edit";
+	setPropertyType: (p: "edit" | "add-photos" | "final-edit") => void;
 }>()((set, get) => ({
-    partialProperty: {},
-    setPartialProperty: (p) => set({ partialProperty: p }),
-    appendPartialProperty: (p) => { console.log('app', { ...get().partialProperty, ...p }); set({ partialProperty: { ...get().partialProperty, ...p } }) },
-    getPartialProperty: () => get().partialProperty,
+	partialProperty: {},
+	setPartialProperty: (p) => set({ partialProperty: p }),
+	appendPartialProperty: (p) => {
+		console.log("app", { ...get().partialProperty, ...p });
+		set({ partialProperty: { ...get().partialProperty, ...p } });
+	},
+	getPartialProperty: () => get().partialProperty,
 
-    postedStatus: undefined, setPostedStatus: (p) => set({ postedStatus: p }),
+	postedStatus: undefined,
+	setPostedStatus: (p) => set({ postedStatus: p }),
 
-    updatePropertyPhotos: async () => { },
-    setUpdatePropertyPhotos: (fn) => set({ updatePropertyPhotos: fn }),
+	updatePropertyPhotos: async () => {},
+	setUpdatePropertyPhotos: (fn) => set({ updatePropertyPhotos: fn }),
 
-    titleAndDescResolver: undefined, setTitleAndDescResolver: (fn) => set({ titleAndDescResolver: fn }),
+	titleAndDescResolver: undefined,
+	setTitleAndDescResolver: (fn) => set({ titleAndDescResolver: fn }),
 
-    titlesAndDescriptions: [],
-    setTitlesAndDescriptions: (p) => set({ titlesAndDescriptions: p }),
+	titlesAndDescriptions: [],
+	setTitlesAndDescriptions: (p) => set({ titlesAndDescriptions: p }),
 
-    propertyType: 'edit', setPropertyType: (e) => set({ propertyType: e }),
+	propertyType: "edit",
+	setPropertyType: (e) => set({ propertyType: e }),
 }));
-
-
-
-
 
 // Property Filters Contexts
 
-type UpdateFiltersFunction = (filters: PropertyFilters) => Promise<string>
+type UpdateFiltersFunction = (filters: PropertyFilters) => Promise<string>;
 
 export const usePropertyFilterStore = create<{
-    sendUpdate(str: string): void, setSendUpdate(fn: (str: string) => void): void
-    startConversation(): Promise<void>, endConversation(): Promise<void>
-    setStartConversation(fn: () => Promise<void>): void, setEndConversation(fn: () => Promise<void>): void
+	sendUpdate(str: string): void;
+	setSendUpdate(fn: (str: string) => void): void;
+	startConversation(): Promise<void>;
+	endConversation(): Promise<void>;
+	setStartConversation(fn: () => Promise<void>): void;
+	setEndConversation(fn: () => Promise<void>): void;
 
-    setDemoPropertyFilters(p: PropertyFiltersObject | undefined): void,
-    demoPropertyFilters: PropertyFiltersObject | undefined,
-}>()((set => ({
-    sendUpdate: (s) => { }, setSendUpdate: (fn) => { },
-    startConversation: async () => { }, endConversation: async () => { },
-    setStartConversation: (p) => set({ startConversation: p }),
-    setEndConversation: (p) => set({ endConversation: p }),
+	setDemoPropertyFilters(p: PropertyFiltersObject | undefined): void;
+	demoPropertyFilters: PropertyFiltersObject | undefined;
+}>()((set) => ({
+	sendUpdate: (s) => {},
+	setSendUpdate: (fn) => {},
+	startConversation: async () => {},
+	endConversation: async () => {},
+	setStartConversation: (p) => set({ startConversation: p }),
+	setEndConversation: (p) => set({ endConversation: p }),
 
-    setDemoPropertyFilters: (p) => set({ demoPropertyFilters: p }),
-    demoPropertyFilters: undefined,
-})));
+	setDemoPropertyFilters: (p) => set({ demoPropertyFilters: p }),
+	demoPropertyFilters: undefined,
+}));
 
-
-export const ElevenlabsTokenContext = createContext<{ token: string | undefined, setToken: (token: string | undefined) => void }>({ token: undefined, setToken: () => { } });
+export const ElevenlabsTokenContext = createContext<{
+	token: string | undefined;
+	setToken: (token: string | undefined) => void;
+}>({ token: undefined, setToken: () => {} });
 
 function RootComponent() {
-    // const { theme } = Route.useLoaderData();
+	// const { theme } = Route.useLoaderData();
 
-    return (
-        <ThemeProvider theme={'dark'}>
-            <RootDocument>
-                <Outlet />
-            </RootDocument>
-        </ThemeProvider>
-    );
+	return (
+		<ThemeProvider theme={"dark"}>
+			<RootDocument>
+				<Outlet />
+			</RootDocument>
+		</ThemeProvider>
+	);
 }
 
-
 export function RootDocument({ children }: { children: React.ReactNode }) {
-    const { token } = Route.useLoaderData();
-    const { theme } = useTheme();
+	const { token } = Route.useLoaderData();
+	const { theme } = useTheme();
 
-    const routerState = useRouterState();
+	const routerState = useRouterState();
 
-    const appWrapper = routerState.location.pathname.includes('/app');
+	const appWrapper = routerState.location.pathname.includes("/app");
 
-    return (
-        <html lang="en" className={theme} suppressHydrationWarning>
-            <head>
-                <HeadContent />
-            </head>
-            <body>
-                <PostHogProvider apiKey={import.meta.env.VITE_PUBLIC_POSTHOG_KEY} options={{
-                    api_host: import.meta.env.VITE_PUBLIC_POSTHOG_HOST,
-                    defaults: '2025-05-24',
-                }}>
-                    <PostHogErrorBoundary >
-                        <GoogleMapsProvider>
-                            <AutumnProvider betterAuthUrl={import.meta.env.VITE_BETTER_AUTH_URL}>
-                                <TRPCWrapper>
-                                    {appWrapper ? <AppRouteWrapper token={token}>{children}</AppRouteWrapper> : children}
-                                </TRPCWrapper>
-                            </AutumnProvider>
-                        </GoogleMapsProvider>
-
-                    </PostHogErrorBoundary>
-
-                </PostHogProvider>
-                <Toaster />
-                {!import.meta.env.PROD && <TanstackDevtools
-                    config={{
-                        position: 'bottom-right',
-                    }}
-                    plugins={[
-                        {
-                            name: 'Tanstack Router',
-                            render: <TanStackRouterDevtoolsPanel />,
-                        },
-                    ]}
-                />}
-                <Scripts />
-            </body>
-        </html>
-    )
+	return (
+		<html lang="en" className={theme} suppressHydrationWarning>
+			<head>
+				<HeadContent />
+			</head>
+			<body>
+				<PostHogProvider
+					apiKey={import.meta.env.VITE_PUBLIC_POSTHOG_KEY}
+					options={{
+						api_host: import.meta.env.VITE_PUBLIC_POSTHOG_HOST,
+						defaults: "2025-05-24",
+					}}
+				>
+					<PostHogErrorBoundary>
+						<GoogleMapsProvider>
+							<AutumnProvider betterAuthUrl={import.meta.env.VITE_BETTER_AUTH_URL}>
+								<TRPCWrapper>
+									{appWrapper ? <AppRouteWrapper token={token}>{children}</AppRouteWrapper> : children}
+								</TRPCWrapper>
+							</AutumnProvider>
+						</GoogleMapsProvider>
+					</PostHogErrorBoundary>
+				</PostHogProvider>
+				<Toaster />
+				{!import.meta.env.PROD && (
+					<TanstackDevtools
+						config={{
+							position: "bottom-right",
+						}}
+						plugins={[
+							{
+								name: "Tanstack Router",
+								render: <TanStackRouterDevtoolsPanel />,
+							},
+						]}
+					/>
+				)}
+				<Scripts />
+			</body>
+		</html>
+	);
 }

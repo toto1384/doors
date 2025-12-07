@@ -3,14 +3,14 @@ import { Link } from "@tanstack/react-router";
 import { CheckCircle } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useTRPC } from "trpc/react";
-import { authClient } from "utils/auth-client";
 import { useShallow } from "zustand/react/shallow";
-import { Badge } from "@/components/ui/badge";
-import { TimelineLayout } from "@/components/ui/timeline-layout";
-import { ElevenLabsChatBotDemo } from "@/components/userAndAi/aiChatbot";
-import { ComparisonTable } from "@/routes";
-import { usePropertyFilterStore } from "@/routes/__root";
+import { Badge } from "@/src/components/ui/badge";
+import { TimelineLayout } from "@/src/components/ui/timeline-layout";
+import { ElevenLabsChatBotDemo } from "@/src/components/userAndAi/aiChatbot";
+import { ComparisonTable } from "@/src/routes";
+import { usePropertyFilterStore } from "@/src/routes/__root";
+import { useTRPC } from "@/trpc/react";
+import { authClient } from "@/utils/auth-client";
 import { PropertiesView } from "../propertiesView";
 
 // Buyer Demo Section Component

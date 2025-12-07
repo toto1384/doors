@@ -2,9 +2,9 @@ import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 import { Link } from "@tanstack/react-router";
 import { ArrowLeft, ChevronRight, LogOut } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { authClient, useSignOutFunction } from "utils/auth-client";
 import { useShallow } from "zustand/react/shallow";
-import { usePopoversOpenStore } from "@/routes/__root";
+import { usePopoversOpenStore } from "@/src/routes/__root";
+import { authClient, useSignOutFunction } from "@/utils/auth-client";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "./ui/dropdown-menu";
 import { UserTypeSwitch } from "./userAndAi/userTypeSwitch";
 

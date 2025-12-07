@@ -1,151 +1,141 @@
+import { act, cleanup, fireEvent, screen, waitFor } from "@testing-library/react";
 import { ReactNode } from "react";
-import { useConversation } from "utils/hooks/mockElevenlabsHook";
-import { describe, expect, it, vi, afterEach, beforeEach } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { useConversation } from "@/utils/hooks/mockElevenlabsHook";
 import { renderWithRouter } from "../../../setupTests.tsx";
-import { act, screen, cleanup, fireEvent, waitFor } from '@testing-library/react';
-import { Route as PropertyAddRoute } from '../../../src/routes/app/properties/add';
+import { Route as PropertyAddRoute } from "../../../src/routes/app/properties/add";
 import AppRouteWrapper from "../appWrapper.tsx";
 
-vi.mock('@elevenlabs/react', async (original) => {
-    const originalImport: any = await original();
+vi.mock("@elevenlabs/react", async (original) => {
+	const originalImport: any = await original();
 
-
-    return {
-        ...originalImport,
-        useConversation: vi.fn(useConversation({ flow: 'seller' })),
-    };
+	return {
+		...originalImport,
+		useConversation: vi.fn(useConversation({ flow: "seller" })),
+	};
 });
 
-vi.mock('utils/auth-client', () => ({
-    authClient: {
-        useSession: vi.fn(() => ({
-            data: {
-                user: {
-                    id: 'test-user-id',
-                    name: 'Test User',
-                    email: 'test@example.com',
-                    userType: 'buyer'
-                }
-            },
-            isPending: false
-        }))
-    }
+vi.mock("utils/auth-client", () => ({
+	authClient: {
+		useSession: vi.fn(() => ({
+			data: {
+				user: {
+					id: "test-user-id",
+					name: "Test User",
+					email: "test@example.com",
+					userType: "buyer",
+				},
+			},
+			isPending: false,
+		})),
+	},
 }));
 
 const PropertyAdd = PropertyAddRoute.options.component as () => ReactNode;
 
-describe('AI Chatbot', () => {
-    let file: File;
+describe("AI Chatbot", () => {
+	let file: File;
 
-    beforeEach(() => {
-        file = new File(["(⌐□_□)"], "chucknorris.png", { type: "image/png" });
-    });
+	beforeEach(() => {
+		file = new File(["(⌐□_□)"], "chucknorris.png", { type: "image/png" });
+	});
 
-    afterEach(() => {
-        cleanup();
-        vi.clearAllMocks();
-    });
-    it('should render the AI Chatbot component', async () => {
+	afterEach(() => {
+		cleanup();
+		vi.clearAllMocks();
+	});
+	it("should render the AI Chatbot component", async () => {
+		await renderWithRouter(
+			<>
+				<AppRouteWrapper token="test">
+					<PropertyAdd />
+				</AppRouteWrapper>
+			</>,
+			{
+				initialLocation: "/app/properties/add",
+				mockRoute: {
+					path: "/app/properties/add", // restricted to available route paths
+					loaderData: undefined, // fully typed
+				},
+			},
+		);
 
-        await renderWithRouter(
-            <>
-                <AppRouteWrapper token="test">
-                    <PropertyAdd />
-                </AppRouteWrapper>
-            </>
-            , {
-                initialLocation: "/app/properties/add",
-                mockRoute: {
-                    path: "/app/properties/add", // restricted to available route paths
-                    loaderData: undefined, // fully typed
-                },
-            });
+		const startButton = screen.queryByText("Start Conversation");
 
-        const startButton = screen.queryByText('Start Conversation')
+		expect(startButton).toBeInTheDocument();
 
-        expect(startButton).toBeInTheDocument()
+		await act(async () => {
+			startButton?.click();
+		});
 
-        await act(async () => {
-            startButton?.click()
-        })
+		const houseButton = screen.queryByText("House", { selector: "button" });
 
+		expect(houseButton).toBeInTheDocument();
 
-        const houseButton = screen.queryByText('House', { selector: 'button' })
+		await act(async () => {
+			houseButton?.click();
+		});
 
-        expect(houseButton).toBeInTheDocument()
+		console.log("screen", screen.getAllByText("Electric"));
+		const electricButton = screen.queryByText("Electric");
 
-        await act(async () => {
-            houseButton?.click()
-        })
+		expect(electricButton).toBeInTheDocument();
 
+		await act(async () => {
+			electricButton?.click();
+		});
 
-        console.log('screen', screen.getAllByText('Electric'))
-        const electricButton = screen.queryByText('Electric')
+		const facilityButtons = ["Parking", "Air Conditioning", "Central Heating", "Furnished"];
 
-        expect(electricButton).toBeInTheDocument()
+		for (const buttonText of facilityButtons) {
+			const button = screen.queryByText(buttonText);
+			expect(button).toBeInTheDocument();
+			await act(async () => {
+				button?.click();
+			});
+		}
 
-        await act(async () => {
-            electricButton?.click();
-        });
+		const doneButton = screen.queryByText("Done");
 
-        const facilityButtons = ["Parking", "Air Conditioning", "Central Heating", "Furnished"]
+		expect(doneButton).toBeInTheDocument();
 
-        for (const buttonText of facilityButtons) {
-            const button = screen.queryByText(buttonText)
-            expect(button).toBeInTheDocument()
-            await act(async () => {
-                button?.click()
-            })
-        }
+		await act(async () => {
+			doneButton?.click();
+		});
 
-        const doneButton = screen.queryByText('Done')
+		const doneButton2 = screen.queryByTestId("submit-done");
 
-        expect(doneButton).toBeInTheDocument()
+		console.log("doneButton2", doneButton2);
 
-        await act(async () => {
-            doneButton?.click()
-        })
+		expect(doneButton2).toBeInTheDocument();
 
+		await act(async () => {
+			doneButton2?.click();
+		});
 
-        const doneButton2 = screen.queryByTestId('submit-done')
+		const browseButtom = screen.queryByText("Browse");
+		expect(browseButtom).toBeInTheDocument();
 
-        console.log('doneButton2', doneButton2)
+		const uploader = screen.getByTestId("image-upload-input");
 
-        expect(doneButton2).toBeInTheDocument()
+		// simulate upload event and wait until finish
+		await waitFor(() =>
+			fireEvent.change(uploader, {
+				target: { files: [file] },
+			}),
+		);
 
-        await act(async () => {
-            doneButton2?.click()
-        })
+		// check if the file is there
+		expect(uploader).toBeInTheDocument();
+		expect((uploader as any)?.files?.[0].name).toBe("chucknorris.png");
+		expect((uploader as any)?.files?.length).toBe(1);
 
-        const browseButtom = screen.queryByText('Browse')
-        expect(browseButtom).toBeInTheDocument()
+		const doneButton3 = screen.queryByTestId("done-image-button");
 
+		expect(doneButton3).toBeInTheDocument();
 
-        const uploader = screen.getByTestId('image-upload-input')
-
-
-        // simulate upload event and wait until finish
-        await waitFor(() =>
-            fireEvent.change(uploader, {
-                target: { files: [(file)] },
-            })
-        );
-
-        // check if the file is there
-        expect(uploader).toBeInTheDocument();
-        expect((uploader as any)?.files?.[0].name).toBe("chucknorris.png");
-        expect((uploader as any)?.files?.length).toBe(1);
-
-
-        const doneButton3 = screen.queryByTestId('done-image-button')
-
-        expect(doneButton3).toBeInTheDocument()
-
-        await act(async () => {
-            doneButton3?.click()
-        })
-
-
-    });
+		await act(async () => {
+			doneButton3?.click();
+		});
+	});
 });
-
