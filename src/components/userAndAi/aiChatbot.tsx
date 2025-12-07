@@ -1,19 +1,17 @@
-import { useConversation } from "@elevenlabs/react";
 import { useQuery } from "@tanstack/react-query";
-import { useRouter, useRouterState } from "@tanstack/react-router";
 import { nanoid } from "nanoid";
 import { createContext, ReactNode, useCallback, useEffect, useState } from "react";
 import { useShallow } from "zustand/react/shallow";
 import { usePropertyAddStore, usePropertyFilterStore } from "@/src/routes/__root";
-import { useTRPC, useTRPCClient } from "@/trpc/react";
+import {  useTRPCClient } from "@/trpc/react";
 import { UserType } from "@/utils/constants";
-import { searchLocationByString } from "@/utils/googleMapsUtils";
 import useDidMountEffect from "@/utils/hooks/useDidMountEffect";
-import { PropertyFilters, UserObject } from "@/utils/validation/types";
+import {  UserObject } from "@/utils/validation/types";
 import i18n from "../i18n";
 import { ChatComponent } from "./chatComponent";
 import { useChooseActions } from "./useChooseActionsAiHook";
 import { useSetPropertyFunctions } from "./usePostPropertyAiHook";
+import { useConversation } from "@elevenlabs/react";
 // import { useConversation as uc } from 'utils/hooks/mockElevenlabsHook';
 // const useConversation = uc({ flow: 'buyer' })
 
@@ -173,7 +171,7 @@ export function ElevenLabsChatBotDemo<T extends boolean>({
 				tokenQuery.refetch().then((_) => start(_.data?.token ?? ""));
 			}
 		}
-	}, [conversation, tokenQuery.data.token]);
+	}, [conversation, tokenQuery.data.token, ]);
 
 	useDidMountEffect(() => {
 		if (conversation.status !== "connected") setMessages([]);

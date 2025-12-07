@@ -60,7 +60,8 @@ export const usePublishPropertyHook = ({ demoVersion }: { demoVersion?: boolean 
 				router.navigate({ to: "/app/my-properties" });
 			}
 			await endConversation();
-			queryClient.invalidateQueries({ queryKey: ["my-properties", "auth.getToken"] });
+			queryClient.invalidateQueries({ queryKey: ["my-properties"] });
+            queryClient.invalidateQueries({ queryKey: ["auth.getToken"] });
 			return JSON.stringify(result);
 		} catch (error) {
 			console.log("error", error);

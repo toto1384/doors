@@ -11,7 +11,6 @@ import {
 	RegisteredRouter,
 	RouterProvider,
 } from "@tanstack/react-router";
-import { ReactNode } from "react";
 import { TRPCWrapper } from "@/src/components/providers/TrpcWrapper.tsx";
 import i18n from "./src/components/i18n";
 

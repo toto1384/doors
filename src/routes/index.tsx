@@ -3,17 +3,17 @@ import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
 import { Search, Bot, Zap, Eye, DollarSign, Home, Star, ArrowRight, Menu, X, Shield, Atom, Focus, CheckCircle, ChevronDown, Check } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { authClient } from 'utils/auth-client';
+import { authClient } from '@/utils/auth-client';
 import '../components/i18n';
-import { TimelineLayout } from '@/components/ui/timeline-layout';
-import { BuyerBenefitsSection, BuyerDemoSection, BuyerPricingSection } from '@/components/pages/landing/buyerComponents';
-import { Header } from '@/components/pages/landing/headerLanding';
+import { TimelineLayout } from '@/src/components/ui/timeline-layout';
+import { BuyerBenefitsSection, BuyerDemoSection, BuyerPricingSection } from '@/src/components/pages/landing/buyerComponents';
+import { Header } from '@/src/components/pages/landing/headerLanding';
 import { createServerFn } from '@tanstack/react-start';
-import { ElevenLabsChatBotDemo } from '@/components/userAndAi/aiChatbot';
+import { ElevenLabsChatBotDemo } from '@/src/components/userAndAi/aiChatbot';
 import { usePropertyFilterStore } from './__root';
 import { useShallow } from 'zustand/react/shallow';
-import { PropertyAddView } from '@/components/pages/propertyAddView';
-import { Button } from '@/components/ui/button';
+import { PropertyAddView } from '@/src/components/pages/propertyAddView';
+import { Button } from '@/src/components/ui/button';
 import { QueryClient, useQueryClient } from '@tanstack/react-query';
 
 

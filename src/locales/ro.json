@@ -10,7 +10,7 @@
       },
       "subtitle": "DOORS readuce controlul acolo unde îi este locul — în mâinile cumpărătorilor și vânzătorilor.",
       "description": "Fără agenți. Fără comisioane. Doar tu, asistentul tău personal Doors și o platformă care face cumpărarea sau vânzarea locuinței mai rapidă, clară și complet fără stres.",
-      "startConversation": "Incepe Conversatia",
+      "startConversation": "Încearcă Demo-ul",
       "talkToAna": "Vorbește cu Ana",
       "freeDemo": "Încearcă demo gratuit. Nu este necesar cont",
       "actionSelector": {
@@ -29,7 +29,7 @@
     },
     "benefits": {
       "buyer": {
-        "title": "De câte ori ai simțit că lumea imobiliară e construită să te încurce, nu să te ajute?",
+        "title": "De câte ori ai simțit ca schimbarea locuinței e mai dificilă decât ar trebui să fie?",
         "subtitle": "Cumpărarea unei locuințe ar trebui să fie o experiență plăcută — dar adesea se transformă într-un maraton de frustrare și timp pierdut.",
         "problemList": [
           "Discuții nesfârșite cu diferiți agenți",
@@ -44,7 +44,7 @@
         "conclusion": "Într-o piață complicată, DOORS readuce simplitatea.",
         "solutionTitle": "Asistentul tău imobiliar personal, mereu disponibil și mereu sincer.",
         "solutionDescription": "DOORS elimină haosul. Asistentul nostru empatic și profesionist ascultă, îți înțelege nevoile și îți găsește instant proprietăți care se potrivesc cu adevărat preferințelor tale — fără intermediari, fără presiune, fără comisioane.",
-        "beforeDoorsTitle": "Înainte de DOORS — Lupta cu piața imobiliară",
+        "beforeDoorsTitle": "Înainte de DOORS — Experiența cu piața imobiliară",
         "whyDoorsTitle": "De ce DOORS — Cumpără mai inteligent",
         "realBenefits": {
           "title": "Beneficii reale:",

@@ -1,4 +1,4 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useShallow } from "zustand/react/shallow";
@@ -8,6 +8,7 @@ import { UserType } from "@/utils/constants";
 
 export function UserTypeSwitch({ extraPadding }: { extraPadding?: boolean }) {
 	const { t } = useTranslation("translation", { keyPrefix: "app-wrapper" });
+    const queryClient = useQueryClient();
 
 	const { userType: gUserType, setUserType } = usePopoversOpenStore(
 		useShallow((state) => ({
@@ -23,6 +24,7 @@ export function UserTypeSwitch({ extraPadding }: { extraPadding?: boolean }) {
 		try {
 			setUserType(userType);
 			const res = await changeUserTypeMutation.mutateAsync({ userType });
+            queryClient.invalidateQueries({ queryKey: ["auth.getToken"] });
 		} catch (error) {
 			console.log("error", error);
 		}
