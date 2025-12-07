@@ -117,10 +117,12 @@ export const ChatComponent = ({
 					<ConversationContent className="bg-transparent p-0 min-h-full flex flex-col ">
 						{messages.length === 0 && agentState !== "stopped" && (
 							<div className="flex flex-col min-h-full grow-1 flex-1 items-center justify-center">
+                                <div className="bg-[#525252]/10 rounded-full p-2 ">
 								<img
-									src={"/doors-logo.png"}
-									className="w-[100px] h-[100px] object-contain bg-[#525252]/50 text-white opacity-70 rounded-full p-2 object-center"
+									src={"/android-chrome-512x512.png"}
+									className="w-[100px] h-[100px] object-contain object-center"
 								/>
+                                </div>
 								<p className="text-gray-400 text-center mt-3">{t("ai-chatbot.assistantNotStarted")}</p>
 							</div>
 							/*<div className="flex flex-col min-h-full grow-1 flex-1 p-2 justify-center items-center">
