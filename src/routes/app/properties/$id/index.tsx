@@ -459,7 +459,7 @@ function PropertyImageGallery({
 	const { t } = useTranslation();
 	const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
-	const [isDialogOpen, setIsDialogOpen] = useState(true);
+	const [isDialogOpen, setIsDialogOpen] = useState(false);
 
 	const size = useSize(true);
 
