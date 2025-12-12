@@ -33,7 +33,8 @@ export const BuyerDemoSection = ({ token }: { token: string }) => {
 			<div className="max-w-7xl mx-auto px-2 md:px-6 flex flex-col items-center">
 				{/* Try Demo Section */}
 				<div className="text-center bg-gradient-to-br from-blue-500/20 to-purple-600/20 rounded-lg p-2 md:p-8 max-w-5xl w-full mx-auto">
-					<h3 className="text-2xl font-semibold text-white mb-4">{t("landing-page.demo.buyer.tryDemo.title")}</h3>
+					<h2 className="text-3xl font-medium mb-3">{t("landing-page.demo.try.title")}</h2>
+					<h3 className="text-xl font-semibold text-white mb-4">{t("landing-page.demo.buyer.tryDemo.title")}</h3>
 
 					<div className="flex md:hidden flex-row items-center w-fit mx-auto gap-6 rounded-lg p-2 bg-gradient-to-br from-green-500/20 to-blue-600/20 text-white">
 						<button
@@ -167,7 +168,7 @@ export const FoundSomethingYouLikeSection: React.FC = () => {
 						<div key={index} className="bg-[#120826] rounded-lg p-6 text-center relative">
 							{service.comingSoon && (
 								<Badge variant="destructive" className="absolute top-1.5 right-1.5">
-									Coming Soon
+									{t('landing-page.footer.comingSoon')}
 								</Badge>
 							)}
 							<div className="text-4xl mb-4">{service.icon}</div>

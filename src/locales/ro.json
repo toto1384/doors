@@ -86,6 +86,13 @@
       }
     },
     "demo": {
+      "watch": {
+        "title": "Vizioneaza Demo"
+      },
+      "try": {
+        "title": "Incearca Demo"
+      },
+      "or": "sau",
       "tabs": {
         "agent": "Agent",
         "results": "Results",
@@ -259,7 +266,8 @@
         "terms": "Termeni și condiții",
         "privacy": "Politica și confidențialitate"
       },
-      "copyright": "© DOORS 2025. Toate drepturile rezervate."
+      "copyright": "© DOORS 2025. Toate drepturile rezervate.",
+      "comingSoon": "În curând"
     }
   },
   "register-page": {
@@ -399,7 +407,16 @@
     "myProperties": "Proprietățile mele",
     "myAppointments": "Programările mele",
     "manageBookings": "Gestionare rezervări",
-    "billing": "Facturare"
+    "billing": "Facturare",
+    "favorites": "Favorite",
+    "verifyPhoneNumber": "Verifică numărul tău de telefon",
+    "savePhoneNumber": "Salvează numărul de telefon",
+    "success": {
+      "phoneNumber": "Numărul de telefon a fost verificat cu succes"
+    },
+    "form": {
+      "phoneNumber": "Număr de telefon"
+    }
   },
   "ai-chatbot": {
     "assistant": "Asistent Doors",
@@ -466,7 +483,29 @@
   "privacy-policy": {
     "title": "Politica de Confidențialitate",
     "lastUpdated": "Ultima actualizare: {date}",
-    "introduction": "Această Politică de Confidențialitate descrie modul în care colectăm, folosim și protejăm informațiile dvs."
+    "introduction": "Această Politică de Confidențialitate descrie modul în care colectăm, folosim și protejăm informațiile dvs.",
+    "cookies": {
+      "title": "Cookie-uri",
+      "content": "Site-ul utilizează cookie-uri pentru funcționalitate, analiză trafic și personalizarea experienței. Utilizatorul poate modifica setările cookie-urilor din browser. Pentru detalii suplimentare, consultați Politica de Cookie-uri disponibilă pe site."
+    },
+    "internationalTransfers": {
+      "title": "Transferuri internaționale",
+      "content": "Dacă furnizorii noștri utilizează servere în afara UE, ne asigurăm că există garanții adecvate (Clauze Contractuale Standard sau decizii de adecvare GDPR)."
+    },
+    "modifications": {
+      "title": "Modificări ale politicii",
+      "content": "URMA CONSULTING S.R.L. poate actualiza această politică periodic. Versiunea curentă este publicată pe www.doorsimobiliare.ro."
+    },
+    "authority": {
+      "title": "Autoritate de supraveghere",
+      "content": "Utilizatorii pot depune plângeri la Autoritatea Națională de Supraveghere a Prelucrării Datelor cu Caracter Personal (www.dataprotection.ro)."
+    },
+    "contact": {
+      "title": "Contact",
+      "company": "URMA CONSULTING S.R.L. – DOORS",
+      "address": "Str. Pavel Roșca nr. 4, Ap. 28, Cluj-Napoca, Jud. Cluj",
+      "email": "doorsimobiliare@gmail.com"
+    }
   },
   "terms-of-service": {
     "title": "Termenii Serviciului",

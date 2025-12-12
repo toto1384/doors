@@ -1,10 +1,21 @@
+import * as Dialog from "@radix-ui/react-dialog";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { getHeaders } from "@tanstack/react-start/server";
 import { CheckoutDialog, useCustomer } from "autumn-js/react";
 import { addDays, endOfDay, format, isAfter, isBefore, isWithinInterval, parse, startOfDay } from "date-fns";
-import { Armchair, CalendarRange, MapPin, MessageCircle, Phone, SquareArrowUp } from "lucide-react";
+import {
+	Armchair,
+	CalendarRange,
+	ChevronLeft,
+	ChevronRight,
+	MapPin,
+	MessageCircle,
+	Phone,
+	SquareArrowUp,
+	X,
+} from "lucide-react";
 import { ReactNode, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
@@ -14,10 +25,12 @@ import { ImageFallback } from "@/src/components/basics/imageFallback";
 import { BathIcon, BedIcon, PropertyFeatureIcon, SurfaceAreaIcon } from "@/src/components/icons/propertyIcons";
 import { GoogleMapPreview } from "@/src/components/maps/GoogleMapPreview";
 import { ViewingScheduleModal } from "@/src/components/scheduling/ViewingScheduleModal";
+import { Badge } from "@/src/components/ui/badge";
 import { Button } from "@/src/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/src/components/ui/card";
 import { auth } from "@/utils/auth";
 import { bypassLimitations } from "@/utils/constants";
+import useDidMountEffect from "@/utils/hooks/useDidMountEffect";
 import { useSize } from "@/utils/hooks/useSize";
 import { formatPrice } from "@/utils/mainUtils";
 import { PropertyObject, UserObject } from "@/utils/validation/types";
@@ -53,7 +66,17 @@ export const Route = createFileRoute("/app/properties/$id/")({
 	},
 });
 
-export const ScheduleViewComponent = ({ id, property }: { id: string; property: Partial<PropertyObject> }) => {
+export const ScheduleViewComponent = ({
+	id,
+	property,
+	ownProperty,
+	big,
+}: {
+	ownProperty: boolean;
+	id: string;
+	property: Partial<PropertyObject>;
+	big?: boolean;
+}) => {
 	const { t } = useTranslation();
 
 	const trpc = useTRPC();
@@ -108,43 +131,46 @@ export const ScheduleViewComponent = ({ id, property }: { id: string; property: 
 		<>
 			{!bypassLimitations && sellerAvailability?.alreadyScheduled ? (
 				<>
-					<Button
-						className="bg-gradient-to-br from-[#4C7CED]/50 to-[#7B31DC]/50 text-white text-xs px-4 py-2 rounded-[6px]"
+					<button
+						className="bg-gradient-to-br from-[#4C7CED]/50 to-[#7B31DC]/50 text-white text-xs px-4 py-3 rounded-[6px]"
 						disabled
 					>
 						{t("units.scheduled")}: {sellerAvailability.alreadyScheduled.startTime} -{" "}
 						{sellerAvailability.alreadyScheduled.endTime} :{" "}
 						{format(sellerAvailability.alreadyScheduled.date, "dd-MM-yyyy")}
-					</Button>
+					</button>
 				</>
 			) : (
-				<Button
-					className="bg-gradient-to-br from-[#4C7CED] to-[#7B31DC] text-white text-xs px-4 py-2 rounded-[6px]"
-					onClick={async () => {
-						const { data } = check({
-							featureId: "appointmnts",
-							dialog: (props: any) => (
-								<PaywallDialog
-									{...props}
-									title={t("property-page.paywall.title")}
-									message={t("property-page.paywall.message")}
-									buttonText={t("property-page.paywall.buttonText")}
-									onClick={async () => {
-										toast(t("units.openingCheckout"));
-										await attach({
-											productId: "pro_plan",
-											forceCheckout: true,
-											successUrl: `${import.meta.env.VITE_BETTER_AUTH_URL}/app/properties/${id}`,
-										});
-									}}
-								/>
-							),
-						});
-						if (data.allowed) setIsScheduleModalOpen(true);
-					}}
-				>
-					{t("property-page.scheduleViewing")}
-				</Button>
+				!ownProperty &&
+				!bypassLimitations && (
+					<button
+						className={`bg-gradient-to-br from-[#4C7CED] to-[#7B31DC] text-white text-xs px-4 py-3 rounded-[6px] ${big && "w-full"}`}
+						onClick={async () => {
+							const { data } = check({
+								featureId: "appointmnts",
+								dialog: (props: any) => (
+									<PaywallDialog
+										{...props}
+										title={t("property-page.paywall.title")}
+										message={t("property-page.paywall.message")}
+										buttonText={t("property-page.paywall.buttonText")}
+										onClick={async () => {
+											toast(t("units.openingCheckout"));
+											await attach({
+												productId: "pro_plan",
+												forceCheckout: true,
+												successUrl: `${import.meta.env.VITE_BETTER_AUTH_URL}/app/properties/${id}`,
+											});
+										}}
+									/>
+								),
+							});
+							if (data.allowed) setIsScheduleModalOpen(true);
+						}}
+					>
+						{t("property-page.scheduleViewing")}
+					</button>
+				)
 			)}
 
 			{/* Viewing Schedule Modal */}
@@ -194,14 +220,22 @@ function PropertyDetailRoute() {
 				ownProperty={loaderData.ownProperty}
 			/>
 			{/* Image Gallery */}
-			<PropertyImageGallery property={property} />
+			<PropertyImageGallery
+				property={property}
+				ownProperty={loaderData.ownProperty}
+				scheduleViewingButton={
+					<ScheduleViewComponent big ownProperty={loaderData.ownProperty} id={id} property={property} />
+				}
+			/>
 
 			<div className="grid grid-cols-1 m:grid-cols-3">
 				<div className="md:col-spa-2">
 					<PropertyInfo
 						property={property}
 						additionalSpacing
-						additionalComponent={<ScheduleViewComponent id={id} property={property} />}
+						additionalComponent={
+							<ScheduleViewComponent ownProperty={loaderData.ownProperty} id={id} property={property} />
+						}
 					/>
 					<DescriptionSection property={property} />
 					<FeaturesSection property={property} />
@@ -413,8 +447,19 @@ function PropertyHeader({
 }
 
 // Component: Property Images Gallery
-function PropertyImageGallery({ property }: { property: PropertyObject }) {
+function PropertyImageGallery({
+	property,
+	scheduleViewingButton,
+	ownProperty,
+}: {
+	property: PropertyObject;
+	scheduleViewingButton: ReactNode;
+	ownProperty: boolean;
+}) {
+	const { t } = useTranslation();
 	const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+
+	const [isDialogOpen, setIsDialogOpen] = useState(true);
 
 	const size = useSize(true);
 
@@ -443,17 +488,118 @@ function PropertyImageGallery({ property }: { property: PropertyObject }) {
 		return () => observer.disconnect();
 	}, []);
 
+	function setPhotoIndex(index: number) {
+		if (index < 0) index = 0;
+		if (index > property.imageUrls.length - 1) index = property.imageUrls.length - 1;
+		setSelectedImageIndex(index);
+		if (!size.gmd)
+			document.querySelector(`#photo-${index}`)?.scrollIntoView({
+				behavior: "smooth",
+				inline: "center",
+			});
+		setTimeout(() => {
+			document.querySelector(`#photo-overlay-${index}`)?.scrollIntoView({
+				behavior: "smooth",
+				inline: "center",
+			});
+		}, 100);
+	}
+
+	const thumbNailStrip = (
+		<div className=" gap-2 mt-2 overflow-x-auto flex px-4 md:px-0">
+			{property.imageUrls.map((url, index) => (
+				<div
+					key={index}
+					className={`flex-shrink-0 w-16 h-16 bg-gray-800 rounded-lg overflow-hidden cursor-pointer border-2 ${selectedImageIndex === index ? "border-[#7B31DC]" : "border-transparent"}`}
+					onClick={() => {
+						setPhotoIndex(index);
+					}}
+				>
+					<ImageFallback src={url} className="w-full h-full object-cover" alt={`Thumbnail ${index + 1}`} />
+				</div>
+			))}
+		</div>
+	);
+
 	return (
 		<div className="md:px-4 mb-6">
 			{/* Main Image */}
 
+			<Dialog.Root open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+				<Dialog.Portal>
+					{/*<Dialog.Overlay className="DialogOverlay" />*/}
+					<Dialog.Content className=" fixed inset-0 bg-[#0B0014] md:p-5 flex flex-col pt-20 md:pt-0 md:justify-center">
+						<Dialog.Title className="text-2xl md:ml-[50px] mb-3 mx-5">{property.title}</Dialog.Title>
+						<div className=" flex flex-col justify-between md:justify-start md:flex-row gap-5">
+							<div className="flex flex-col">
+								<div className="flex flex-row  items-center gap-2 mx-auto">
+									<div
+										className={`p-3 rounded-lg hidden md:block select-none touch-none ${selectedImageIndex != 0 && "bg-white/10 hover:bg-white/20 cursor-pointer "}`}
+										onClick={() => setPhotoIndex(selectedImageIndex - 1)}
+									>
+										<ChevronLeft className="w-5 h-5 text-white " />
+									</div>
+									<div className="flex flex-row items-center snap-x snap-mandatory overflow-x-scroll no-scrollbar w-[90dvw] md:w-[60dvw]">
+										{property.imageUrls.map((i, ind) => (
+											<div
+												className={`bg-gray-800 snap-center min-w-[90dvw] md:min-w-[60dvw] ${nonSelected[0] && "mr-2"} overflow-hidden flex items-center justify-center`}
+												id={`photo-overlay-${ind}`}
+											>
+												<ImageFallback
+													src={i}
+													className="w-full h-full object-cover aspect-[3/2] rounded-lg"
+													alt="Property main view"
+												/>
+											</div>
+										))}
+									</div>
+									<div
+										className={`p-3 rounded-lg hidden md:block select-none touch-none ${selectedImageIndex != property.imageUrls.length - 1 && "bg-white/10 hover:bg-white/20 cursor-pointer "}`}
+										onClick={() => setPhotoIndex(selectedImageIndex + 1)}
+									>
+										<ChevronRight className="w-5 h-5 text-white " />
+									</div>
+								</div>
+								<div className="md:ml-[50px]">{thumbNailStrip}</div>
+							</div>
+
+							<div className="flex flex-col w-full px-3 items-center gap-2">
+								{scheduleViewingButton}
+								{(!ownProperty || !bypassLimitations) && (
+									<button className="bg-gradient-to-br relative from-[#4C7CED] to-[#7B31DC] text-white text-xs px-4 py-3 w-full mt-3 rounded-[6px]">
+										<Badge variant="destructive" className="absolute -top-1.5 -right-1.5">
+											{t("landing-page.footer.comingSoon")}
+										</Badge>
+										Pune o intrebare
+									</button>
+								)}
+							</div>
+						</div>
+						<div className="absolute top-10 right-10">
+							<Dialog.Close asChild>
+								<X className="w-6 h-6" />
+							</Dialog.Close>
+						</div>
+					</Dialog.Content>
+				</Dialog.Portal>
+			</Dialog.Root>
+
+			{/* Mobile image gallery */}
 			<div className="flex flex-row items-center snap-x snap-mandatory overflow-x-scroll md:hidden">
 				{property.imageUrls.map((i, ind) => (
 					<div
 						className={`bg-gray-800 snap-center min-w-[100dvw] ${nonSelected[0] && "mr-2"} overflow-hidden h-80 flex items-center justify-center`}
 						id={`photo-${ind}`}
 					>
-						<ImageFallback src={i} className="w-full h-full object-cover" alt="Property main view" />
+						<ImageFallback
+							onClick={() => {
+								setPhotoIndex(ind);
+								setIsDialogOpen(true);
+							}}
+							src={i}
+							className="w-full h-full object-cover"
+							alt="Property main view"
+						/>
 					</div>
 				))}
 			</div>
@@ -464,6 +610,10 @@ function PropertyImageGallery({ property }: { property: PropertyObject }) {
 						<ImageFallback
 							src={property.imageUrls[selectedImageIndex] || property.imageUrls[0]}
 							className="w-full h-full object-cover"
+							onClick={() => {
+								setPhotoIndex(selectedImageIndex);
+								setIsDialogOpen(true);
+							}}
 							alt="Property main view"
 						/>
 					</div>
@@ -477,7 +627,10 @@ function PropertyImageGallery({ property }: { property: PropertyObject }) {
 								<ImageFallback
 									src={nonSelected[0]}
 									className="w-full h-full object-cover cursor-pointer hover:opacity-80"
-									onClick={() => setSelectedImageIndex(property.imageUrls.findIndex((i) => i === nonSelected[0]))}
+									onClick={() => {
+										setPhotoIndex(property.imageUrls.findIndex((i) => i === nonSelected[0]));
+										setIsDialogOpen(true);
+									}}
 									alt="Property view 2"
 								/>
 							</div>
@@ -487,7 +640,10 @@ function PropertyImageGallery({ property }: { property: PropertyObject }) {
 								<ImageFallback
 									src={nonSelected[1]}
 									className="w-full h-full object-cover cursor-pointer hover:opacity-80"
-									onClick={() => setSelectedImageIndex(property.imageUrls.findIndex((i) => i === nonSelected[1]))}
+									onClick={() => {
+										setPhotoIndex(property.imageUrls.findIndex((i) => i === nonSelected[1]));
+										setIsDialogOpen(true);
+									}}
 									alt="Property view 3"
 								/>
 							</div>
@@ -496,25 +652,7 @@ function PropertyImageGallery({ property }: { property: PropertyObject }) {
 				)}
 			</div>
 
-			{/* Thumbnail Strip */}
-			<div className=" gap-2 mt-2 overflow-x-auto flex px-4 md:px-0">
-				{property.imageUrls.slice(0, 4).map((url, index) => (
-					<div
-						key={index}
-						className={`flex-shrink-0 w-16 h-16 bg-gray-800 rounded-lg overflow-hidden cursor-pointer border-2 ${selectedImageIndex === index ? "border-[#7B31DC]" : "border-transparent"}`}
-						onClick={() => {
-							setSelectedImageIndex(index);
-							if (!size.gmd)
-								document.querySelector(`#photo-${index}`)?.scrollIntoView({
-									behavior: "smooth",
-									inline: "center",
-								});
-						}}
-					>
-						<ImageFallback src={url} className="w-full h-full object-cover" alt={`Thumbnail ${index + 1}`} />
-					</div>
-				))}
-			</div>
+			{thumbNailStrip}
 		</div>
 	);
 }

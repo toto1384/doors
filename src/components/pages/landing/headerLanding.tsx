@@ -30,10 +30,10 @@ export const Header: React.FC = () => {
 		>
 			<div className="max-w-[1200px] mx-auto md:px-6 py-1">
 				<div className="flex items-center justify-between">
-					<Link to="/" className="flex items-center space-x-2">
+					<Link to="/" className="flex items-center space-x-2 h-16">
 						<img
 							src="/doors-logo.png"
-							className="w-28 h-16 object-cover object-center flex items-center justify-center"
+							className={`${!isScrolled && "hidden"} w-28 h-16 object-cover object-center flex items-center justify-center`}
 						/>
 					</Link>
 

@@ -6,6 +6,7 @@ import {
 	PropertyHeatingValues,
 	PropertyStatusValues,
 	PropertyType,
+	phoneRegex,
 	UserType,
 } from "@/utils/constants";
 import { LocationSchema } from "./location";
@@ -82,6 +83,8 @@ export const UserSchema = z.object({
 		pushNotifications: z.boolean().optional(),
 		aiNotifications: z.boolean().optional(),
 	}),
+	phoneNumber: z.string().regex(phoneRegex).optional(),
+	phoneNumberVerified: z.boolean().optional(),
 	favoriteProperties: z.array(z.string()).optional(),
 	name: z.string(),
 	email: z.string(),

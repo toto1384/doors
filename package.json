@@ -81,6 +81,7 @@
     "react-intersection-observer": "^10.0.0",
     "react-phone-number-input": "^3.4.12",
     "react-syntax-highlighter": "^15.6.6",
+    "react-youtube": "^10.1.0",
     "resend": "^6.1.2",
     "sonner": "^2.0.7",
     "streamdown": "^1.2.0",

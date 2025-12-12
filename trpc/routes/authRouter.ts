@@ -1,7 +1,7 @@
 import { TRPCError, TRPCRouterRecord } from "@trpc/server";
 import z from "zod/v3";
 import { authProcedure, publicProcedure } from "@/trpc/init";
-import { UserType } from "@/utils/constants";
+import { phoneRegex, UserType } from "@/utils/constants";
 import dbConnect from "@/utils/db/mongodb";
 import { UserPreferences } from "@/utils/validation/dbSchemas";
 import { getUserModel } from "@/utils/validation/mongooseModels";
@@ -52,6 +52,28 @@ export const authRouter = {
 
 		return { success: true };
 	}),
+
+	updatePhoneNumber: authProcedure
+		.input(z.object({ phoneNumber: z.string().regex(phoneRegex) }))
+		.mutation(async ({ ctx, input }) => {
+			const db = await dbConnect();
+			const UserModel = getUserModel(db);
+
+			const alreadyExists = await UserModel.findOne({ phoneNumber: input.phoneNumber });
+			if (alreadyExists) {
+				throw new TRPCError({ code: "UNAUTHORIZED", message: "Phone number already exists" });
+			}
+
+			const user = await UserModel.updateOne({ _id: ctx.user.id }, { $set: { phoneNumber: input.phoneNumber } });
+
+			if (!user) {
+				throw new TRPCError({ code: "UNAUTHORIZED", message: "User not found" });
+			}
+
+			console.log("gh", user, input.phoneNumber);
+
+			return { success: true };
+		}),
 
 	updateUserPreferences: authProcedure.input(UserPreferences).mutation(async ({ ctx, input }) => {
 		const db = await dbConnect();

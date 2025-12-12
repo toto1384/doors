@@ -86,6 +86,13 @@
       }
     },
     "demo": {
+      "watch": {
+        "title": "Watch Demo"
+      },
+      "try": {
+        "title": "Try Demo"
+      },
+      "or": "or",
       "tabs": {
         "agent": "Agent",
         "results": "Results",
@@ -277,7 +284,8 @@
         "terms": "Terms and conditions",
         "privacy": "Privacy policy"
       },
-      "copyright": "© DOORS 2025. All rights reserved."
+      "copyright": "© DOORS 2025. All rights reserved.",
+      "comingSoon": "Coming Soon"
     }
   },
   "register-page": {
@@ -417,7 +425,16 @@
     "myProperties": "My properties",
     "myAppointments": "My Appointments",
     "manageBookings": "Manage Bookings",
-    "billing": "Billing"
+    "billing": "Billing",
+    "favorites": "Favorites",
+    "verifyPhoneNumber": "Verify your phone number",
+    "savePhoneNumber": "Save Phone Number",
+    "success": {
+      "phoneNumber": "Phone number verified successfully"
+    },
+    "form": {
+      "phoneNumber": "Phone number"
+    }
   },
   "ai-chatbot": {
     "assistant": "Doors Assistant",

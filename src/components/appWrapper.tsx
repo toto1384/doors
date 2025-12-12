@@ -1,9 +1,13 @@
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery } from "@tanstack/react-query";
 import { Link, useRouter } from "@tanstack/react-router";
 import { CalendarIcon } from "lucide-react";
 import { posthog } from "posthog-js";
 import { createContext, useEffect } from "react";
+import { Controller, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
+import z from "zod/v3";
 import { useShallow } from "zustand/react/shallow";
 import { usePopoversOpenStore } from "@/src/routes/__root";
 import { useTRPCClient } from "@/trpc/react";
@@ -17,6 +21,7 @@ import { ProfileDropdown } from "./profile-dropdown";
 import { useTheme } from "./providers/ThemeProvider";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
+import { PhoneInput } from "./ui/phone-input";
 import { ElevenLabsChatBotDemo } from "./userAndAi/aiChatbot";
 
 export const NotificationsContext = createContext<NotificationObject[]>([]);
@@ -66,6 +71,10 @@ export default function AppRouteWrapper({
 		return <></>;
 	}
 
+	if (!session?.user?.phoneNumber) {
+		return <RegisterPhoneNumber />;
+	}
+
 	return (
 		<NotificationsContext.Provider value={notificationsData.data?.notifications || []}>
 			<div className="flex flex-col h-dvh overflow-clip relative max-w-[1900px] mx-auto">
@@ -100,7 +109,11 @@ export default function AppRouteWrapper({
 					<div
 						className={` ${!aiChatbotOpen ? "hidden" : "flex "} absolute top-0 bottom-20 z-30 mx-3 md:mx-0 md:z-auto w-[calc(100%-24px)] md:relative md:flex flex-col border rounded-lg dark:border-[#1C252E] md:w-[30vw] md:ml-2 mb-2 bg-gray-100 dark:bg-[#120826] `}
 					>
-						<ElevenLabsChatBotDemo userType={userType} user={session.user as any as UserObject} conversationToken={token} />
+						<ElevenLabsChatBotDemo
+							userType={userType}
+							user={session.user as any as UserObject}
+							conversationToken={token}
+						/>
 					</div>
 					<div className="flex flex-col w-full max-h-full overflow-y-auto">
 						<div className="pb-28 md:pb-0">{children}</div>
@@ -161,7 +174,7 @@ export default function AppRouteWrapper({
 										},
 									]),
 							{
-								name: "Favorites",
+								name: t("favorites"),
 								icon: (selected: boolean) => <HeartIcon color={selected ? "#8A4FFF" : "#919EAB"} />,
 								link: "/app/favorites",
 							},
@@ -198,5 +211,80 @@ function NavBarItem({
 				{name}
 			</span>
 		</Link>
+	);
+}
+
+function RegisterPhoneNumber() {
+	const { data: session, isPending, refetch } = authClient.useSession();
+	const trpcClient = useTRPCClient();
+	const { t } = useTranslation("translation", { keyPrefix: "app-wrapper" });
+
+	const {
+		register,
+		handleSubmit,
+		watch,
+		control,
+		formState: { errors },
+	} = useForm({
+		defaultValues: {
+			phoneNumber: "",
+		},
+		resolver: zodResolver(z.object({ phoneNumber: z.string().min(10, "Phone number must be at least 10 characters") })),
+	});
+
+	return (
+		<div className="flex flex-col items-center justify-center h-dvh">
+			<div
+				className="absolute w-[1000px] h-[1000px] rounded-full blur-[100px] pointer-events-none -z10"
+				style={{
+					left: `50%`,
+					top: `30%`,
+					background: "radial-gradient(circle, rgba(138, 64, 182, 0.25) 0%, transparent 70%)",
+					transform: "translate(-50%, -50%)",
+				}}
+			/>
+			<div className="flex flex-col items-start">
+				{t("verifyPhoneNumber")}
+				<form
+					onSubmit={handleSubmit(async ({ phoneNumber }) => {
+						trpcClient.auth.updatePhoneNumber
+							.mutate({ phoneNumber })
+							.then((res) => {
+								toast.success(t("success.phoneNumber"));
+								refetch();
+							})
+							.catch((err) => {
+								toast.error(err.message);
+							});
+						// await authClient.updateUser({ phoneNumber }).then((res) => {
+						// 	toast.success(t("success.phoneNumber"));
+						// });
+					})}
+					className="space-y-4"
+				>
+					<div className="group relative w-full">
+						<Controller
+							name="phoneNumber"
+							control={control}
+							rules={{
+								required: "Phone number is required",
+							}}
+							render={({ field }) => <PhoneInput {...field} defaultCountry="RO" className="peer" />}
+						/>
+						<label className="text-sm text-[#637381] absolute top-4 left-4 origin-[0] -translate-y-2 scale-75 duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:-translate-y-2 peer-focus:scale-75">
+							{t("form.phoneNumber")}
+						</label>
+					</div>
+					{errors.phoneNumber && <p className="text-red-400 text-sm mt-1">{errors.phoneNumber.message}</p>}
+					<Button
+						type="submit"
+						className="w-full py-6 text-[15px] hover:bg-indigo-700/20 cursor-pointer bg-gradient-to-br from-[#4C7CED] to-[#7B31DC] text-white"
+						disabled={isPending}
+					>
+						{isPending ? "..." : t("savePhoneNumber")}
+					</Button>
+				</form>
+			</div>
+		</div>
 	);
 }

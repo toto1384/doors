@@ -1,17 +1,17 @@
+import { useConversation } from "@elevenlabs/react";
 import { useQuery } from "@tanstack/react-query";
 import { nanoid } from "nanoid";
 import { createContext, ReactNode, useCallback, useEffect, useState } from "react";
 import { useShallow } from "zustand/react/shallow";
 import { usePropertyAddStore, usePropertyFilterStore } from "@/src/routes/__root";
-import {  useTRPCClient } from "@/trpc/react";
+import { useTRPCClient } from "@/trpc/react";
 import { UserType } from "@/utils/constants";
 import useDidMountEffect from "@/utils/hooks/useDidMountEffect";
-import {  UserObject } from "@/utils/validation/types";
+import { UserObject } from "@/utils/validation/types";
 import i18n from "../i18n";
 import { ChatComponent } from "./chatComponent";
 import { useChooseActions } from "./useChooseActionsAiHook";
 import { useSetPropertyFunctions } from "./usePostPropertyAiHook";
-import { useConversation } from "@elevenlabs/react";
 // import { useConversation as uc } from 'utils/hooks/mockElevenlabsHook';
 // const useConversation = uc({ flow: 'buyer' })
 
@@ -74,7 +74,7 @@ export function ElevenLabsChatBotDemo<T extends boolean>({
 				: "Are you looking to buy or to sell a property"
 			: userTypeVar === "buyer"
 				? localeVar == "ro"
-					? "sunt aici sa te ajut sa iti gasesti noua proprietate. Cauti un apartament sau o casa?"
+					? "sunt aici sa te ajut sa iti gasesti o nouă proprietate. Cauti un apartament sau o casa?"
 					: "I\'m here to help you buy a property. Are you looking for an apartment or a house?"
 				: localeVar == "ro"
 					? "sunt aici sa te ajut sa iti vinzi proprietatea. Este vorba de apartament sau casa?"
@@ -171,7 +171,7 @@ export function ElevenLabsChatBotDemo<T extends boolean>({
 				tokenQuery.refetch().then((_) => start(_.data?.token ?? ""));
 			}
 		}
-	}, [conversation, tokenQuery.data.token, ]);
+	}, [conversation, tokenQuery.data.token]);
 
 	useDidMountEffect(() => {
 		if (conversation.status !== "connected") setMessages([]);
