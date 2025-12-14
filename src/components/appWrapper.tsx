@@ -269,7 +269,9 @@ function RegisterPhoneNumber() {
 							rules={{
 								required: "Phone number is required",
 							}}
-							render={({ field }) => <PhoneInput {...field} defaultCountry="RO" className="peer" />}
+							render={({ field }) => (
+								<PhoneInput {...field} defaultCountry="RO" placeholder="07xxxxxxxx" className="peer" />
+							)}
 						/>
 						<label className="text-sm text-[#637381] absolute top-4 left-4 origin-[0] -translate-y-2 scale-75 duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:-translate-y-2 peer-focus:scale-75">
 							{t("form.phoneNumber")}

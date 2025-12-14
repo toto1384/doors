@@ -32,8 +32,8 @@ export const BuyerDemoSection = ({ token }: { token: string }) => {
 		<section id="demo" className="md:py-10 ">
 			<div className="max-w-7xl mx-auto px-2 md:px-6 flex flex-col items-center">
 				{/* Try Demo Section */}
+				<h2 className="text-3xl text-center font-medium mb-3">{t("landing-page.demo.try.title")}</h2>
 				<div className="text-center bg-gradient-to-br from-blue-500/20 to-purple-600/20 rounded-lg p-2 md:p-8 max-w-5xl w-full mx-auto">
-					<h2 className="text-3xl font-medium mb-3">{t("landing-page.demo.try.title")}</h2>
 					<h3 className="text-xl font-semibold text-white mb-4">{t("landing-page.demo.buyer.tryDemo.title")}</h3>
 
 					<div className="flex md:hidden flex-row items-center w-fit mx-auto gap-6 rounded-lg p-2 bg-gradient-to-br from-green-500/20 to-blue-600/20 text-white">
@@ -168,7 +168,7 @@ export const FoundSomethingYouLikeSection: React.FC = () => {
 						<div key={index} className="bg-[#120826] rounded-lg p-6 text-center relative">
 							{service.comingSoon && (
 								<Badge variant="destructive" className="absolute top-1.5 right-1.5">
-									{t('landing-page.footer.comingSoon')}
+									{t("landing-page.footer.comingSoon")}
 								</Badge>
 							)}
 							<div className="text-4xl mb-4">{service.icon}</div>
@@ -230,7 +230,8 @@ export const FromLookingToFound = () => {
 };
 
 // Buyer Pricing Section Component
-export const BuyerPricingSection: React.FC = () => {
+export const BuyerPricingSection = () => {
+	const { data } = authClient.useSession();
 	const { t } = useTranslation();
 
 	return (
@@ -247,16 +248,16 @@ export const BuyerPricingSection: React.FC = () => {
 			{/* Plan Card */}
 			<div className="max-w-md mx-auto">
 				<div className="bg-gradient-to-br from-blue-500/50 to-purple-600/50 rounded-lg p-8 text-center text-white">
-					<h3 className="text-2xl font-semibold mb-4">{t("landing-page.pricing.buyer.plan.name")}</h3>
-					<span className="text-4xl font-bold">{t("landing-page.pricing.buyer.plan.price")}</span>
-					<p className="text-blue-100 mt-3 mb-6">{t("landing-page.pricing.buyer.plan.features")}</p>
 					<Link
-						to={"/auth/$path"}
-						params={{ path: "sign-in" }}
-						className="bg-white text-blue-900 px-8 py-3 rounded-md font-semibold text-lg hover:bg-gray-100 transition-all transform hover:scale-105 shadow-2xl w-full"
+						to={data ? "/app" : "/auth/$path"}
+						params={data ? {} : { path: "sign-in" }}
+						className="inline-block bg-gradient-to-r mx-auto text-center from-blue-500 to-purple-600 text-white px-8 py-3 rounded-md font-semibold text-lg hover:from-blue-600 hover:to-purple-700 transition-all transform shadow-2xl"
 					>
-						{t("landing-page.pricing.buyer.plan.name")}
+						{t("landing-page.finalCta.buyerButton")}
 					</Link>
+
+					<p className="mx-auto w-fit mt-5 mb-3 text-xl">{t("landing-page.demo.or")}</p>
+					<span className="text-4xl font-bold">{t("landing-page.pricing.buyer.plan.price")}</span>
 				</div>
 			</div>
 		</section>

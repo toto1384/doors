@@ -24,10 +24,11 @@ type PhoneInputProps = Omit<React.ComponentProps<"input">, "onChange" | "value" 
 const PhoneInput: React.ForwardRefExoticComponent<PhoneInputProps> = React.forwardRef<
 	React.ElementRef<typeof RPNInput.default>,
 	PhoneInputProps
->(({ className, onChange, value, ...props }, ref) => {
+>(({ className, onChange, value, placeholder, ...props }, ref) => {
 	return (
 		<RPNInput.default
 			ref={ref}
+			placeholder={placeholder}
 			className={cn("flex", className)}
 			flagComponent={FlagComponent}
 			countrySelectComponent={CountrySelect}

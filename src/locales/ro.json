@@ -87,12 +87,12 @@
     },
     "demo": {
       "watch": {
-        "title": "Vizioneaza Demo"
+        "title": "Vizionează Tutorial"
       },
       "try": {
-        "title": "Incearca Demo"
+        "title": "Încearcă Demo"
       },
-      "or": "sau",
+      "or": "apoi",
       "tabs": {
         "agent": "Agent",
         "results": "Results",
@@ -188,8 +188,9 @@
         "guarantee": "Nu ai găsit locuința potrivită? Primești ramburs integral pentru vizionările nefolosite — fără întrebări.",
         "highlights": "💡 Zero comisioane. Zero riscuri. 100% transparență.",
         "plan": {
+          "title": "Încarcă-ți contul cu doar",
           "name": "Activează contul",
-          "price": "19,99 €",
+          "price": "19,99 € / 4 vizionări",
           "features": "4 vizionări incluse, garanție de returnare"
         }
       },
@@ -409,7 +410,7 @@
     "manageBookings": "Gestionare rezervări",
     "billing": "Facturare",
     "favorites": "Favorite",
-    "verifyPhoneNumber": "Verifică numărul tău de telefon",
+    "verifyPhoneNumber": "Introdu numărul de telefon",
     "savePhoneNumber": "Salvează numărul de telefon",
     "success": {
       "phoneNumber": "Numărul de telefon a fost verificat cu succes"
@@ -422,6 +423,9 @@
     "assistant": "Asistent Doors",
     "assistantNotStarted": "Asistent Doors nu a fost pornit",
     "startConversation": "Pornește conversația",
+    "startDemo": "Începe demo-ul",
+    "searchProperty": "Caută o proprietate",
+    "listProperty": "Listează o proprietate",
     "propertyTypes": {
       "house": "Casa",
       "apartment": "Apartament",

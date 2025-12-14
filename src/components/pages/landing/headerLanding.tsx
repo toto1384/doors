@@ -7,7 +7,7 @@ import { useTranslation } from "react-i18next";
 import { LanguageToggleVariant } from "@/src/components/language-toggle";
 
 // Header Component
-export const Header: React.FC = () => {
+export const Header = ({ hideOnScroll }: { hideOnScroll?: boolean }) => {
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
 	const [isScrolled, setIsScrolled] = useState(false);
 
@@ -33,7 +33,7 @@ export const Header: React.FC = () => {
 					<Link to="/" className="flex items-center space-x-2 h-16">
 						<img
 							src="/doors-logo.png"
-							className={`${!isScrolled && "hidden"} w-28 h-16 object-cover object-center flex items-center justify-center`}
+							className={`${!isScrolled && hideOnScroll && "hidden"} w-28 h-16 object-cover object-center flex items-center justify-center`}
 						/>
 					</Link>
 

@@ -87,12 +87,12 @@
     },
     "demo": {
       "watch": {
-        "title": "Watch Demo"
+        "title": "Watch Tutorial"
       },
       "try": {
         "title": "Try Demo"
       },
-      "or": "or",
+      "or": "then",
       "tabs": {
         "agent": "Agent",
         "results": "Results",
@@ -188,8 +188,9 @@
         "guarantee": "Didn't find the right home? Get a full refund for unused viewings — no questions asked.",
         "highlights": "💡 Zero commissions. Zero risks. 100% transparency.",
         "plan": {
+            "title": "Fill your account with just",
           "name": "Activate account",
-          "price": "€19.99",
+          "price": "€19.99 / 4 viewings",
           "features": "4 viewings included, return guarantee"
         }
       },
@@ -427,7 +428,7 @@
     "manageBookings": "Manage Bookings",
     "billing": "Billing",
     "favorites": "Favorites",
-    "verifyPhoneNumber": "Verify your phone number",
+    "verifyPhoneNumber": "Enter your phone number",
     "savePhoneNumber": "Save Phone Number",
     "success": {
       "phoneNumber": "Phone number verified successfully"
@@ -440,6 +441,9 @@
     "assistant": "Doors Assistant",
     "assistantNotStarted": "Doors Assistant Not Started",
     "startConversation": "Start Conversation",
+    "startDemo": "Start Demo",
+    "searchProperty": "Search for a Property",
+    "listProperty": "List a Property",
     "propertyTypes": {
       "house": "House",
       "apartment": "Apartment",

@@ -17,6 +17,7 @@ import { Header } from "@/src/components/pages/landing/headerLanding";
 import { PropertyAddView } from "@/src/components/pages/propertyAddView";
 import { TimelineLayout } from "@/src/components/ui/timeline-layout";
 import { ElevenLabsChatBotDemo } from "@/src/components/userAndAi/aiChatbot";
+import { useSize } from "@/utils/hooks/useSize";
 import { usePropertyFilterStore } from "./__root";
 
 export const Route = createFileRoute("/")({
@@ -42,6 +43,8 @@ function LandingPage() {
 	const { data: session } = authClient.useSession();
 	const queryClient = useQueryClient();
 
+	const size = useSize(true);
+
 	const { token } = Route.useLoaderData();
 
 	useEffect(() => {
@@ -53,7 +56,7 @@ function LandingPage() {
 	const blobs = Array.from({ length: 10 }, (_, i) => ({
 		id: i,
 		x: i % 2 === 0 ? 10 : 90, // alternates left (20%) and right (80%)
-		y: i * 600, // fixed spacing, 400px apart
+		y: (size.gmd ? 0 : 1000) + i * 600, // fixed spacing, 400px apart
 	}));
 
 	const { t } = useTranslation();
@@ -66,14 +69,14 @@ function LandingPage() {
 					className="absolute w-[700px] h-[700px] rounded-full blur-[100px] pointer-events-none -z10"
 					style={{
 						left: `${blob.x}%`,
-						top: `calc(${blob.y}px + 150dvh)`,
+						top: `calc(${blob.y}px + ${"150dvh"})`,
 						background: "radial-gradient(circle, rgba(138, 64, 182, 0.3) 0%, transparent 70%)",
 						transform: "translate(-50%, -50%)",
 					}}
 				/>
 			))}
 
-			<Header />
+			<Header hideOnScroll />
 			<HeroSection
 				selectedAction={selectedAction}
 				setSelectedAction={(e) => {
@@ -111,7 +114,7 @@ const HeroSection = ({
 	);
 
 	return (
-		<section className="min-h-[95dvh] bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-end relative md:overflow-hidden h-fit">
+		<section className="min-h-[95dvh] flex items-center justify-end relative md:overflow-hidden h-fit">
 			<img
 				src="/landing/chat.png"
 				className="absolute hidden md:block z-40 top-0 bottom-0 my-auto left-10 w-[30vw] opacity-50"
@@ -122,11 +125,11 @@ const HeroSection = ({
 			/>
 			<img
 				src="/landing/heroDesktop.webp"
-				className="absolute brightness-100 hidden md:block z-20 right-0 top-0 md:left-[20%] md:w-[80%] object-cover h-[70dvh] md:h-auto "
+				className="absolute brightness-100 hidden md:block z-20 right-0 -top-10 md:left-[20%] md:w-[80%] object-cover h-[70dvh] md:h-auto "
 			/>
 
-			<div className="bg-gradient-to-r hidden md:block from-[#0B0014]/90 from-20% to-black/0 to-40% absolute z-30 inset-0"></div>
-			<div className="bg-gradient-to-t from-[#0B0014] from-20% to-black/0 to-50% absolute z-30 inset-0"></div>
+			<div className="bg-gradient-to-r hidden md:block from-[#0B0014]/90 from-20% to-black/0 to-33% absolute z-30 inset-0"></div>
+			<div className="bg-gradient-to-t from-[#0B0014] from-10% to-black/0 to-50% absolute z-30 inset-0"></div>
 
 			<div className="md:w-[47vw] absolute bottom-30 w-[95%] left-0 md:left-auto right-0 md:mt-0 md:top-[28vw] md:right-[11vw] mx-auto">
 				<div className="z-10 md:px-3 text-center md:hidden pr-2 md:pr-0 md:pl-5">
@@ -305,9 +308,9 @@ const SellerDemoSection = ({ token }: { token: string }) => {
 	return (
 		<section className="md:pb-10 ">
 			<div className="max-w-7xl mx-auto px-2 w-full md:px-6 flex flex-col items-center">
-				{/* Watch Demo Section */}
+				{/* Watch Tutorial Section */}
 				<div className="mx-auto mb-4">
-					<h2 className="text-3xl  font-medium mb-3">{t("landing-page.demo.watch.title")}</h2>
+					<h2 className="text-3xl text-center font-medium mb-3">{t("landing-page.demo.watch.title")}</h2>
 					<Youtube
 						videoId={"f0Li9JZzhds"}
 						id="video"
@@ -326,11 +329,11 @@ const SellerDemoSection = ({ token }: { token: string }) => {
 				</div>
 
 				{/* Try Demo Section */}
+				<h2 className="text-3xl text-center font-medium mb-3">{t("landing-page.demo.try.title")}</h2>
 				<div
 					id="demo"
 					className="text-center bg-gradient-to-br from-green-500/20 to-blue-600/20 rounded-lg p-2 md:p-8 max-w-5xl w-full mx-auto"
 				>
-					<h2 className="text-3xl font-medium mb-3">{t("landing-page.demo.try.title")}</h2>
 					<h3 className="text-xl font-semibold text-white mb-4">{t("landing-page.demo.seller.tryDemo.title")}</h3>
 					<div className="flex md:hidden flex-row items-center w-fit mx-auto gap-6 rounded-lg p-2 bg-gradient-to-br from-green-500/20 to-blue-600/20 text-white">
 						<button
