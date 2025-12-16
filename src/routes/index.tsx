@@ -306,7 +306,7 @@ const SellerDemoSection = ({ token }: { token: string }) => {
 	const [tab, setTab] = useState<"agent" | "results">("agent");
 
 	return (
-		<section className="md:pb-10 ">
+		<section className="md:py-10 ">
 			<div className="max-w-7xl mx-auto px-2 w-full md:px-6 flex flex-col items-center">
 				{/* Watch Tutorial Section */}
 				<div className="mx-auto mb-4">

@@ -77,7 +77,7 @@
         "realBenefits": {
           "title": "Beneficii reale:",
           "items": [
-            "100% gratuit pentru vânzători — fără taxe, niciodată",
+            "100% gratuit pentru vânzători — fără taxe, fără comisioane",
             "Anunțuri create automat din voce sau text",
             "Publicare instant — fără editare suplimentară",
             "Doar cumpărători serioși și verificați"
@@ -198,7 +198,7 @@
         "title": "Publici gratuit. Vinzi gratuit.",
         "subtitle": "Pentru vânzători, DOORS este complet gratuit.",
         "features": [
-          "Fără taxe de listare, fără abonamente, fără comisioane — niciodată",
+          "Fără taxe de listare, fără abonamente, fără comisioane",
           "Poți publica proprietăți nelimitat și păstrezi 100% din prețul de vânzare"
         ],
         "highlights": "💡 Tu vinzi. Noi te ajutăm să vinzi mai inteligent.",
@@ -515,6 +515,10 @@
     "title": "Termenii Serviciului",
     "lastUpdated": "Ultima actualizare: {date}",
     "introduction": "Acești Termeni de Serviciu guvernează utilizarea platformei și serviciilor noastre."
+  },
+  "app": {
+    "title": "Ce vrei să faci astăzi pe DOORS?",
+    "subtitle": "Alege dacă vrei să explorezi proprietăți sau să adaugi una pe platformă prin a începe conversația cu agentul."
   },
   "property-page": {
     "scheduleViewing": "Programeaza o vizionare",

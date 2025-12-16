@@ -77,7 +77,7 @@
         "realBenefits": {
           "title": "Real benefits:",
           "items": [
-            "100% free for sellers — no fees, ever",
+            "100% free for sellers — no fees, no commisions",
             "Listings created automatically from voice or text",
             "Instant publishing — no additional editing",
             "Only serious and verified buyers"
@@ -198,7 +198,7 @@
         "title": "List for free. Sell for free.",
         "subtitle": "For sellers, DOORS is completely free.",
         "features": [
-          "No listing fees, no subscriptions, no commissions — ever",
+          "No listing fees, no subscriptions, no commissions",
           "You can list unlimited properties and keep 100% of the sale price"
         ],
         "highlights": "💡 You sell. We help you sell smarter.",
@@ -511,6 +511,10 @@
     "title": "Terms of Service",
     "lastUpdated": "Last updated: {date}",
     "introduction": "These Terms of Service govern your use of our platform and services."
+  },
+  "app": {
+    "title": "What do you want to do on DOORS today?",
+    "subtitle": "Choose if you want to explore properties or add one to the platform by starting a conversation with the agent."
   },
   "property-page": {
     "scheduleViewing": "Schedule a Viewing",

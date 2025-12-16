@@ -3,6 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { getHeaders } from "@tanstack/react-start/server";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { LocationSelector, libraries } from "@/src/components/basics/locationSelector";
 import { PropertyCard } from "@/src/components/basics/propertyCard";
 import { trpcRouter } from "@/trpc/router";
@@ -40,24 +41,22 @@ export const Route = createFileRoute("/app/")({
 });
 
 function Dashboard() {
+	const { t } = useTranslation();
 	const propertiesReceived = Route.useLoaderData();
 
 	const [properties, setProperties] = useState<PropertyObject[]>(propertiesReceived.properties);
 
-	const [locationObject, setLocationObject] = useState<LocationObject | undefined>();
-
 	return (
 		<div className="flex flex-col items-center justify-center border mx-2 rounded-lg">
 			<div className="flex w-full flex-col gap-2 border-b px-6 pt-4 pb-5 dark:border-[#404040] ">
-				<h1 className="text-2xl font-light">Ce vrei să faci astăzi pe DOORS?</h1>
+				<h1 className="text-2xl font-light">{t("app.title")}</h1>
 
 				<p
 					className={`relative max-w-2xl pl-4 text-xs before:absolute before:left-0 before:mt-1 before:text-3xl/1 before:text-gray-500  before:content-['•'] dark:text-[#a3a3a3] before:dark:text-[#737373]`}
 				>
-					Alege dacă vrei să explorezi proprietăți sau să adaugi una pe platformă.
+					{t("app.subtitle")}
 				</p>
 			</div>
-			{/* <LocationSelector locationObject={locationObject as any} setLocationObject={setLocationObject} /> */}
 
 			{/* Properties Grid */}
 			{
@@ -70,7 +69,7 @@ function Dashboard() {
 
 			{properties && properties.length === 0 && (
 				<div className="h-full py-8 text-center">
-					<p className="text-gray-400">No properties found matching your criteria.</p>
+					<p className="text-gray-400">{t("my-properties.emptyState")}</p>
 				</div>
 			)}
 		</div>

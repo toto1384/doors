@@ -1,10 +1,12 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useInView } from "react-intersection-observer";
 import { useTRPCClient } from "@/trpc/react";
 import { PropertyFiltersObject } from "@/utils/validation/propertyFilters";
 import { PropertyFilters, PropertyObject } from "@/utils/validation/types";
 import { PropertyCard } from "../basics/propertyCard";
+import { Badge } from "../ui/badge";
 
 export function PropertiesView({
 	propertiesReceived,
@@ -21,6 +23,7 @@ export function PropertiesView({
 }) {
 	const { ref, inView } = useInView();
 	const trpcClient = useTRPCClient();
+	const { t } = useTranslation();
 
 	const { status, data, error, isFetchingNextPage, fetchNextPage, hasNextPage } = useInfiniteQuery({
 		queryKey: [demoVersion ? "demoProperties" : "properties", searchParams],

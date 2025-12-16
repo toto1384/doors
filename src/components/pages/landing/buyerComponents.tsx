@@ -33,7 +33,7 @@ export const BuyerDemoSection = ({ token }: { token: string }) => {
 			<div className="max-w-7xl mx-auto px-2 md:px-6 flex flex-col items-center">
 				{/* Try Demo Section */}
 				<h2 className="text-3xl text-center font-medium mb-3">{t("landing-page.demo.try.title")}</h2>
-				<div className="text-center bg-gradient-to-br from-blue-500/20 to-purple-600/20 rounded-lg p-2 md:p-8 max-w-5xl w-full mx-auto">
+				<div className="text-center relative bg-gradient-to-br from-blue-500/20 to-purple-600/20 rounded-lg p-2 md:p-8 max-w-5xl w-full mx-auto">
 					<h3 className="text-xl font-semibold text-white mb-4">{t("landing-page.demo.buyer.tryDemo.title")}</h3>
 
 					<div className="flex md:hidden flex-row items-center w-fit mx-auto gap-6 rounded-lg p-2 bg-gradient-to-br from-green-500/20 to-blue-600/20 text-white">
@@ -63,6 +63,11 @@ export const BuyerDemoSection = ({ token }: { token: string }) => {
 								<PropertiesView searchParams={demoPropertyFilters ?? {}} demoVersion />
 							</div>
 						</div>
+					</div>
+					<div className="absolute inset-0 backdrop-blur-xs w-full h-full flex items-center justify-center rounded-lg">
+						<Badge variant="default" className=" px-10 py-5 text-2xl">
+							{t("landing-page.footer.comingSoon")}
+						</Badge>
 					</div>
 				</div>
 

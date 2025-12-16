@@ -248,11 +248,12 @@ export const propertiesRouter = {
 				])) as [{ properties: (PropertyObject & { matchScore: number })[]; count: [{ count: number }] }];
 
 				return {
-					properties: properties[0].properties,
-					count: properties[0].count[0].count,
+					properties: properties[0]?.properties ?? [],
+					count: properties[0]?.count?.[0]?.count ?? 0,
 					totalFilterCount: query.length,
 				};
 			} catch (error) {
+				console.log(error);
 				throw new TRPCError({
 					code: "INTERNAL_SERVER_ERROR",
 					message: "Failed to fetch properties",
