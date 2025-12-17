@@ -51,7 +51,7 @@ export const PropertyStatusValues = ["available", "sold", "pending", "rented", "
 
 export type PropertyStatus = (typeof PropertyStatusValues)[number];
 
-export const PropertyHeatingValues = ["gas", "fireplace", "electric", "3rd_party"] as const;
+export const PropertyHeatingValues = ["gas", "fireplace", "electric", "3rd_party", "block", "floor"] as const;
 
 export type PropertyHeating = (typeof PropertyHeatingValues)[number];
 

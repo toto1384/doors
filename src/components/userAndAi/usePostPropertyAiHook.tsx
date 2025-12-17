@@ -61,7 +61,7 @@ export const usePublishPropertyHook = ({ demoVersion }: { demoVersion?: boolean 
 			}
 			await endConversation();
 			queryClient.invalidateQueries({ queryKey: ["my-properties"] });
-            queryClient.invalidateQueries({ queryKey: ["auth.getToken"] });
+			queryClient.invalidateQueries({ queryKey: ["auth.getToken"] });
 			return JSON.stringify(result);
 		} catch (error) {
 			console.log("error", error);
@@ -255,6 +255,8 @@ export const useSetPropertyFunctions = ({
 				{ value: t("heating.gas"), key: "gas" },
 				{ value: t("heating.electric"), key: "electric" },
 				{ value: t("heating.3rd_party"), key: "3rd_party" },
+				{ value: t("heating.block"), key: "block" },
+				{ value: t("heating.floor"), key: "floor" },
 			],
 			additionalOnClick(value) {
 				updateGhostProperty({ heating: value as any });

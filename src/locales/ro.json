@@ -440,7 +440,9 @@
     "heating": {
       "gas": "Gaz",
       "electric": "Electric",
-      "3rd_party": "Centrală"
+      "3rd_party": "Centrală Termică Proprie",
+    "block": "Incălzire bloc",
+            "floor": "Incălzire pardoseala"
     },
     "facilities": {
       "parking": "Parking",
@@ -599,8 +601,8 @@
     "city-center": "Centrul orașului",
     "furnished": "Mobilat",
     "notFurnished": "Nemobilat",
-    "central_heating": "Încălzire centrală",
-    "centralHeating": "Încălzire centrală",
+    "central_heating": "Centrală termică proprie",
+    "centralHeating": "Centrală termică proprie",
     "internet": "Internet",
     "parking": "Parking"
   },

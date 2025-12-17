@@ -38,7 +38,7 @@ export const getRootObjectsServerFn = createServerFn().handler(async ({ data: fi
 });
 
 function LandingPage() {
-	const [selectedAction, setSelectedAction] = useState<"buy" | "sell">("buy");
+	const [selectedAction, setSelectedAction] = useState<"buy" | "sell">("sell");
 	const navigate = useNavigate();
 	const { data: session } = authClient.useSession();
 	const queryClient = useQueryClient();

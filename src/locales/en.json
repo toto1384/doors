@@ -458,7 +458,9 @@
     "heating": {
       "gas": "Gas",
       "electric": "Electric",
-      "3rd_party": "Central"
+      "3rd_party": "Own Central Heating",
+        "block": "Block Heating",
+            "floor": "Floor Heating"
     },
     "facilities": {
       "parking": "Parking",
@@ -467,7 +469,7 @@
       "garden": "Garden",
       "elevator": "Elevator",
       "airConditioning": "Air Conditioning",
-      "centralHeating": "Central Heating",
+      "centralHeating": "Own Central Heating",
       "furnished": "Furnished"
     },
     "actions": {
@@ -595,8 +597,8 @@
     "city-center": "City Center",
     "furnished": "Furnished",
     "notFurnished": "Not furnished",
-    "central_heating": "Central Heating",
-    "centralHeating": "Central Heating",
+    "central_heating": "Own Central Heating",
+    "centralHeating": "Own Central Heating",
     "internet": "Internet",
     "parking": "Parking"
   },
