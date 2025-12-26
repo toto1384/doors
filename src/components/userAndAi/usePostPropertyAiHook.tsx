@@ -25,15 +25,14 @@ export const usePublishPropertyHook = ({ demoVersion }: { demoVersion?: boolean 
 		})),
 	);
 
-	const { setTitlesAndDescriptions, setTitleAndDescResolver, getPartialProperty, setPostedStatus } =
-		usePropertyAddStore(
-			useShallow((state) => ({
-				setTitlesAndDescriptions: state.setTitlesAndDescriptions,
-				setTitleAndDescResolver: state.setTitleAndDescResolver,
-				getPartialProperty: state.getPartialProperty,
-				setPostedStatus: state.setPostedStatus,
-			})),
-		);
+	const { getPartialProperty, setPostedStatus, setPartialProperty, setPropertyType } = usePropertyAddStore(
+		useShallow((state) => ({
+			getPartialProperty: state.getPartialProperty,
+			setPostedStatus: state.setPostedStatus,
+			setPartialProperty: state.setPartialProperty,
+			setPropertyType: state.setPropertyType,
+		})),
+	);
 
 	const { setProgressBar, aiChatbotOpen, setAiChatbotOpen } = usePopoversOpenStore(
 		useShallow((state) => ({
@@ -62,6 +61,8 @@ export const usePublishPropertyHook = ({ demoVersion }: { demoVersion?: boolean 
 			await endConversation();
 			queryClient.invalidateQueries({ queryKey: ["my-properties"] });
 			queryClient.invalidateQueries({ queryKey: ["auth.getToken"] });
+			setPartialProperty({});
+			setPropertyType("edit");
 			return JSON.stringify(result);
 		} catch (error) {
 			console.log("error", error);
@@ -95,6 +96,7 @@ export const useSetPropertyFunctions = ({
 		);
 		if (routerState.location.pathname !== "/app/properties/add" && !demoVersion)
 			router.navigate({ to: "/app/properties/add" });
+		setPostedStatus(undefined);
 	};
 
 	const { aiChatbotOpen, setAiChatbotOpen } = usePopoversOpenStore(
@@ -104,14 +106,16 @@ export const useSetPropertyFunctions = ({
 		})),
 	);
 
-	const { setTitlesAndDescriptions, setTitleAndDescResolver, setPropertyType, propertyType } = usePropertyAddStore(
-		useShallow((state) => ({
-			setTitlesAndDescriptions: state.setTitlesAndDescriptions,
-			setTitleAndDescResolver: state.setTitleAndDescResolver,
-			setPropertyType: state.setPropertyType,
-			propertyType: state.propertyType,
-		})),
-	);
+	const { setTitlesAndDescriptions, setTitleAndDescResolver, setPropertyType, propertyType, setPostedStatus } =
+		usePropertyAddStore(
+			useShallow((state) => ({
+				setTitlesAndDescriptions: state.setTitlesAndDescriptions,
+				setTitleAndDescResolver: state.setTitleAndDescResolver,
+				setPropertyType: state.setPropertyType,
+				propertyType: state.propertyType,
+				setPostedStatus: state.setPostedStatus,
+			})),
+		);
 
 	const publishProperty = usePublishPropertyHook({ demoVersion });
 

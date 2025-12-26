@@ -435,6 +435,12 @@
     },
     "form": {
       "phoneNumber": "Phone number"
+    },
+    "customPhoneNumber": {
+      "label": "Phone Number",
+      "title": "Custom Phone Number",
+      "done": "Done",
+      "notSet": "Not Set (Using Profile Default)"
     }
   },
   "ai-chatbot": {

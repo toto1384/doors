@@ -417,6 +417,12 @@
     },
     "form": {
       "phoneNumber": "Număr de telefon"
+    },
+    "customPhoneNumber": {
+      "label": "Număr de telefon",
+      "title": "Număr de telefon personalizat",
+      "done": "Gata",
+      "notSet": "Nesetat (Se folosește cel din profil)"
     }
   },
   "ai-chatbot": {

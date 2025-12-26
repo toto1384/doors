@@ -1,7 +1,8 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Pencil } from "lucide-react";
+import { Divide, Pencil } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
+import { useTranslation } from "react-i18next";
 import z from "zod/v3";
 import {
 	DescriptionSection,
@@ -9,16 +10,16 @@ import {
 	LocationSection,
 	PropertyInfo,
 } from "@/src/routes/app/properties/$id/index";
-import { useTRPCClient } from "@/trpc/react";
-import { useUploadThing } from "@/utils/uploadThingClient";
+import { authClient } from "@/utils/auth-client";
 import { PropertyObject } from "@/utils/validation/types";
 import { LocationSelector } from "./basics/locationSelector";
 import { FacilitiesSelector } from "./facilitiesSelector";
 import { Button } from "./ui/button";
 import { FloatingInput } from "./ui/floating-input";
 import { useUploadThingCompressed } from "./ui/imageUploaders";
-import { MultiSelect } from "./ui/multi-select";
+import { Input } from "./ui/input";
 import { MultiImageUpload } from "./ui/multiImageUpload";
+import { PhoneInput } from "./ui/phone-input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { Textarea } from "./ui/textarea";
 
@@ -48,6 +49,8 @@ export function EditPropertyComponent<T extends Partial<PropertyObject> | Proper
 }) {
 	const [disabled, setDisabled] = useState(false);
 
+	const { data: session } = authClient.useSession();
+
 	const { startUpload, isUploading } = useUploadThingCompressed("imageUploader", {
 		onClientUploadComplete: (e) => {
 			console.log("e", e);
@@ -61,12 +64,16 @@ export function EditPropertyComponent<T extends Partial<PropertyObject> | Proper
 		description: boolean;
 		facilities: boolean;
 		location: boolean;
+		customPhoneNumber: boolean;
 	}>({
 		titlePriceRoomsSqFeet: false,
 		description: false,
 		facilities: false,
 		location: false,
+		customPhoneNumber: false,
 	});
+
+	const { t } = useTranslation("translation", { keyPrefix: "app-wrapper" });
 
 	const [hasEdited, setHasEdited] = useState(saveWithoutEdit);
 
@@ -83,7 +90,7 @@ export function EditPropertyComponent<T extends Partial<PropertyObject> | Proper
 					}}
 					deleteFile={async (url) => {
 						console.log("deleteFile", url);
-						onPropertyChange({ ...property, imageUrls: property.imageUrls?.filter((i) => i != url) });
+						onPropertyChange({ ...property, imageUrls: property.imageUrls?.filter((i) => i !== url) });
 						setHasEdited(true);
 					}}
 					value={property.imageUrls}
@@ -107,14 +114,14 @@ export function EditPropertyComponent<T extends Partial<PropertyObject> | Proper
 				<PropertyInfo
 					property={property}
 					additionalComponent={
-						<div
+						<button
 							className="flex flex-row items-center gap-2 cursor-pointer hover:opacity-80 p-3 rounded-lg hover:bg-white/5 "
 							onClick={async () => {
 								setEditingStates((p) => ({ ...p, titlePriceRoomsSqFeet: !p.titlePriceRoomsSqFeet }));
 							}}
 						>
 							<Pencil className="w-4 h-4" />
-						</div>
+						</button>
 					}
 				/>
 			)}
@@ -134,14 +141,14 @@ export function EditPropertyComponent<T extends Partial<PropertyObject> | Proper
 				<DescriptionSection
 					property={property}
 					additionalComponent={
-						<div
+						<button
 							className="flex flex-row items-center gap-2 cursor-pointer hover:opacity-80 p-3 rounded-lg hover:bg-white/5 "
 							onClick={async () => {
 								setEditingStates((p) => ({ ...p, description: !p.description }));
 							}}
 						>
 							<Pencil className="w-4 h-4" />
-						</div>
+						</button>
 					}
 				/>
 			)}
@@ -161,14 +168,14 @@ export function EditPropertyComponent<T extends Partial<PropertyObject> | Proper
 				<LocationSection
 					property={property}
 					additionalComponent={
-						<div
+						<button
 							className="flex flex-row items-center gap-2 cursor-pointer hover:opacity-80 p-3 rounded-lg hover:bg-white/5 "
 							onClick={async () => {
 								setEditingStates((p) => ({ ...p, location: !p.location }));
 							}}
 						>
 							<Pencil className="w-4 h-4" />
-						</div>
+						</button>
 					}
 				/>
 			)}
@@ -188,21 +195,60 @@ export function EditPropertyComponent<T extends Partial<PropertyObject> | Proper
 				<FeaturesSection
 					property={property}
 					additionalComponent={
-						<div
+						<button
 							className="flex flex-row items-center gap-2 cursor-pointer hover:opacity-80 p-3 rounded-lg hover:bg-white/5 "
 							onClick={async () => {
 								setEditingStates((p) => ({ ...p, facilities: !p.facilities }));
 							}}
 						>
 							<Pencil className="w-4 h-4" />
-						</div>
+						</button>
 					}
 				/>
+			)}
+
+			{editingStates.customPhoneNumber ? (
+				<div className="mx-4">
+					<PhoneInput
+						id="customPhoneNumber"
+						defaultCountry="RO"
+						name={t("customPhoneNumber.label")}
+						placeholder="07xxxxxxxx"
+						onChange={(e) => onPropertyChange({ ...property, customPhoneNumber: e })}
+						value={property.customPhoneNumber}
+					/>
+					<Button
+						className="w-full mt-2 bg-gradient-to-br from-[#4C7CED] to-[#7B31DC] text-white text-xs px-4 py-2 rounded-[6px]"
+						onClick={() => setEditingStates((p) => ({ ...p, customPhoneNumber: false }))}
+					>
+						{t("customPhoneNumber.done")}
+					</Button>
+				</div>
+			) : (
+				<div className="flex flex-col gap-2 mx-4">
+					<div className="flex flex-row items-center">
+						<h3 className="text-xl">{t("customPhoneNumber.title")}:</h3>
+						<button
+							className="flex flex-row items-center gap-2 cursor-pointer hover:opacity-80 p-3 rounded-lg hover:bg-white/5 "
+							onClick={async () => {
+								setEditingStates((p) => ({ ...p, customPhoneNumber: !p.customPhoneNumber }));
+							}}
+						>
+							<Pencil className="w-4 h-4" />
+						</button>
+					</div>
+					{property.customPhoneNumber ? (
+						<h4 className="text-base">{property.customPhoneNumber}</h4>
+					) : (
+						<h4 className="text-base">{t("customPhoneNumber.notSet")}</h4>
+					)}
+				</div>
 			)}
 
 			{!editingStates.titlePriceRoomsSqFeet &&
 				!editingStates.description &&
 				!editingStates.location &&
+				!editingStates.customPhoneNumber &&
 				!editingStates.facilities && (
 					<div className={`pb-20 md:pb-5 sticky bottom-10 md:bottom-0 ${!landingPage && "bg-[#0E0118]"} px-4`}>
 						<Button

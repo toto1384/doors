@@ -12,8 +12,8 @@ import i18n from "../i18n";
 import { ChatComponent } from "./chatComponent";
 import { useChooseActions } from "./useChooseActionsAiHook";
 import { useSetPropertyFunctions } from "./usePostPropertyAiHook";
-// import { useConversation as uc } from 'utils/hooks/mockElevenlabsHook';
-// const useConversation = uc({ flow: 'buyer' })
+// import { useConversation as uc } from "@/utils/hooks/mockElevenlabsHook";
+// const useConversation = uc({ flow: "seller" });
 
 export type MessageType = { source: "user" | "ai"; message: string | ReactNode; id: string };
 

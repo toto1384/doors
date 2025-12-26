@@ -168,6 +168,8 @@ const ToPostPropertySchemaZod = {
 
 	tags: z.array(z.string()).default([]).optional(),
 
+	customPhoneNumber: z.string().regex(phoneRegex).optional(),
+
 	status: z.enum(PropertyStatusValues).default("available"),
 };
 

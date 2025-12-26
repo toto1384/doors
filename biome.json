@@ -1,17 +1,25 @@
 {
-  "formatter": {
-    "lineWidth": 120
-  },
-  "javascript": {
-    "formatter": {
-      "quoteStyle": "double"
-    }
-  },
-    "assist": {
-    "actions": {
-      "source": {
-        "organizeImports": "on"
-      }
-    }
-  }
+	"formatter": {
+		"lineWidth": 120
+	},
+	"javascript": {
+		"formatter": {
+			"quoteStyle": "double"
+		}
+	},
+	"assist": {
+		"actions": {
+			"source": {
+				"organizeImports": "on"
+			}
+		}
+	},
+	"linter": {
+		"rules": {
+			"a11y": {
+				"useKeyWithClickEvents": "off",
+				"useButtonType": "off"
+			}
+		}
+	}
 }
